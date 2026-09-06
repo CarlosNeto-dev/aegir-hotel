@@ -13,8 +13,8 @@
     └── devcontainer.json     # web-client dev-container
 ```
 
-> This is **step 1** of the contributor workflow — diagrams in
-> [`../.github/README.md`](../.github/README.md) and [`../README.md`](../README.md).
+> This is **step 1** of the contributor workflow — full guide in
+> [`../.github/CONTRIBUTING.md`](../.github/CONTRIBUTING.md).
 
 ---
 
@@ -69,7 +69,7 @@ container, it gets a sibling folder and the editor shows a picker on
 ## 🧭 Related docs
 
 [🏠 Project overview](../README.md) ·
-[🤝 Contribution workflow](../.github/README.md) ·
+[🤝 Contribution workflow](../.github/CONTRIBUTING.md) ·
 [🎨 app/](../app/README.md) ·
 [🐳 docker/](../docker/README.md) ·
 [🤖 CLAUDE.md](CLAUDE.md)

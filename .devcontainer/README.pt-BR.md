@@ -13,9 +13,8 @@
     └── devcontainer.json     # dev-container do cliente web
 ```
 
-> Este é o **passo 1** do fluxo de contribuição — diagramas em
-> [`../.github/README.pt-BR.md`](../.github/README.pt-BR.md) e
-> [`../README.pt-BR.md`](../README.pt-BR.md).
+> Este é o **passo 1** do fluxo de contribuição — guia completo em
+> [`../.github/CONTRIBUTING.pt-BR.md`](../.github/CONTRIBUTING.pt-BR.md).
 
 ---
 
@@ -69,7 +68,7 @@ seletor no "Reopen in Container".
 ## 🧭 Documentação relacionada
 
 [🏠 Visão geral](../README.pt-BR.md) ·
-[🤝 Fluxo de contribuição](../.github/README.pt-BR.md) ·
+[🤝 Fluxo de contribuição](../.github/CONTRIBUTING.pt-BR.md) ·
 [🎨 app/](../app/README.pt-BR.md) ·
 [🐳 docker/](../docker/README.pt-BR.md) ·
 [🤖 CLAUDE.md](CLAUDE.md)

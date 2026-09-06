@@ -138,7 +138,7 @@ docker compose down          # ou  down -v  para remover volumes também
 ## 🧭 Documentação relacionada
 
 [🏠 Visão geral](../README.pt-BR.md) ·
-[🤝 Fluxo de contribuição](../.github/README.pt-BR.md) ·
+[🤝 Fluxo de contribuição](../.github/CONTRIBUTING.pt-BR.md) ·
 [🎨 app/](../app/README.pt-BR.md) ·
 [🧩 .devcontainer/](../.devcontainer/README.pt-BR.md) ·
 [🤖 CLAUDE.md](CLAUDE.md)

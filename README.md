@@ -54,7 +54,7 @@ is already wired (opt-in) for that work.
 ```
 aegir-hotel/
 ├── .github/
-│   ├── README.md · README.pt-BR.md   # 📘 THE workflow guide (branches · issues · PRs · release)
+│   ├── CONTRIBUTING.md · CONTRIBUTING.pt-BR.md   # 📘 THE workflow guide (branches · issues · PRs · release)
 │   ├── CLAUDE.md                      # agent notes for CI / templates
 │   ├── CODEOWNERS                     # required reviewers per path (5-person roster)
 │   ├── ISSUE_TEMPLATE/                # bug / feature / task forms (GitHub Projects)
@@ -161,7 +161,7 @@ The **entire contribution workflow** — dev environment, branch model, issues &
 GitHub Projects, pull requests, versioning and the release pipeline — lives in
 one place:
 
-### → [`.github/README.md`](.github/README.md) · [Português](.github/README.pt-BR.md)
+### → [`.github/CONTRIBUTING.md`](.github/CONTRIBUTING.md) · [Português](.github/CONTRIBUTING.pt-BR.md)
 
 In short: work on a fork, branch off `develop`, open a PR, get a
 [CODEOWNERS](.github/CODEOWNERS) review from Neto, and a `v*.*.*` tag on `main`
@@ -175,7 +175,7 @@ GitHub Release.
 | File | Contents |
 |------|----------|
 | `README.md` · [`README.pt-BR.md`](README.pt-BR.md) | project overview (this page) |
-| [`.github/README.md`](.github/README.md) · [pt-BR](.github/README.pt-BR.md) | **the workflow guide**: environment, branches, issues, PRs, releases |
+| [`.github/CONTRIBUTING.md`](.github/CONTRIBUTING.md) · [pt-BR](.github/CONTRIBUTING.pt-BR.md) | **the workflow guide**: environment, branches, issues, PRs, releases |
 | [`app/README.md`](app/README.md) · [pt-BR](app/README.pt-BR.md) | folder structure + step-by-step app bootstrap guide |
 | [`docker/README.md`](docker/README.md) · [pt-BR](docker/README.pt-BR.md) | images, Compose, GPU, hot-reload workflow, troubleshooting |
 | [`.devcontainer/README.md`](.devcontainer/README.md) · [pt-BR](.devcontainer/README.pt-BR.md) | the VS Code dev-container |

@@ -56,7 +56,7 @@ trabalho.
 ```
 aegir-hotel/
 ├── .github/
-│   ├── README.md · README.pt-BR.md   # 📘 O guia de fluxo (branches · issues · PRs · release)
+│   ├── CONTRIBUTING.md · CONTRIBUTING.pt-BR.md   # 📘 O guia de fluxo (branches · issues · PRs · release)
 │   ├── CLAUDE.md                      # notas do agente para CI / templates
 │   ├── CODEOWNERS                     # revisores obrigatórios por path (roster de 5)
 │   ├── ISSUE_TEMPLATE/                # formulários bug / feature / task (GitHub Projects)
@@ -164,7 +164,7 @@ apagam o arquivo de override). Detalhe em
 GitHub Projects, pull requests, versionamento e o pipeline de release — está num
 único lugar:
 
-### → [`.github/README.pt-BR.md`](.github/README.pt-BR.md) · [English](.github/README.md)
+### → [`.github/CONTRIBUTING.pt-BR.md`](.github/CONTRIBUTING.pt-BR.md) · [English](.github/CONTRIBUTING.md)
 
 Resumindo: trabalhe num fork, saia de `develop`, abra um PR, receba uma revisão
 de [CODEOWNERS](.github/CODEOWNERS) do Neto, e uma tag `v*.*.*` na `main` dispara
@@ -178,7 +178,7 @@ Release.
 | Arquivo | Conteúdo |
 |---------|----------|
 | [`README.md`](README.md) · `README.pt-BR.md` | visão geral do projeto (esta página) |
-| [`.github/README.pt-BR.md`](.github/README.pt-BR.md) · [en](.github/README.md) | **o guia de fluxo**: ambiente, branches, issues, PRs, releases |
+| [`.github/CONTRIBUTING.pt-BR.md`](.github/CONTRIBUTING.pt-BR.md) · [en](.github/CONTRIBUTING.md) | **o guia de fluxo**: ambiente, branches, issues, PRs, releases |
 | [`app/README.pt-BR.md`](app/README.pt-BR.md) · [en](app/README.md) | estrutura de pastas + guia passo a passo da aplicação |
 | [`docker/README.pt-BR.md`](docker/README.pt-BR.md) · [en](docker/README.md) | imagens, Compose, GPU, fluxo de hot-reload, solução de problemas |
 | [`.devcontainer/README.pt-BR.md`](.devcontainer/README.pt-BR.md) · [en](.devcontainer/README.md) | o dev-container do VS Code |

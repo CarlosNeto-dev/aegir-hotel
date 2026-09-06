@@ -137,7 +137,7 @@ docker compose down          # or  down -v  to also drop volumes
 ## 🧭 Related docs
 
 [🏠 Project overview](../README.md) ·
-[🤝 Contribution workflow](../.github/README.md) ·
+[🤝 Contribution workflow](../.github/CONTRIBUTING.md) ·
 [🎨 app/](../app/README.md) ·
 [🧩 .devcontainer/](../.devcontainer/README.md) ·
 [🤖 CLAUDE.md](CLAUDE.md)

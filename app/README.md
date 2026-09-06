@@ -320,7 +320,7 @@ Docker bind mounts from Windows/WSL2/macOS do not deliver file events otherwise.
 ## 🧭 Related docs
 
 [🏠 Project overview](../README.md) ·
-[🤝 Contribution workflow](../.github/README.md) ·
+[🤝 Contribution workflow](../.github/CONTRIBUTING.md) ·
 [🐳 docker/](../docker/README.md) ·
 [🧩 .devcontainer/](../.devcontainer/README.md) ·
 [🤖 CLAUDE.md](CLAUDE.md)
