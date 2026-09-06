@@ -7,8 +7,7 @@ Agent notes for the CI / community-health files. Root guidance:
 
 | File | Notes |
 |------|-------|
-| `README.md` / `README.pt-BR.md` | **the** workflow guide (branches, issues, PRs, release). Overrides the root README on the repo home page — keep it that way unless the user says otherwise. **Diagrams removed on request** — `<!-- diagram (...) removed ... -->` placeholders mark where 5 go (flowchart, gitGraph, stateDiagram, 2 sequenceDiagrams). Only this file gets diagrams, and only when the user asks. |
-| `CONTRIBUTING.md` | 6-line redirect to `README.md`. Do not expand it. |
+| `CONTRIBUTING.md` / `CONTRIBUTING.pt-BR.md` | **the** workflow guide (branches, issues, PRs, release). GitHub surfaces it as the repo's "Contributing guidelines". **Do NOT rename it to `README.md`** — that would replace the root README as the repo home page. **Diagrams removed on request** — `<!-- diagram (...) removed ... -->` placeholders mark where 5 go (flowchart, gitGraph, stateDiagram, 2 sequenceDiagrams). Re-add only here, only when the user asks. |
 | `CODEOWNERS` | 5 handles: `@CarlosNeto-dev` + `@member-2..5` (placeholders). Keep the roster at 5+; keep the comment block's role list in sync with the rules. |
 | `ISSUE_TEMPLATE/*.yml` | GitHub issue **forms**. `render:` only accepts `shell` + linguist languages (not `markdown`). `projects:` is commented out — real value is `owner/number`. |
 | `PULL_REQUEST_TEMPLATE.md` | checklist mirrors the release pipeline steps. |
@@ -17,9 +16,9 @@ Agent notes for the CI / community-health files. Root guidance:
 ## Rules
 
 - Diagrams are **removed for now** (user: "depois eu mando você colocar"). When
-  the user asks, re-add them **only** at the placeholders in `README.md` +
-  `README.pt-BR.md` here — never in the root README or `../CLAUDE.md`. After any
-  diagram edit run `bash ../scripts/check-docs.sh`.
+  the user asks, re-add them **only** at the placeholders in `CONTRIBUTING.md` +
+  `CONTRIBUTING.pt-BR.md` here — never in the root README or `../CLAUDE.md`.
+  After any diagram edit run `bash ../scripts/check-docs.sh`.
 - **Mermaid must stay ultra-conservative** — the user hit renderer errors twice
   (GitHub / IDE preview). Rules that broke things and are now banned:
   - gitGraph: no `/` in branch names; **no `merge <branch> tag:`**; **never

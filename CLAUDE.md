@@ -22,7 +22,7 @@ holds the folder skeleton only.
 | `app/src/` | feature-first: `Foo.tsx` + `Foo.module.scss` + `Foo.test.tsx` co-located. `src/styles/` is **global SCSS only**. |
 | `docker/` | `Dockerfile.frontend` (multi-stage), `docker-compose.yml`, `docker-compose.override.yml` (GPU), `.env`. |
 | `.devcontainer/frontend/` | VS Code dev-container, reuses the compose file. |
-| `.github/` | `CODEOWNERS`, issue/PR templates, `workflows/release.yml` (CI **only** on `v*.*.*` tags), and `README.md` = the workflow guide. |
+| `.github/` | `CODEOWNERS`, issue/PR templates, `workflows/release.yml` (CI **only** on `v*.*.*` tags), and `CONTRIBUTING.md` (+ `.pt-BR`) = the workflow guide. No `README.md` here — it would replace the root README as the repo home page. |
 | `.dockerignore` | at repo root because compose build `context: ..`. |
 | `scripts/check-docs.sh` | validates every Mermaid diagram + local links. Run it after touching any `.md`. |
 
@@ -33,24 +33,25 @@ holds the folder skeleton only.
 - Every folder also has a `CLAUDE.md` (English, agent-facing, this format).
 - Every folder README ends with a **🧭 Related docs** nav linking the siblings +
   the other language. Keep it present and correct.
+- **Never create `.github/README.md`** — GitHub's README precedence is
+  `.github/` → root → `docs/`, so a `.github/README.md` silently replaces the
+  root README as the repo home page. The workflow guide lives in
+  `.github/CONTRIBUTING.md` (+ `.pt-BR`) instead.
 - **Mermaid diagrams are currently REMOVED at the user's request** ("depois eu
-  mando você colocar"). HTML-comment placeholders in `.github/README.md` +
-  `.github/README.pt-BR.md` mark where 5 go (flowchart, gitGraph, stateDiagram,
-  2 sequenceDiagrams). Root README, its pt-BR and CLAUDE.md stay diagram-free.
-  Do not re-add any diagram until the user asks; when they do, put them only at
-  those `.github/` placeholders.
+  mando você colocar"). HTML-comment placeholders in `.github/CONTRIBUTING.md` +
+  `.github/CONTRIBUTING.pt-BR.md` mark where 5 go (flowchart, gitGraph,
+  stateDiagram, 2 sequenceDiagrams). Root README, its pt-BR and CLAUDE.md stay
+  diagram-free. Re-add only at those `.github/` placeholders, only when asked.
 - When diagrams return: conservative Mermaid only — ASCII labels (no
   `<` `>` `#` `·` `→` `—`, no emoji), no `subgraph`; gitGraph without `/` in
   branch names, no `merge <branch> tag:`, never `id:` + `tag:` on one `commit`.
   Validated on mermaid-cli 10.2 → 11.4. Any diagram edit → `bash scripts/check-docs.sh`.
-- `.github/README.md` **overrides the root README** on the repo home page — this
-  is intended; don't "fix" it without the user asking.
 
 ## Workflow
 
 The **entire** git flow (branches, issues, PRs, versioning, release) lives in
-**[`.github/README.md`](.github/README.md)** — do not restate or diagram it here
-or in the root README. One-liner for orientation: work on a fork, branch off
+**[`.github/CONTRIBUTING.md`](.github/CONTRIBUTING.md)** — do not restate or
+diagram it here or in the root README. One-liner for orientation: work on a fork, branch off
 `develop`, PR into `develop`, CODEOWNERS review by Neto, a `v*.*.*` tag on `main`
 triggers `release.yml` which publishes the GitHub Release.
 

@@ -1,4 +1,4 @@
-# 🤝 `.github/` — automação & fluxo de contribuição
+# 🤝 Contribuindo com o Aegir Hotel
 
 <p>
   <img alt="CI" src="https://img.shields.io/badge/CI-por%20tag-2088FF?logo=githubactions&logoColor=white">
@@ -7,22 +7,17 @@
   <img alt="Versioning" src="https://img.shields.io/badge/versionamento-SemVer%20(v*)-orange">
 </p>
 
-**🌐 Idioma:** [English](README.md) · **Português**
+**🌐 Idioma:** [English](CONTRIBUTING.md) · **Português**
 
-Esta pasta guarda os arquivos de automação e de saúde do repositório, e esta
-página é a **fonte única da verdade do fluxo de contribuição**: ambiente de dev,
-branches, issues, pull requests, versionamento e releases.
+A **fonte única da verdade do fluxo de contribuição**: ambiente de dev, branches,
+issues, pull requests, versionamento e releases. A visão geral do projeto está no
+[`README.pt-BR.md`](../README.pt-BR.md) da raiz.
 
-> ⚠️ O GitHub exibe o `.github/README.md` **no lugar** do `README.md` da raiz na
-> página inicial do repositório (precedência: `.github/` → raiz → `docs/`). Isso
-> é intencional aqui — o contribuidor cai direto no fluxo. A visão geral do
-> projeto está em [`../README.pt-BR.md`](../README.pt-BR.md).
->
 > _Os diagramas do fluxo foram removidos temporariamente e serão readicionados aqui._
 
 ---
 
-## 📁 O que tem nesta pasta
+## 📁 O que tem em `.github/`
 
 | Caminho | Finalidade |
 |---------|------------|
@@ -162,4 +157,4 @@ para a tag. **Esse Release é o artefato final entregável.**
 [🐳 docker/](../docker/README.pt-BR.md) ·
 [🧩 .devcontainer/](../.devcontainer/README.pt-BR.md) ·
 [🤖 CLAUDE.md](../CLAUDE.md)
-&nbsp;&nbsp;|&nbsp;&nbsp; 🇬🇧 [English](README.md)
+&nbsp;&nbsp;|&nbsp;&nbsp; 🇬🇧 [English](CONTRIBUTING.md)

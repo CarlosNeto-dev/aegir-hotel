@@ -323,7 +323,7 @@ forma.
 ## 🧭 Documentação relacionada
 
 [🏠 Visão geral](../README.pt-BR.md) ·
-[🤝 Fluxo de contribuição](../.github/README.pt-BR.md) ·
+[🤝 Fluxo de contribuição](../.github/CONTRIBUTING.pt-BR.md) ·
 [🐳 docker/](../docker/README.pt-BR.md) ·
 [🧩 .devcontainer/](../.devcontainer/README.pt-BR.md) ·
 [🤖 CLAUDE.md](CLAUDE.md)
