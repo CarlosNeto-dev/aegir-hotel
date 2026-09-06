@@ -1,0 +1,63 @@
+name: 🧩 Task / Tarefa (GitHub Projects)
+description: A concrete unit of work tracked on the board. / Unidade concreta de trabalho no board.
+title: "[task]: "
+labels: ["task"]
+# projects: ["CarlosNeto-dev/1"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this for planned work that already has a clear scope (no triage needed).
+        It maps 1:1 to a card in the GitHub Project.
+        _Use para trabalho planejado com escopo claro. Vira um card no GitHub Projects._
+
+  - type: textarea
+    id: goal
+    attributes:
+      label: Goal / Objetivo
+      description: One or two sentences. What will exist after this is done?
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area / Área
+      options:
+        - app (React / TS / SCSS)
+        - animation (GSAP)
+        - 3D (react-three-fiber / Blender)
+        - docker / compose
+        - dev-container
+        - CI / release
+        - docs
+    validations:
+      required: true
+
+  - type: input
+    id: milestone
+    attributes:
+      label: Target version / Versão alvo
+      placeholder: v0.3.0
+
+  - type: textarea
+    id: subtasks
+    attributes:
+      label: Sub-tasks / Subtarefas
+      value: |
+        - [ ] Implementation
+        - [ ] Tests
+        - [ ] Docs / README updated
+    validations:
+      required: true
+
+  - type: textarea
+    id: done
+    attributes:
+      label: Definition of done / Definição de pronto
+      value: |
+        - [ ] `npm run lint && npm run typecheck && npm run test && npm run build` all pass
+        - [ ] PR merged into `develop`
+        - [ ] This issue auto-closed by the PR (`Closes #<id>`)
+    validations:
+      required: true

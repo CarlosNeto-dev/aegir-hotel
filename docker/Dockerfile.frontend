@@ -1,0 +1,174 @@
+# syntax=docker/dockerfile:1
+
+# =============================================================================
+#  Dockerfile.frontend - Aegir Hotel web client
+# -----------------------------------------------------------------------------
+#  Stack served by this image:
+#    - React + TypeScript          (application code)
+#    - SCSS                        (styling)
+#    - GSAP                        (animation)
+#    - react-three-fiber / three   (3D scenes - added later)
+#    - Blender-exported .glb/.gltf (3D assets - added later)
+#
+#  Multi-stage layout (each stage is a `--target` you can build):
+#
+#    base        Only the Node.js runtime + WORKDIR. The single place the
+#                Node version is defined; every other stage builds FROM it.
+#
+#    debugger    base + test runners, debuggers and diagnostic tooling.
+#                This is the image used for local development and CI.
+#
+#    build       Helper stage. Compiles TS/React/SCSS into static assets.
+#                Never shipped - only its /app/dist output is copied forward.
+#
+#    production  Lean, self-contained static file server (nginx-alpine).
+#                No Node.js, no sources, no dev dependencies.
+#
+#  Build examples:
+#    docker build -f docker/Dockerfile.frontend --target debugger  -t aegir-web:dev  .
+#    docker build -f docker/Dockerfile.frontend --target production -t aegir-web:prod .
+# =============================================================================
+
+
+# -----------------------------------------------------------------------------
+#  Global build arguments - override from docker-compose.yml, .env or --build-arg.
+#  Declared once here; each stage re-declares the ones it uses because Docker
+#  resets the ARG scope at every FROM.
+# -----------------------------------------------------------------------------
+ARG NODE_VERSION=24
+ARG NODE_IMAGE=node:${NODE_VERSION}-bookworm-slim
+ARG NGINX_IMAGE=nginx:1.27-alpine
+ARG APP_DIR=/app
+
+#  Network ports - kept in one place so the Dockerfile, docker-compose.yml and
+#  .devcontainer/devcontainer.json all agree on the same numbers:
+#    WEB_DEV_PORT      5173   website  - Vite dev server (hot reload)
+#    WEB_PREVIEW_PORT  4173   website  - `vite preview` (production-like preview)
+#    WEB_PROD_PORT     80     website  - nginx in the production image
+#    TEST_UI_PORT      51204  tests    - Vitest UI dashboard
+#    NODE_DEBUG_PORT   9229   debug    - Node.js inspector (chrome://inspect)
+ARG WEB_DEV_PORT=5173
+ARG WEB_PREVIEW_PORT=4173
+ARG WEB_PROD_PORT=80
+ARG TEST_UI_PORT=51204
+ARG NODE_DEBUG_PORT=9229
+
+
+# =============================================================================
+#  Stage 1 - base
+#  Nothing but the Node.js runtime and the working directory.
+# =============================================================================
+FROM ${NODE_IMAGE} AS base
+
+ARG APP_DIR
+WORKDIR ${APP_DIR}
+
+# Sane defaults inherited by every downstream stage.
+ENV NODE_ENV=development \
+    npm_config_fund=false \
+    npm_config_audit=false
+
+
+# =============================================================================
+#  Stage 2 - debugger
+#  Same base image, plus everything needed to run, test and debug the app.
+#  Used by docker-compose (the `website` and `tests` services) and by CI.
+# =============================================================================
+FROM base AS debugger
+
+# --- OS-level tools handy when shelling into a running container --------------
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        git \
+        curl \
+        wget \
+        procps \
+        ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+# --- Global Node.js helpers on PATH -----------------------------------------
+#  Test runners (vitest, @vitest/ui) come from the project's package.json so the
+#  versions stay pinned there. Only truly project-agnostic helpers go here.
+#  npm is NOT upgraded: the version bundled with the Node image is used as-is
+#  (it blocks package install-scripts by default — approve any that are really
+#  needed with `npm install-scripts approve <pkg>`).
+RUN npm install -g \
+        serve \
+        source-map-explorer
+
+# Re-declare the port args so EXPOSE can see them, and promote the runtime one
+# to ENV so HEALTHCHECK (evaluated when the container runs) can read it too.
+ARG WEB_DEV_PORT
+ARG WEB_PREVIEW_PORT
+ARG TEST_UI_PORT
+ARG NODE_DEBUG_PORT
+
+# Documented ports (numbers/purpose listed in the ARG block at the top):
+#   website - Vite dev server (hot module reload)
+EXPOSE ${WEB_DEV_PORT}
+#   website - `vite preview` production-like preview
+EXPOSE ${WEB_PREVIEW_PORT}
+#   tests   - Vitest UI dashboard
+EXPOSE ${TEST_UI_PORT}
+#   debug   - Node.js inspector, attach from the host
+EXPOSE ${NODE_DEBUG_PORT}
+
+# Container-level liveness probe (docker-compose defines its own as well).
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+    CMD node -e "process.exit(0)" || exit 1
+
+# Overridden by docker-compose. Typical local commands:
+#   npm run dev                                  -> website (serves WEB_DEV_PORT)
+#   npm run test -- --ui --api.port TEST_UI_PORT -> tests   (serves TEST_UI_PORT)
+CMD ["npm", "run", "dev"]
+
+
+# =============================================================================
+#  Stage 3 - build (helper, not shipped)
+#  Produces the static site in /app/dist.
+#  Requires app/package.json (+ lock file). Until those exist, build only the
+#  `debugger` target above.
+# =============================================================================
+FROM base AS build
+
+ENV NODE_ENV=production
+
+# Copy manifests first so `npm ci` stays cached until dependencies change.
+COPY app/package*.json ./
+RUN npm ci
+
+# Then the sources, and compile.
+COPY app/ ./
+RUN npm run build
+
+
+# =============================================================================
+#  Stage 4 - production
+#  Minimal static file server. Ships only the compiled site.
+# =============================================================================
+FROM ${NGINX_IMAGE} AS production
+
+ARG WEB_PROD_PORT
+# Promote to ENV: needed by the nginx config below and by HEALTHCHECK at runtime.
+ENV WEB_PROD_PORT=${WEB_PROD_PORT}
+
+# Static build output from the `build` stage.
+COPY --from=build /app/dist /usr/share/nginx/html
+
+# SPA routing: unknown paths fall back to index.html (React Router friendly),
+# hashed asset files get long-lived immutable caching.
+RUN printf '%s\n' \
+    'server {' \
+    "  listen ${WEB_PROD_PORT};" \
+    '  server_tokens off;' \
+    '  root /usr/share/nginx/html;' \
+    '  location / { try_files $uri $uri/ /index.html; }' \
+    '  location /assets/ { expires 1y; add_header Cache-Control "public, immutable"; }' \
+    '}' > /etc/nginx/conf.d/default.conf
+
+# website - production build served by nginx
+EXPOSE ${WEB_PROD_PORT}
+
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+    CMD wget --quiet --tries=1 --spider "http://localhost:${WEB_PROD_PORT}/" || exit 1
+
+CMD ["nginx", "-g", "daemon off;"]

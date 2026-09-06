@@ -1,0 +1,83 @@
+name: 🐞 Bug report / Relato de bug
+description: Something is broken. / Algo está quebrado.
+title: "[bug]: "
+labels: ["bug", "triage"]
+# Add the issue to a GitHub Project automatically (replace with your project ref):
+# projects: ["CarlosNeto-dev/1"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the report! Fill every field — it saves a round-trip.
+        _Obrigado pelo relato! Preencha todos os campos._
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened? / O que aconteceu?
+      description: A clear description of the bug and what you expected instead.
+      placeholder: When I edit a .scss file, the browser does not update...
+    validations:
+      required: true
+
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce / Passos para reproduzir
+      value: |
+        1. `cd docker && docker compose -f docker-compose.yml up`
+        2. ...
+        3. See error
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Version / Versão
+      description: Git tag, or commit SHA if untagged.
+      placeholder: v0.2.1  ·  or  ·  a1b2c3d
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area / Área
+      options:
+        - app (React / TS / SCSS)
+        - docker / compose
+        - dev-container
+        - CI / release
+        - docs
+        - other
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment / Ambiente
+      value: |
+        - OS:
+        - Docker version (`docker version`):
+        - Running via: [ ] Docker Compose  [ ] dev-container  [ ] local Node
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs / console output
+      description: Paste relevant `docker compose logs` output. It is rendered as code.
+      render: shell
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before submitting / Antes de enviar
+      options:
+        - label: I searched existing issues and this is not a duplicate.
+          required: true
+        - label: I am on the latest `develop` (or a released tag).
+          required: true

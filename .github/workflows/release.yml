@@ -1,0 +1,140 @@
+# =============================================================================
+#  Release · Aegir Hotel
+# -----------------------------------------------------------------------------
+#  Runs ONLY when a semver tag is pushed:
+#      git tag v1.2.3   &&   git push origin v1.2.3
+#
+#  Pipeline:  detect → quality (lint · typecheck · test · build) → release
+#
+#  Nothing runs on branch pushes or PRs — this is the release gate only.
+#  Until `app/package.json` exists, `quality` is skipped and the workflow still
+#  publishes a GitHub Release for the tag.
+# =============================================================================
+
+name: Release
+
+on:
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+"        # v1.2.3
+      - "v[0-9]+.[0-9]+.[0-9]+-*"      # v1.2.3-rc.1, v1.2.3-beta.2
+
+permissions:
+  contents: write                     # create the Release + upload assets
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  # ---------------------------------------------------------------------------
+  detect:
+    name: Detect project
+    runs-on: ubuntu-latest
+    outputs:
+      has_app: ${{ steps.check.outputs.has_app }}
+      node_version: ${{ steps.node.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: check
+        name: Is there an app to build?
+        run: |
+          if [ -f app/package.json ]; then
+            echo "has_app=true"  >> "$GITHUB_OUTPUT"
+          else
+            echo "has_app=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::app/package.json not found — quality checks will be skipped."
+          fi
+
+      - id: node
+        name: Read Node version from docker/.env.example
+        run: |
+          v="$(grep -E '^NODE_VERSION=' docker/.env.example | cut -d= -f2 | tr -d '[:space:]')"
+          echo "version=${v:-24}" >> "$GITHUB_OUTPUT"
+
+  # ---------------------------------------------------------------------------
+  quality:
+    name: Lint · Typecheck · Test · Build
+    needs: detect
+    if: needs.detect.outputs.has_app == 'true'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ needs.detect.outputs.node_version }}
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+
+      - name: Install (clean)
+        run: npm ci
+
+      - name: Lint (ESLint)
+        run: npm run lint --if-present
+
+      - name: Format check (Prettier)
+        run: npm run format:check --if-present
+
+      - name: Typecheck (tsc)
+        run: npm run typecheck --if-present
+
+      - name: Unit tests (Vitest)
+        run: npm run test --if-present
+
+      - name: Dependency audit (advisory)
+        run: npm audit --audit-level=high || true
+
+      - name: Production build (Vite)
+        run: npm run build --if-present
+
+      - name: Upload build output
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: app/dist
+          if-no-files-found: warn
+          retention-days: 7
+
+  # ---------------------------------------------------------------------------
+  release:
+    name: Publish GitHub Release
+    needs: [detect, quality]
+    if: always() && (needs.quality.result == 'success' || needs.quality.result == 'skipped')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download build output
+        if: needs.detect.outputs.has_app == 'true'
+        continue-on-error: true        # no artifact yet if there is no build script
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
+
+      - name: Package build output
+        if: needs.detect.outputs.has_app == 'true'
+        run: |
+          if [ -d dist ] && [ -n "$(ls -A dist 2>/dev/null)" ]; then
+            zip -r "aegir-hotel-${GITHUB_REF_NAME}.zip" dist
+          fi
+
+      - name: Create release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          prerelease=""
+          case "${GITHUB_REF_NAME}" in *-*) prerelease="--prerelease";; esac
+          assets="$(ls aegir-hotel-*.zip 2>/dev/null || true)"
+          gh release create "${GITHUB_REF_NAME}" \
+            --title "${GITHUB_REF_NAME}" \
+            --generate-notes \
+            $prerelease \
+            $assets

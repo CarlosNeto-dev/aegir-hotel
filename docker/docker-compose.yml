@@ -1,0 +1,104 @@
+# =============================================================================
+#  docker-compose.yml · Aegir Hotel — local orchestration (frontend only)
+# -----------------------------------------------------------------------------
+#  Services
+#    website  → the React app (Vite dev server, hot reload)
+#    tests    → the Vitest runner + UI; starts after `website`
+#
+#  Design
+#    · Every tunable value is an env var with a default → edit docker/.env only.
+#    · Shared config lives in YAML anchors (`x-*`) merged with `<<:` → DRY.
+#    · Both services bind-mount ONLY ../app and run `npm install` on startup
+#      before their long-running process (no package-lock is vendored yet).
+#    · GPU passthrough is opt-in via docker-compose.override.yml (auto-merged
+#      by `docker compose up`). Machines without an NVIDIA runtime run the
+#      base file explicitly:  docker compose -f docker-compose.yml up
+#
+#  Run from this folder (docker/) so ../ paths and .env resolve:
+#    cd docker
+#    docker compose up                       # website + tests (+ GPU override)
+#    docker compose -f docker-compose.yml up  # website + tests, no GPU
+#    docker compose up website               # just the site
+# =============================================================================
+
+name: aegir-hotel
+
+# -----------------------------------------------------------------------------
+#  Reusable fragments
+# -----------------------------------------------------------------------------
+
+x-frontend-build: &frontend-build
+  context: ..                       # build context = repo root
+  dockerfile: docker/Dockerfile.frontend
+  target: ${FRONTEND_TARGET:-debugger}
+  args:
+    NODE_VERSION: ${NODE_VERSION:-24}
+    APP_DIR: ${APP_DIR:-/app}
+    WEB_DEV_PORT: ${WEB_DEV_PORT:-5173}
+    WEB_PREVIEW_PORT: ${WEB_PREVIEW_PORT:-4173}
+    TEST_UI_PORT: ${TEST_UI_PORT:-51204}
+    NODE_DEBUG_PORT: ${NODE_DEBUG_PORT:-9229}
+
+x-frontend-service: &frontend-service
+  build: *frontend-build
+  working_dir: ${APP_DIR:-/app}
+  # Volume: ONLY the application folder. Path is relative to THIS file (docker/).
+  volumes:
+    - ../app:${APP_DIR:-/app}
+  restart: unless-stopped
+
+x-frontend-healthcheck: &frontend-healthcheck
+  # "Is the container alive?" — cheap liveness probe, no HTTP dependency.
+  test: ["CMD", "node", "-e", "process.exit(0)"]
+  interval: 30s
+  timeout: 5s
+  retries: 3
+  start_period: 20s
+
+# -----------------------------------------------------------------------------
+#  Services
+# -----------------------------------------------------------------------------
+
+services:
+
+  # website — the React application (Vite dev server)
+  website:
+    <<: *frontend-service
+    container_name: aegir-website
+    environment:
+      NODE_ENV: development
+    # Install deps into the mounted volume, then start the dev server.
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0 --port ${WEB_DEV_PORT:-5173}"
+    ports:
+      # website — Vite dev server (hot reload)
+      - "${WEB_DEV_PORT:-5173}:${WEB_DEV_PORT:-5173}"
+      # website — `vite preview` production-like preview
+      - "${WEB_PREVIEW_PORT:-4173}:${WEB_PREVIEW_PORT:-4173}"
+      # debug — Node.js inspector
+      - "${NODE_DEBUG_PORT:-9229}:${NODE_DEBUG_PORT:-9229}"
+    healthcheck:
+      <<: *frontend-healthcheck
+
+  # tests — Vitest UI; waits for `website` before starting.
+  #
+  # Vitest exits (cleanly, code 0) when the project has ZERO test files, so on a
+  # fresh checkout this container starts, prints "No test files found" and stops.
+  # As soon as you add the first `*.test.tsx`, the same command keeps the UI
+  # resident on TEST_UI_PORT. `restart: on-failure` (overriding the shared
+  # `unless-stopped`) means the clean empty-project exit does NOT loop, but a
+  # real crash still recovers.
+  tests:
+    <<: *frontend-service
+    container_name: aegir-tests
+    restart: on-failure
+    environment:
+      NODE_ENV: test
+    command: sh -c "npm install && npm run test:ui -- --open=false --api.host 0.0.0.0 --api.port ${TEST_UI_PORT:-51204} --passWithNoTests"
+    depends_on:
+      website:
+        condition: service_started
+    ports:
+      # tests — Vitest UI dashboard
+      - "${TEST_UI_PORT:-51204}:${TEST_UI_PORT:-51204}"
+    healthcheck:
+      <<: *frontend-healthcheck

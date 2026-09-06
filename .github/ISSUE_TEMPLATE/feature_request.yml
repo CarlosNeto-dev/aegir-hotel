@@ -1,0 +1,61 @@
+name: ✨ Feature request / Proposta de funcionalidade
+description: Suggest a new capability or improvement. / Sugira uma nova capacidade ou melhoria.
+title: "[feat]: "
+labels: ["enhancement", "triage"]
+# projects: ["CarlosNeto-dev/1"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem / Problema
+      description: What are you trying to do that is hard or impossible today?
+      placeholder: There is no shared GSAP timeline helper, so every component re-implements...
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution / Solução proposta
+      description: Describe the change. Include component/folder names where it would live.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area / Área
+      options:
+        - app (React / TS / SCSS)
+        - animation (GSAP)
+        - 3D (react-three-fiber / Blender)
+        - docker / compose
+        - dev-container
+        - CI / release
+        - docs
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered / Alternativas consideradas
+
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria / Critérios de aceite
+      description: Checklist that tells us this issue is done.
+      value: |
+        - [ ]
+        - [ ]
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before submitting / Antes de enviar
+      options:
+        - label: I searched existing issues and discussions.
+          required: true
