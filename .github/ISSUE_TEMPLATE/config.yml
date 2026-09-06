@@ -1,0 +1,9 @@
+# Force contributors through the structured forms below (no blank issues).
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 Questions & ideas / Dúvidas e ideias
+    url: https://github.com/CarlosNeto-dev/aegir-hotel/discussions
+    about: Use Discussions for open-ended questions. Issues are for actionable work.
+  - name: 📖 Documentation / Documentação
+    url: https://github.com/CarlosNeto-dev/aegir-hotel#-documentation-map
+    about: Read the README and the per-folder guides first.

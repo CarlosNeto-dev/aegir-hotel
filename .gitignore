@@ -1,0 +1,40 @@
+# ---- Dependencies -------------------------------------------------------
+node_modules/
+.pnpm-store/
+
+# ---- Build output ------------------------------------------------------
+app/dist/
+app/build/
+*.tsbuildinfo
+
+# ---- Vite / test caches ---------------------------------------------
+.vite/
+app/coverage/
+*.local
+
+# ---- scripts/check-docs.sh scratch --------------------------------
+.docs-check-tmp/
+
+# ---- Live Sass Compiler output (generated from .scss) -----------------
+#  Remove these two lines if you decide to commit compiled CSS.
+app/src/**/*.css
+app/src/**/*.css.map
+
+# ---- Environment -----------------------------------------------------
+docker/.env
+.env
+.env.*
+!docker/.env.example
+!.env.example
+
+# ---- Editor / OS ---------------------------------------------------
+.DS_Store
+Thumbs.db
+desktop.ini
+*.log
+npm-debug.log*
+
+# ---- 3D source files (ship exported .glb/.gltf only) -----------------
+*.blend
+*.blend[0-9]
+*.fbx

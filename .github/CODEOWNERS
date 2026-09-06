@@ -1,0 +1,38 @@
+# =============================================================================
+#  CODEOWNERS · Aegir Hotel
+# -----------------------------------------------------------------------------
+#  A pull request that touches a path below automatically requests a review from
+#  the listed owners, and (with "Require review from Code Owners" branch
+#  protection on `main` / `develop`) cannot merge without their approval.
+#
+#  Order matters: the LAST matching pattern wins.
+#
+#  ⚠️ PLACEHOLDERS — replace with real GitHub usernames (or org teams like
+#     @aegir-hotel/frontend) before enabling branch protection. Roster of 5:
+#       @CarlosNeto-dev  → Neto — repository owner / final approver
+#       @member-2        → frontend (React / TypeScript / SCSS)
+#       @member-3        → frontend (animation / 3D — GSAP, react-three-fiber)
+#       @member-4        → DevOps (Docker / dev-container / CI)
+#       @member-5        → documentation
+# =============================================================================
+
+# ---- Default: everything, unless a more specific rule matches below ---------
+*                    @CarlosNeto-dev @member-2 @member-3 @member-4 @member-5
+
+# ---- Application code ------------------------------------------------------
+/app/                @CarlosNeto-dev @member-2 @member-3
+/app/src/scenes/     @CarlosNeto-dev @member-3
+/app/src/styles/     @CarlosNeto-dev @member-2
+
+# ---- Containers & environment -------------------------------------------
+/docker/             @CarlosNeto-dev @member-4
+/.devcontainer/      @CarlosNeto-dev @member-4
+/.dockerignore       @CarlosNeto-dev @member-4
+
+# ---- CI / repository automation ---------------------------------------
+/.github/            @CarlosNeto-dev @member-4
+
+# ---- Documentation ----------------------------------------------------
+*.md                 @CarlosNeto-dev @member-5
+/README.md           @CarlosNeto-dev @member-5 @member-2
+/CLAUDE.md           @CarlosNeto-dev @member-5

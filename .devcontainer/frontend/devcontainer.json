@@ -1,0 +1,61 @@
+// =============================================================================
+//  .devcontainer/frontend · dev-container for the Aegir Hotel web client.
+//
+//  Reuses docker/docker-compose.yml so the editor attaches to the very same
+//  container the project runs day to day. On "Reopen in Container" the tool:
+//    1. builds the `website` service (frontend `debugger` stage),
+//    2. starts it (plus `tests` via depends_on),
+//    3. opens a shell in /app,
+//    4. runs `npm install` after creation.
+//
+//  Ports mirror docker/docker-compose.yml and docker/.env.
+// =============================================================================
+{
+  "name": "Aegir Hotel · Web",
+
+  "dockerComposeFile": ["../../docker/docker-compose.yml"],
+  "service": "website",
+  "workspaceFolder": "/app",
+
+  // The compose command runs the dev server; override it so the editor's
+  // container stays a plain long-lived shell instead.
+  "overrideCommand": true,
+  "runServices": ["website", "tests"],
+  "shutdownAction": "stopCompose",
+
+  // Keep in sync with docker/docker-compose.yml + docker/.env.
+  "forwardPorts": [5173, 4173, 51204, 9229],
+  "portsAttributes": {
+    "5173":  { "label": "website · Vite dev",     "onAutoForward": "notify" },
+    "4173":  { "label": "website · Vite preview" },
+    "51204": { "label": "tests · Vitest UI" },
+    "9229":  { "label": "debug · Node inspector" }
+  },
+
+  "postCreateCommand": "npm install",
+  "remoteUser": "node",
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "glenn2223.live-sass",
+        "stylelint.vscode-stylelint",
+        "ms-azuretools.vscode-docker",
+        "vitest.explorer",
+        "slevesque.shader"
+      ],
+      "settings": {
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        // Live Sass Compiler — emit a CSS (+ map) sibling next to each .scss.
+        "liveSassCompile.settings.formats": [
+          { "format": "expanded", "extensionName": ".css", "savePath": "~/" }
+        ],
+        "liveSassCompile.settings.generateMap": true,
+        "liveSassCompile.settings.autoprefix": ["defaults"]
+      }
+    }
+  }
+}

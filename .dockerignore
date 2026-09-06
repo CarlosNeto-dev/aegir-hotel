@@ -1,0 +1,60 @@
+# =============================================================================
+#  .dockerignore · keeps the build context small and reproducible.
+#  Lives at the repo root because that is the build context for every image
+#  (docker/docker-compose.yml sets `context: ..`). Also honoured by a plain
+#  `docker build -f docker/Dockerfile.frontend .` run from the repo root.
+# =============================================================================
+
+# ---- Version control / editors / CI ----------------------------------
+.git
+.gitignore
+.gitattributes
+.github
+.vscode
+.idea
+*.code-workspace
+
+# ---- Docker / dev-container config (not needed inside the image) -----
+.devcontainer
+docker
+scripts
+.dockerignore
+
+# ---- Environment / secrets -----------------------------------------
+**/.env
+**/.env.*
+!**/.env.example
+
+# ---- Node --------------------------------------------------------
+**/node_modules
+**/.npm
+**/npm-debug.log*
+**/pnpm-debug.log*
+**/.pnpm-store
+**/dist
+**/build
+**/.vite
+**/coverage
+**/.eslintcache
+**/*.tsbuildinfo
+
+# ---- Live Sass Compiler output (regenerated from .scss) --------------
+**/src/**/*.css
+**/src/**/*.css.map
+
+# ---- 3D / Blender sources (heavy; only exported .glb/.gltf ship) -----
+**/*.blend
+**/*.blend[0-9]
+**/*.fbx
+**/*.abc
+
+# ---- OS noise --------------------------------------------------
+**/.DS_Store
+**/Thumbs.db
+**/desktop.ini
+
+# ---- Docs (never belong in an image) -------------------------
+**/*.log
+**/*.md
+LICENSE
+docs
