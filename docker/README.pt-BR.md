@@ -38,12 +38,12 @@ docker build -f docker/Dockerfile.frontend --target production -t aegir-web:prod
 |---------|-------------|--------|------------------|
 | `base` | `node:24-bookworm-slim` | **apenas** o runtime do Node + `WORKDIR /app` — único lugar onde a versão do Node é definida | não |
 | `debugger` | `base` | `base` + `git`, `curl`, `procps`, `serve`, `source-map-explorer` | dev / CI |
-| `build` | `base` | `npm ci` + `npm run build` → `/app/dist` | não |
+| `build` | `base` | `npm install` + `npm run build` → `/app/dist` | não |
 | `production` | `nginx:1.27-alpine` | **apenas** o site estático compilado + fallback SPA + cache de assets | ✅ |
 
 - O `debugger` é o que o Compose e o dev-container usam.
-- `build` / `production` precisam de `app/package.json` (+ lock). Num esqueleto
-  novo, só o `debugger` compila — que é tudo que o Compose precisa.
+- `build` / `production` precisam de `app/package.json`. Num esqueleto novo, só o
+  `debugger` compila — que é tudo que o Compose precisa.
 - **O npm não é atualizado** — mantém-se o que vem na imagem do Node. Ele bloqueia
   install-scripts de pacotes por padrão (ok para React / Vite / Sass / Vitest /
   GSAP). Aprove uma necessidade real com `npm install-scripts approve <pacote>`.
@@ -67,8 +67,9 @@ com `<<:`.
 | depends_on | — | `website` |
 
 - **`npm install` no comando:** as deps são instaladas no `app/` montado a cada
-  start, reconciliadas com o `app/package-lock.json` versionado. Troque o comando
-  por `npm ci` se quiser que o start falhe a qualquer divergência do lock.
+  start. Nenhum lock é versionado (`app/package-lock.json` está no
+  `.gitignore`) — o npm resolve a partir do `package.json` e grava o lock no
+  bind mount a cada execução.
 - **`user: "node"`** — a âncora compartilhada fixa os dois serviços no usuário
   não-privilegiado da imagem, a mesma identidade do dev-container (`remoteUser:
   node`). Sem isso, `docker compose up` grava um `node_modules` **do root** que um

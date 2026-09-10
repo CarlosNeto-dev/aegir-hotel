@@ -125,16 +125,18 @@ CMD ["npm", "run", "dev"]
 # =============================================================================
 #  Stage 3 - build (helper, not shipped)
 #  Produces the static site in /app/dist.
-#  Requires app/package.json (+ lock file). Until those exist, build only the
-#  `debugger` target above.
+#  Requires app/package.json. Until it exists, build only the `debugger` target
+#  above.
 # =============================================================================
 FROM base AS build
 
 ENV NODE_ENV=production
 
-# Copy manifests first so `npm ci` stays cached until dependencies change.
-COPY app/package*.json ./
-RUN npm ci
+# Copy the manifest first so the install layer stays cached until deps change.
+# No lock file is committed (it is regenerated per environment), so this is a
+# resolving `npm install`, not `npm ci`.
+COPY app/package.json ./
+RUN npm install
 
 # Then the sources, and compile.
 COPY app/ ./

@@ -69,10 +69,10 @@ jobs:
         with:
           node-version: ${{ needs.detect.outputs.node_version }}
           cache: npm
-          cache-dependency-path: app/package-lock.json
+          cache-dependency-path: app/package.json
 
-      - name: Install (clean)
-        run: npm ci
+      - name: Install
+        run: npm install
 
       - name: Lint (ESLint)
         run: npm run lint --if-present

@@ -9,8 +9,8 @@
 #    · Every tunable value is an env var with a default → edit docker/.env only.
 #    · Shared config lives in YAML anchors (`x-*`) merged with `<<:` → DRY.
 #    · Both services bind-mount ONLY ../app and run `npm install` on startup
-#      (reconciled against the vendored app/package-lock.json) before their
-#      long-running process.
+#      before their long-running process. No lock file is committed — npm
+#      resolves and writes app/package-lock.json into the bind mount each run.
 #    · Services run as the unprivileged `node` user — the SAME identity the
 #      dev-container uses (remoteUser: node) — so node_modules written here and
 #      by "Reopen in Container" never collide on ownership.

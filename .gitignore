@@ -1,6 +1,9 @@
 # ---- Dependencies -------------------------------------------------------
 node_modules/
 .pnpm-store/
+#  Lock file is NOT committed: the container / dev-container regenerate it on
+#  every `npm install`. Canonical resolution is Linux, in-container.
+app/package-lock.json
 
 # ---- Build output ------------------------------------------------------
 app/dist/

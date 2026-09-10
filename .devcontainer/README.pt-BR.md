@@ -28,7 +28,9 @@ Ao usar **Reopen in Container**:
 
 1. `website` + `tests` são construídos e iniciados via Compose.
 2. O editor abre um shell em `/app`.
-3. `postCreateCommand` roda `npm install`.
+3. `postCreateCommand` roda `npm install` — isso resolve e grava o
+   `app/package-lock.json` (que está no `.gitignore`) do zero; não há lock
+   versionado pra sincronizar.
 4. `overrideCommand: true` mantém o container como um shell simples de longa
    duração em vez de rodar o comando de dev-server do Compose — você mesmo inicia
    `npm run dev` pelo terminal integrado.

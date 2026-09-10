@@ -6,7 +6,8 @@
 //    1. builds the `website` service (frontend `debugger` stage),
 //    2. starts it (plus `tests` via depends_on),
 //    3. opens a shell in /app,
-//    4. runs `npm install` after creation.
+//    4. runs `npm install` after creation (regenerates the git-ignored
+//       app/package-lock.json — nothing to keep in sync).
 //
 //  Ports mirror docker/docker-compose.yml and docker/.env.
 // =============================================================================

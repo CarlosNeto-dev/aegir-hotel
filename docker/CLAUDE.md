@@ -23,9 +23,11 @@ Agent notes for the container setup. Root guidance: [`../CLAUDE.md`](../CLAUDE.m
   bind-mounted `node_modules` written by `docker compose up` and by the
   dev-container (`remoteUser: node`) share one owner. Removing it reintroduces
   the root-owned-`node_modules` → `EACCES` on the next `node`-user install.
-- `app/package-lock.json` is vendored — `npm install` in the service commands
-  now reconciles against it. Canonical lock is generated in-container (Linux);
-  regenerating it on a Windows host is flaky (OneDrive/Defender locks).
+- `app/package-lock.json` is **git-ignored** — every `npm install` (service
+  commands, devcontainer `postCreateCommand`, the `build` stage, CI) resolves it
+  fresh. Canonical resolution is in-container (Linux); a host-generated lock is
+  never committed and would only be a Windows flakiness source anyway
+  (OneDrive/Defender locks).
 - npm is **not** upgraded in the image (install-scripts blocked by default —
   intentional).
 

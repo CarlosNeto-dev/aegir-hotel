@@ -37,12 +37,12 @@ docker build -f docker/Dockerfile.frontend --target production -t aegir-web:prod
 |-------|------|----------|----------|
 | `base` | `node:24-bookworm-slim` | **only** the Node runtime + `WORKDIR /app` — one place the Node version is set | no |
 | `debugger` | `base` | `base` + `git`, `curl`, `procps`, `serve`, `source-map-explorer` | dev / CI |
-| `build` | `base` | `npm ci` + `npm run build` → `/app/dist` | no |
+| `build` | `base` | `npm install` + `npm run build` → `/app/dist` | no |
 | `production` | `nginx:1.27-alpine` | **only** the built static site + SPA fallback + asset caching | ✅ |
 
 - `debugger` is what Compose and the dev-container use.
-- `build` / `production` need `app/package.json` (+ lock). On a bare scaffold,
-  only `debugger` builds — which is all Compose needs.
+- `build` / `production` need `app/package.json`. On a bare scaffold, only
+  `debugger` builds — which is all Compose needs.
 - **npm is not upgraded** — the version bundled with the Node image is kept. It
   blocks package install-scripts by default (fine for React / Vite / Sass /
   Vitest / GSAP). Approve a genuine need with `npm install-scripts approve <pkg>`.
@@ -65,8 +65,9 @@ Shared config is defined once as YAML anchors (`x-frontend-build`,
 | depends_on | — | `website` |
 
 - **`npm install` in the command:** deps install into the bind-mounted `app/` on
-  every start, reconciled against the committed `app/package-lock.json`. Switch
-  the command to `npm ci` if you want start-up to fail on any lock drift.
+  every start. No lock file is committed (`app/package-lock.json` is
+  git-ignored) — npm resolves from `package.json` and writes the lock into the
+  bind mount each run.
 - **`user: "node"`** — the shared anchor pins both services to the image's
   unprivileged user, the same identity the dev-container uses (`remoteUser:
   node`). Without it `docker compose up` writes a **root-owned** `node_modules`
