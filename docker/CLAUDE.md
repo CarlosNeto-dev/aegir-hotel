@@ -19,6 +19,13 @@ Agent notes for the container setup. Root guidance: [`../CLAUDE.md`](../CLAUDE.m
   pass `-f docker-compose.yml`.
 - `tests` uses `restart: on-failure` (overrides the anchor's `unless-stopped`)
   because Vitest exits 0 on an empty project.
+- The `x-frontend-service` anchor pins `user: "node"` (uid 1000) so the
+  bind-mounted `node_modules` written by `docker compose up` and by the
+  dev-container (`remoteUser: node`) share one owner. Removing it reintroduces
+  the root-owned-`node_modules` → `EACCES` on the next `node`-user install.
+- `app/package-lock.json` is vendored — `npm install` in the service commands
+  now reconciles against it. Canonical lock is generated in-container (Linux);
+  regenerating it on a Windows host is flaky (OneDrive/Defender locks).
 - npm is **not** upgraded in the image (install-scripts blocked by default —
   intentional).
 

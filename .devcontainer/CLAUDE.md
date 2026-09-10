@@ -13,6 +13,11 @@ Agent notes for the dev-container. Root guidance: [`../CLAUDE.md`](../CLAUDE.md)
 - Extensions list is deliberate; `glenn2223.live-sass` + its
   `liveSassCompile.settings.*` are the SCSS-standalone path (output is
   git-ignored).
+- `settings."files.autoSave": "onFocusChange"` is load-bearing, not cosmetic.
+  The editor default (`off`) leaves edits in the buffer; the bind-mounted file
+  never changes; Vite HMR (verified working, polling watcher) has nothing to
+  fire on until the tab is closed. Do not remove it. `formatOnSave` (Prettier)
+  runs on that same save.
 - It's JSONC — comments are allowed; keep it parseable
   (`node -e "JSON.parse(stripComments(...))"`).
 

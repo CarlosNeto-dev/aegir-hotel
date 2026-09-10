@@ -1,0 +1,8 @@
+# Generated / vendored — not ours to format
+dist
+coverage
+node_modules
+package-lock.json
+
+# Markdown is hand-formatted to 80 cols and validated by scripts/check-docs.sh
+*.md

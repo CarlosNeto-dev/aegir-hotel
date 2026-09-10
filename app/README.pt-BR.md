@@ -21,8 +21,12 @@ tudo que você faz aqui é o que roda.
 ```
 app/
 ├── index.html                 # documento de entrada do Vite (fica na raiz de app/, NÃO em src/)
-├── package.json               # você cria — veja "Bootstrap" abaixo
-├── vite.config.ts
+├── package.json               # dependências + scripts (já commitado)
+├── package-lock.json          # árvore exata de dependências — commite; o `npm ci` precisa
+├── eslint.config.js           # config flat do ESLint 9 (TS + react-hooks + react-refresh)
+├── .prettierrc.json           # opções do Prettier   (.prettierignore exclui *.md)
+├── .stylelintrc.json          # config do Stylelint (SCSS)
+├── vite.config.ts             # já commitado — Vite + React, HMR por polling no Docker
 ├── tsconfig.json · tsconfig.node.json
 ├── public/                    # servido como está em "/" — favicon, robots.txt, models/
 │   └── models/                # .glb / .gltf para react-three-fiber (futuro)
@@ -111,42 +115,44 @@ dist/
 O container roda `npm install` ao subir, então você só precisa criar os arquivos
 de código. Faça isto **uma vez**, a partir de `app/`.
 
-### 1. `package.json`
+### 1. `package.json` — já commitado
 
-```json
+`package.json`, `package-lock.json` e as configs de lint/formatação
+(`eslint.config.js`, `.prettierrc.json`, `.prettierignore`, `.stylelintrc.json`)
+já estão no repo. Traz React 19, GSAP, Vite 6, Vitest 2, Sass, mais o ferramental
+que o pipeline de release espera (ESLint, Prettier, Stylelint, `typescript`).
+
+```jsonc
 {
-  "name": "aegir-hotel-web",
-  "private": true,
-  "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
-    "test": "vitest run",
+    "test": "vitest run --passWithNoTests",
     "test:watch": "vitest",
-    "test:ui": "vitest --ui"
-  },
-  "dependencies": {
-    "gsap": "^3.12.5",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0"
-  },
-  "devDependencies": {
-    "@testing-library/react": "^16.1.0",
-    "@types/react": "^19.0.0",
-    "@types/react-dom": "^19.0.0",
-    "@vitejs/plugin-react": "^4.3.4",
-    "@vitest/ui": "^2.1.8",
-    "jsdom": "^25.0.1",
-    "sass": "^1.83.0",
-    "typescript": "~5.7.2",
-    "vite": "^6.0.5",
-    "vitest": "^2.1.8"
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest run --coverage --passWithNoTests",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "lint:styles": "stylelint \"src/**/*.{css,scss}\" --allow-empty-input",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "tsc -b"
   }
 }
 ```
 
-### 2. `vite.config.ts`
+> `lint`, `format:check` e `test` já passam no scaffold atual.
+> `typecheck` e `build` dependem dos passos 3/4 abaixo (leem `tsconfig.json`).
+> O `.github/workflows/release.yml` roda `lint → format:check → typecheck → test
+> → build` a cada tag `v*.*.*` — crie os arquivos abaixo **antes** de marcar um
+> release ou o quality gate falha.
+
+### 2. `vite.config.ts` — já commitado
+
+Está no repo. Reproduzido aqui como referência. O HMR pelo bind mount do Docker
+está verificado com este arquivo: editar um `.tsx`, um `*.module.scss`, um
+`.scss` global ou o próprio arquivo faz hot-reload (o último reinicia o servidor).
 
 ```ts
 import { defineConfig } from "vite";
@@ -218,7 +224,12 @@ export default defineConfig({
 }
 ```
 
-### 5. `index.html` (na raiz de `app/`)
+### 5. `index.html` (na raiz de `app/`) — já ligado
+
+Um `index.html` + `src/main.tsx` mínimos já estão no repo: `#root` no body e
+`main.tsx` montando o export default de `./app` com `createRoot`. **Sem esse
+mount, editar o componente recarrega via HMR mas nada aparece na tela.** Os
+trechos aqui são o alvo mais completo (`<title>` próprio, import do SCSS global).
 
 ```html
 <!doctype html>

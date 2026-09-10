@@ -9,7 +9,11 @@
 #    · Every tunable value is an env var with a default → edit docker/.env only.
 #    · Shared config lives in YAML anchors (`x-*`) merged with `<<:` → DRY.
 #    · Both services bind-mount ONLY ../app and run `npm install` on startup
-#      before their long-running process (no package-lock is vendored yet).
+#      (reconciled against the vendored app/package-lock.json) before their
+#      long-running process.
+#    · Services run as the unprivileged `node` user — the SAME identity the
+#      dev-container uses (remoteUser: node) — so node_modules written here and
+#      by "Reopen in Container" never collide on ownership.
 #    · GPU passthrough is opt-in via docker-compose.override.yml (auto-merged
 #      by `docker compose up`). Machines without an NVIDIA runtime run the
 #      base file explicitly:  docker compose -f docker-compose.yml up
@@ -42,6 +46,9 @@ x-frontend-build: &frontend-build
 x-frontend-service: &frontend-service
   build: *frontend-build
   working_dir: ${APP_DIR:-/app}
+  # Run as the image's unprivileged user (uid 1000), matching the dev-container's
+  # remoteUser. Keeps node_modules ownership consistent across both entry points.
+  user: "node"
   # Volume: ONLY the application folder. Path is relative to THIS file (docker/).
   volumes:
     - ../app:${APP_DIR:-/app}
