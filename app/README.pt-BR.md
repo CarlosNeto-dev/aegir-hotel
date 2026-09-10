@@ -21,8 +21,8 @@ tudo que você faz aqui é o que roda.
 ```
 app/
 ├── index.html                 # documento de entrada do Vite (fica na raiz de app/, NÃO em src/)
-├── package.json               # dependências + scripts (já commitado)
-├── package-lock.json          # árvore exata de dependências — commite; o `npm ci` precisa
+├── package.json               # dependências + scripts (commitado; package-lock.json está no
+│                              #   .gitignore, regenerado a cada `npm install`)
 ├── eslint.config.js           # config flat do ESLint 9 (TS + react-hooks + react-refresh)
 ├── .prettierrc.json           # opções do Prettier   (.prettierignore exclui *.md)
 ├── .stylelintrc.json          # config do Stylelint (SCSS)
@@ -117,10 +117,16 @@ de código. Faça isto **uma vez**, a partir de `app/`.
 
 ### 1. `package.json` — já commitado
 
-`package.json`, `package-lock.json` e as configs de lint/formatação
-(`eslint.config.js`, `.prettierrc.json`, `.prettierignore`, `.stylelintrc.json`)
-já estão no repo. Traz React 19, GSAP, Vite 6, Vitest 2, Sass, mais o ferramental
-que o pipeline de release espera (ESLint, Prettier, Stylelint, `typescript`).
+`package.json` e as configs de lint/formatação (`eslint.config.js`,
+`.prettierrc.json`, `.prettierignore`, `.stylelintrc.json`) já estão no repo.
+Traz React 19, GSAP, Vite 6, Vitest 2, Sass, react-three-fiber / three / drei,
+mais o ferramental que o pipeline de release espera (ESLint, Prettier,
+Stylelint, `typescript`).
+
+O `package-lock.json` está no **`.gitignore`** — todo `npm install` (start do
+container, `postCreateCommand` do dev-container, o stage `build` do Docker, o
+CI) resolve o lock do zero a partir do `package.json`. A resolução canônica é
+Linux, dentro do container.
 
 ```jsonc
 {

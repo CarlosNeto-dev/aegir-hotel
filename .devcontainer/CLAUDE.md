@@ -18,6 +18,9 @@ Agent notes for the dev-container. Root guidance: [`../CLAUDE.md`](../CLAUDE.md)
   never changes; Vite HMR (verified working, polling watcher) has nothing to
   fire on until the tab is closed. Do not remove it. `formatOnSave` (Prettier)
   runs on that same save.
+- `postCreateCommand: npm install` — `app/package-lock.json` is git-ignored and
+  regenerated here (and by the compose service commands, the Docker `build`
+  stage and CI). There is no committed lock to reconcile against.
 - It's JSONC — comments are allowed; keep it parseable
   (`node -e "JSON.parse(stripComments(...))"`).
 

@@ -28,6 +28,9 @@ scripts
 # ---- Node --------------------------------------------------------
 **/node_modules
 **/.npm
+#  Lock file is git-ignored and regenerated in-container — never copy a
+#  host-resolved one into the image; the `build` stage runs `npm install`.
+app/package-lock.json
 **/npm-debug.log*
 **/pnpm-debug.log*
 **/.pnpm-store

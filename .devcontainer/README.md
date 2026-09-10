@@ -29,7 +29,8 @@ On **Reopen in Container**:
 
 1. `website` + `tests` are built and started via Compose.
 2. The editor opens a shell in `/app`.
-3. `postCreateCommand` runs `npm install`.
+3. `postCreateCommand` runs `npm install` — this resolves and writes
+   `app/package-lock.json` (git-ignored) from scratch; no committed lock to sync.
 4. `overrideCommand: true` keeps the container a plain long-lived shell instead
    of running the Compose dev-server command — you start `npm run dev` yourself
    from the integrated terminal.

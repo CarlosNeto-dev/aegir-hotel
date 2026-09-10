@@ -142,7 +142,7 @@ git push upstream v1.2.0        # ← the only trigger for GitHub Actions
 
 [`workflows/release.yml`](workflows/release.yml) runs **only** on a `v*.*.*` tag.
 Pipeline: `detect` (find `app/package.json`, read `NODE_VERSION` from
-`docker/.env.example`) → `quality` (`npm ci`, then lint · format · typecheck ·
+`docker/.env.example`) → `quality` (`npm install`, then lint · format · typecheck ·
 test · `npm audit` · build, each `--if-present`) → `release` (`gh release create`
 with generated notes and the built `dist/` zipped). Until `app/package.json`
 exists, `quality` is skipped and the workflow still publishes a Release for the
