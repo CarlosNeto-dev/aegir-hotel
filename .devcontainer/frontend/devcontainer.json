@@ -47,6 +47,11 @@
         "slevesque.shader"
       ],
       "settings": {
+        // Write the buffer to disk on focus change (switch to browser / terminal
+        // / another file). Without this the editor default is "off": edits stay
+        // in the buffer, the file on the bind mount never changes, and Vite HMR
+        // has nothing to react to until the tab is closed.
+        "files.autoSave": "onFocusChange",
         "editor.formatOnSave": true,
         "editor.defaultFormatter": "esbenp.prettier-vscode",
         // Live Sass Compiler — emit a CSS (+ map) sibling next to each .scss.

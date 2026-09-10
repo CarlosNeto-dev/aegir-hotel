@@ -4,9 +4,32 @@ Agent notes for the web client. Root guidance: [`../CLAUDE.md`](../CLAUDE.md).
 
 ## State
 
-Scaffold only: folder skeleton (`.gitkeep`) + `index.html` (empty) + these docs.
-No `package.json` yet — the exact files to create are in `README.md` §Bootstrap.
-Do **not** scaffold the app unless asked; if asked, use those exact configs.
+Scaffold. Present: `package.json` + `package-lock.json`, `eslint.config.js`
+(ESLint 9 flat), `.prettierrc.json` + `.prettierignore` (ignores `*.md`),
+`.stylelintrc.json`, `vite.config.ts` (exact contents from README §Bootstrap 2 —
+polling watcher, `@` alias, modern-compiler SCSS). Folder skeleton (`.gitkeep`) +
+`index.html` (`#root` + `<script src="/src/main.tsx">`) + `src/main.tsx`
+(mounts the default export of `./app` in `<StrictMode>`) + `src/app.tsx`
+(the component — currently the react.dev quick-start example, exported as
+`MyApp`).
+
+Still to create (README.md §Bootstrap has the exact contents): `tsconfig.json`,
+`tsconfig.node.json`, `src/styles/main.scss`, `src/vite-env.d.ts`. Do **not**
+scaffold those unless asked; if asked, use those exact configs.
+
+`src/main.tsx` is the entry — **a component that nothing mounts renders nothing**
+even though HMR reports the update. Keep `index.html` → `main.tsx` →
+`createRoot(...).render()` intact. File is `app.tsx` (lowercase) so `main.tsx`
+imports `./app`; case matters in the Linux container.
+
+HMR through the Docker bind mount is verified end-to-end with `vite.config.ts`
+in place: editing `.tsx`, `*.module.scss`, a global `.scss`, and `vite.config.ts`
+itself all reload correctly (the last restarts the dev server).
+
+`npm run lint` / `format:check` / `test` pass now. `typecheck` (`tsc -b`) and
+`build` fail until `tsconfig.json` exists — expected. `release.yml`'s `quality`
+job activates the moment `package.json` is on a tagged commit, so it must not be
+tagged before the tsconfig/vite files land.
 
 ## Structure rules (enforce on any code you add)
 
@@ -20,7 +43,15 @@ Do **not** scaffold the app unless asked; if asked, use those exact configs.
 ## Vite / build facts (verified)
 
 - `server.watch.usePolling: true` is **mandatory** — no HMR in the Docker bind
-  mount without it.
+  mount without it. Verified 2026-09-07: with it, edits from the host **and**
+  from inside the container both propagate; the browser applies the update with
+  no tab interaction.
+- HMR "not working" is almost always **not** the watcher: (1) the dev-container
+  editor didn't save to disk — needs `files.autoSave` (set in
+  `.devcontainer/frontend/devcontainer.json`); (2) an import whose casing differs
+  from the real file name (`./components/layout` vs `Layout.tsx`) — on the
+  case-insensitive Windows mount Vite serves it but silently drops HMR for that
+  module. Match casing exactly.
 - `css.preprocessorOptions.scss.api: "modern-compiler"` — silences the legacy
   Dart Sass deprecation.
 - `npm run build` → `dist/` is minified, contains **no `.scss`**; all styles

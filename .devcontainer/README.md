@@ -55,6 +55,14 @@ The Live Sass Compiler settings (`liveSassCompile.settings.*`) emit an
 `expanded` `.css` + source map next to each `.scss`. Those files are git-ignored
 — see [`../.gitignore`](../.gitignore).
 
+### `files.autoSave: onFocusChange`
+
+Set on purpose. The editor default is `off` — an unsaved buffer never reaches
+the bind-mounted file, so Vite HMR has nothing to react to until you close the
+tab. `onFocusChange` writes the file the moment you switch to the browser or the
+terminal, which is exactly when you want HMR to fire. Reload the window after
+changing this (`Dev Containers: Rebuild` not needed — it's an editor setting).
+
 ---
 
 ## Why a `frontend/` subfolder?

@@ -59,15 +59,22 @@ com `<<:`.
 | | `website` | `tests` |
 |-|-----------|---------|
 | comando | `npm install && vite` | `npm install && vitest --ui …` |
+| roda como | `node` (uid 1000) | igual |
 | volume | `../app → /app` **apenas** | igual |
 | portas | `5173`, `4173`, `9229` | `51204` |
 | healthcheck | `node -e "process.exit(0)"` (liveness) | igual |
 | restart | `unless-stopped` | `on-failure` |
 | depends_on | — | `website` |
 
-- **`npm install` no comando:** ainda não há lock file embutido na imagem, então
-  as deps são instaladas no `app/` montado a cada start. Quando `app/package-lock.json`
-  for versionado, coloque `npm ci` na imagem e remova a instalação do comando.
+- **`npm install` no comando:** as deps são instaladas no `app/` montado a cada
+  start, reconciliadas com o `app/package-lock.json` versionado. Troque o comando
+  por `npm ci` se quiser que o start falhe a qualquer divergência do lock.
+- **`user: "node"`** — a âncora compartilhada fixa os dois serviços no usuário
+  não-privilegiado da imagem, a mesma identidade do dev-container (`remoteUser:
+  node`). Sem isso, `docker compose up` grava um `node_modules` **do root** que um
+  "Reopen in Container" posterior (rodando como `node`) não consegue alterar —
+  `EACCES: unlink node_modules/.package-lock.json`. Se já aconteceu, limpe uma
+  vez: `docker compose run --rm -u 0 website rm -rf node_modules`.
 - **`tests` sai sem arquivos de teste** (comportamento do Vitest, código 0).
   `restart: on-failure` faz essa saída limpa não entrar em loop; a UI fica
   residente na `51204` assim que existir um `*.test.tsx`.
@@ -126,7 +133,7 @@ docker compose down          # ou  down -v  para remover volumes também
 
 | Sintoma | Causa / correção |
 |---------|------------------|
-| Edições não fazem hot-reload | falta `usePolling` no `vite.config.ts`, ou você editou fora de `app/` (só `app/` é montado) |
+| Edições não fazem hot-reload | (1) o editor não salvou em disco — dev-container precisa de `files.autoSave` (fica em `onFocusChange` no `.devcontainer/frontend/devcontainer.json`); (2) falta `usePolling` no `vite.config.ts`; (3) você editou fora de `app/` (só `app/` é montado); (4) um import com casing diferente do nome do arquivo — o Vite serve mas perde o HMR |
 | O container `tests` fica parando | esperado com zero arquivos de teste — adicione um em `src/` |
 | Porta já alocada | mude o valor em `docker/.env` e rode `docker compose up` de novo |
 | `could not select device driver "nvidia"` | sem runtime de GPU — use `docker compose -f docker-compose.yml up` |
