@@ -44,7 +44,8 @@ app/
     ├── hooks/                 # hooks React customizados (useXxx)
     ├── lib/                   # helpers agnósticos de framework (setup do GSAP, formatadores…)
     ├── scenes/                # cenas react-three-fiber (futuro)
-    ├── styles/                # SOMENTE SCSS GLOBAL: _tokens, _mixins, _reset, main.scss
+    ├── styles/                # SOMENTE SCSS GLOBAL: _reset, _basic-styles, main.scss
+    │   └── css/               # saida do Live Sass Compiler (gerado, git-ignored)
     └── types/                 # tipos TypeScript compartilhados
 ```
 
@@ -55,7 +56,10 @@ app/
    global nem um `styles/` global para código de componente — mover ou apagar uma
    funcionalidade deve mexer em exatamente uma pasta.
 2. **`src/styles/` é só para globais** — tokens de design, mixins, resets, o
-   `main.scss` raiz importado uma vez no `main.tsx`. Nada específico de componente.
+   `main.scss` raiz importado uma vez no `main.tsx` (`import "./styles/main.scss"`
+   — é esse import que ativa a estilização; o Vite compila o SCSS). Nada
+   específico de componente. `src/styles/css/` guarda o build opcional do Live
+   Sass Compiler (gerado, git-ignored) — o app nunca importa ele.
 3. **`index.html` fica na raiz de `app/`.** O Vite o trata como documento de
    entrada e resolve `/src/main.tsx` a partir dali.
 4. **`public/` vs `src/assets/`** — `public/` é copiado literalmente (URLs

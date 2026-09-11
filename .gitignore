@@ -19,7 +19,12 @@ app/coverage/
 .docs-check-tmp/
 
 # ---- Live Sass Compiler output (generated from .scss) -----------------
-#  Remove these two lines if you decide to commit compiled CSS.
+#  The app imports .scss through Vite; these files are a standalone build for
+#  inspection only. They land in one dedicated folder (Live Sass `savePath`)
+#  whose contents are ignored but the folder itself is kept (.gitkeep). The
+#  broad globs are a safety net — .css under src/ is always generated here.
+app/src/styles/css/*
+!app/src/styles/css/.gitkeep
 app/src/**/*.css
 app/src/**/*.css.map
 

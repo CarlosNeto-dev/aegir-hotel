@@ -75,8 +75,11 @@ Ports (from `docker/.env`): `5173` dev server, `4173` preview, `51204` Vitest UI
 - Import alias: `@/` → `src/`.
 - Tests: `*.test.tsx` next to the component, `@testing-library/react` + Vitest.
 - Styles: `*.module.scss` beside the component; globals only in `src/styles/`.
-  Vite compiles SCSS (modern Dart Sass API); `glenn2223.live-sass` is an optional
-  extra that emits git-ignored `.css` siblings.
+  The global sheet is `src/styles/main.scss`, imported once in `src/main.tsx`.
+  Vite compiles SCSS (modern Dart Sass API) on import — that is the only path the
+  app uses. `glenn2223.live-sass` is an optional extra that writes a standalone
+  build to `app/src/styles/css/` (git-ignored, folder kept via `.gitkeep`;
+  `*.module.scss` excluded); the app never imports those files.
 
 ## Gotchas
 

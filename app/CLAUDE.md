@@ -14,9 +14,16 @@ polling watcher, `@` alias, modern-compiler SCSS). Folder skeleton (`.gitkeep`) 
 (the component — currently the react.dev quick-start example, exported as
 `MyApp`).
 
+`src/styles/main.scss` exists (`@use "reset"` + `@use "basic-styles"`) and is
+imported once in `src/main.tsx` (`import "./styles/main.scss"`) — that import is
+what makes styles load; Vite compiles the SCSS. Partials: `_reset.scss`,
+`_basic-styles.scss`. `src/styles/css/` is the Live Sass Compiler output folder
+(git-ignored contents, `.gitkeep` kept) — the app does not read it.
+
 Still to create (README.md §Bootstrap has the exact contents): `tsconfig.json`,
-`tsconfig.node.json`, `src/styles/main.scss`, `src/vite-env.d.ts`. Do **not**
-scaffold those unless asked; if asked, use those exact configs.
+`tsconfig.node.json`, `src/vite-env.d.ts` (the last declares `*.scss` side-effect
+imports — until it exists `tsc` flags the `main.scss` import; expected). Do
+**not** scaffold those unless asked; if asked, use those exact configs.
 
 `src/main.tsx` is the entry — **a component that nothing mounts renders nothing**
 even though HMR reports the update. Keep `index.html` → `main.tsx` →
@@ -37,6 +44,8 @@ tagged before the tsconfig/vite files land.
 - **Feature-first, co-located:** `Foo.tsx` + `Foo.module.scss` + `Foo.test.tsx`
   in one folder under `src/components/` (or `pages/`, `scenes/`).
 - `src/styles/` = **global SCSS only** (tokens, mixins, reset, `main.scss`).
+  `src/styles/css/` is the Live Sass Compiler `savePath` — generated CSS, not
+  source; never edit or import it.
 - `index.html` stays at `app/` root (Vite entry) — never move it to `src/`.
 - Import alias `@/` → `src/`.
 - `public/` = verbatim assets (3D models); `src/assets/` = imported/bundled.
@@ -57,8 +66,9 @@ tagged before the tsconfig/vite files land.
   Dart Sass deprecation.
 - `npm run build` → `dist/` is minified, contains **no `.scss`**; all styles
   (global + every `*.module.scss`) merge into one hashed `assets/index-*.css`.
-- `dist/`, `node_modules/`, and Live-Sass-generated `src/**/*.css` are
-  git-ignored.
+- `dist/`, `node_modules/`, and the Live-Sass output folder `src/styles/css/`
+  (plus any stray `src/**/*.css`) are git-ignored; `src/styles/css/.gitkeep`
+  keeps the folder.
 
 ## When editing
 

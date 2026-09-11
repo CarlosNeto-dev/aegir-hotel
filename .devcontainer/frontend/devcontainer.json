@@ -55,9 +55,22 @@
         "files.autoSave": "onFocusChange",
         "editor.formatOnSave": true,
         "editor.defaultFormatter": "esbenp.prettier-vscode",
-        // Live Sass Compiler — emit a CSS (+ map) sibling next to each .scss.
+        // Live Sass Compiler — standalone build of the GLOBAL stylesheet only.
+        // Output goes to one dedicated folder (savePath is workspace-relative,
+        // workspaceFolder is /app), NOT next to each .scss. The app itself never
+        // reads this CSS — Vite compiles .scss on import. src/styles/css/ is
+        // git-ignored. *.module.scss is excluded: those are Vite-only.
         "liveSassCompile.settings.formats": [
-          { "format": "expanded", "extensionName": ".css", "savePath": "~/" }
+          {
+            "format": "expanded",
+            "extensionName": ".css",
+            "savePath": "/src/styles/css"
+          }
+        ],
+        "liveSassCompile.settings.excludeList": [
+          "**/node_modules/**",
+          ".vscode/**",
+          "**/*.module.scss"
         ],
         "liveSassCompile.settings.generateMap": true,
         "liveSassCompile.settings.autoprefix": ["defaults"]

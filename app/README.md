@@ -44,7 +44,8 @@ app/
     ├── hooks/                 # custom React hooks (useXxx)
     ├── lib/                   # framework-agnostic helpers (GSAP setup, formatters…)
     ├── scenes/                # react-three-fiber scenes (future)
-    ├── styles/                # GLOBAL SCSS ONLY: _tokens, _mixins, _reset, main.scss
+    ├── styles/                # GLOBAL SCSS ONLY: _reset, _basic-styles, main.scss
+    │   └── css/               # Live Sass Compiler output (generated, git-ignored)
     └── types/                 # shared TypeScript types
 ```
 
@@ -55,7 +56,10 @@ app/
    global `styles/` bucket for component code — moving or deleting a feature
    should touch exactly one folder.
 2. **`src/styles/` is for globals only** — design tokens, mixins, resets, the
-   root `main.scss` imported once in `main.tsx`. Nothing component-specific.
+   root `main.scss` imported once in `main.tsx` (`import "./styles/main.scss"` —
+   that import is what activates styling; Vite compiles the SCSS). Nothing
+   component-specific. `src/styles/css/` holds the optional Live Sass Compiler
+   build (generated, git-ignored) — the app never imports it.
 3. **`index.html` stays at `app/` root.** Vite treats it as the entry document
    and resolves `/src/main.tsx` from there.
 4. **`public/` vs `src/assets/`** — `public/` is copied verbatim (stable URLs,
