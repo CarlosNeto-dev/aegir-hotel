@@ -1,2 +1,5 @@
+// Global stylesheet. Vite compiles this on import (see src/main.tsx) and injects
+// it; the app never reads a .css file from disk. Live Sass Compiler additionally
+// writes a standalone build to src/styles/css/ for inspection (git-ignored).
 @use "reset";
 @use "basic-styles";

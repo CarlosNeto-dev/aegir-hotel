@@ -11,8 +11,11 @@ Agent notes for the dev-container. Root guidance: [`../CLAUDE.md`](../CLAUDE.md)
 - `forwardPorts` / `portsAttributes` must mirror `docker/.env`
   (`5173 / 4173 / 51204 / 9229`). No Python/backend ports — front-end only.
 - Extensions list is deliberate; `glenn2223.live-sass` + its
-  `liveSassCompile.settings.*` are the SCSS-standalone path (output is
-  git-ignored).
+  `liveSassCompile.settings.*` are the SCSS-standalone path. `savePath` is
+  `/src/styles/css` (workspace-relative; one dedicated folder, not siblings);
+  `excludeList` adds `**/*.module.scss` so only global styles get a standalone
+  build. Folder contents git-ignored, `.gitkeep` retained. The app itself does
+  not read this CSS — Vite compiles `.scss` on import.
 - `settings."files.autoSave": "onFocusChange"` is load-bearing, not cosmetic.
   The editor default (`off`) leaves edits in the buffer; the bind-mounted file
   never changes; Vite HMR (verified working, polling watcher) has nothing to

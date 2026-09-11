@@ -53,8 +53,15 @@ Forwarded ports: `5173` (Vite), `4173` (preview), `51204` (Vitest UI),
 | `slevesque.shader` | GLSL syntax (future r3f shaders) |
 
 The Live Sass Compiler settings (`liveSassCompile.settings.*`) emit an
-`expanded` `.css` + source map next to each `.scss`. Those files are git-ignored
-— see [`../.gitignore`](../.gitignore).
+`expanded` `.css` + source map into **one dedicated folder**,
+[`app/src/styles/css/`](../app/src/styles) (`savePath` is workspace-relative and
+`workspaceFolder` is `/app`) — not next to each `.scss`. `*.module.scss` is on
+the `excludeList`: component styles are compiled by Vite only. The folder's
+contents are git-ignored (the folder itself is kept via `.gitkeep`) — see
+[`../.gitignore`](../.gitignore).
+
+This CSS is for inspection / standalone use; **the app never imports it**. Vite
+compiles `.scss` on import (`src/main.tsx` → `import "./styles/main.scss"`).
 
 ### `files.autoSave: onFocusChange`
 
