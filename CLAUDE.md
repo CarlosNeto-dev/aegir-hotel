@@ -4,22 +4,22 @@ Guidance for Claude Code when working in this repository.
 
 ## What this is
 
-Aegir Hotel — a **front-end only** web project: React 19 + TypeScript + SCSS +
-GSAP, bundled by Vite 6, run entirely through Docker. Future (not present yet):
-react-three-fiber / three.js, Blender assets, a database, and **Python** pipeline
-tooling. Python is *documented* as future in the stack list but is **not** in the
-containers — do not add a backend/Python service unless asked.
+Aegir Hotel — a **front-end only** web project: **Next.js 15 (App Router)** +
+React 19 + TypeScript + SCSS Modules, managed with **pnpm**, run entirely through
+Docker. Future (not present yet): GSAP, react-three-fiber / three.js, Blender
+assets, a database, and **Python** pipeline tooling. Python is *documented* as
+future in the stack list but is **not** in the containers — do not add a
+backend/Python service unless asked.
 
-The repo is a **scaffold**: container setup is complete and verified; `app/`
-holds the folder skeleton only.
+The repo is a **scaffold**: `app/` holds the Next.js skeleton (most files are
+still empty placeholders) — `app/CLAUDE.md` is the source of truth for it.
 
 ## Layout
 
 | Path | What |
 |------|------|
 | `app/` | the web client; bind-mounted to `/app` in the container. Only this folder is mounted. |
-| `app/index.html` | Vite entry — keep it at `app/` root, never in `src/`. |
-| `app/src/` | feature-first: `Foo.tsx` + `Foo.module.scss` + `Foo.test.tsx` co-located. `src/styles/` is **global SCSS only**. |
+| `app/src/` | five top-level folders — `app/` (routes), `site/` (2D UI), `scene/` (3D UI), `lib/` (api + data), `styles/` (global SCSS only). Every component is its own folder: `Foo/Foo.tsx` + `Foo/Foo.module.scss`. Details in `app/CLAUDE.md`. |
 | `docker/` | `Dockerfile.frontend` (multi-stage), `docker-compose.yml`, `docker-compose.override.yml` (GPU), `.env`. |
 | `.devcontainer/frontend/` | VS Code dev-container, reuses the compose file. |
 | `.github/` | `CODEOWNERS`, issue/PR templates, `workflows/release.yml` (CI **only** on `v*.*.*` tags), and `CONTRIBUTING.md` (+ `.pt-BR`) = the workflow guide. No `README.md` here — it would replace the root README as the repo home page. |
@@ -65,42 +65,46 @@ docker compose up                                 # with GPU (merges override)
 docker compose down [-v]
 ```
 
-Ports (from `docker/.env`): `5173` dev server, `4173` preview, `51204` Vitest UI,
-`9229` Node inspector.
+Ports (from `docker/.env`): `5173` Next dev server, `9229` Node inspector. `4173`
+(preview) and `51204` (test UI) are defined but **currently unused** — there is no
+test runner installed.
 
 ## Conventions
 
 - Components: `PascalCase` folder + files, default export.
 - Hooks: `useThing.ts`, one per file.
 - Import alias: `@/` → `src/`.
-- Tests: `*.test.tsx` next to the component, `@testing-library/react` + Vitest.
-- Styles: `*.module.scss` beside the component; globals only in `src/styles/`.
-  The global sheet is `src/styles/main.scss`, imported once in `src/main.tsx`.
-  Vite compiles SCSS (modern Dart Sass API) on import — that is the only path the
-  app uses. `glenn2223.live-sass` is an optional extra that writes a standalone
-  build to `app/src/styles/css/` (git-ignored, folder kept via `.gitkeep`;
-  `*.module.scss` excluded); the app never imports those files.
+- Styles: `Foo.module.scss` beside `Foo.tsx`; globals only in `src/styles/`.
+  The global sheet is `src/styles/main.scss`, imported once in
+  `src/app/layout.tsx`. Next compiles SCSS natively (`sass` package), and
+  `next.config.ts` sets `sassOptions.includePaths` to `src/styles` so any module
+  can `@use "tools/variables" as *;`.
 
 ## Gotchas
 
-- **HMR needs polling.** `app/vite.config.ts` must set
-  `server.watch.usePolling: true` — Docker bind mounts on Windows/WSL2/macOS emit
-  no fs events otherwise.
-- **npm blocks install-scripts by default** (current npm, bundled with the Node
-  image — not upgraded on purpose). Fine for this stack. Approve real needs with
-  `npm install-scripts approve <pkg>`.
-- **`tests` service exits with no test files** (Vitest behaviour). `restart:
-  on-failure` stops it looping. It stays resident once a `*.test.tsx` exists.
-- **`build` / `production` image targets need `app/package.json` + lock file.**
-  Only `debugger` builds on a bare scaffold.
+- **HMR needs polling.** Docker bind mounts on Windows/WSL2/macOS emit no fs
+  events, so the compose `website` service sets `WATCHPACK_POLLING=true`.
+- **Next's dev flags are `-H` / `-p`**, not `--host` / `--port`
+  (`next dev -H 0.0.0.0 -p 5173`).
+- **Package manager is pnpm** (via Corepack; version pinned in
+  `app/package.json` `"packageManager"`). pnpm 12 **fails `pnpm install`**
+  (`ERR_PNPM_IGNORED_BUILDS`) on any dependency build script nobody decided on;
+  decisions live in `app/pnpm-workspace.yaml` (`allowBuilds`). Add one with
+  `pnpm approve-builds <pkg>` (or `'!<pkg>'` to deny). Never use `npm install`
+  in `app/` — it would create a competing `package-lock.json`.
+- **`tests` service is currently broken** — it runs `pnpm run test:ui`, a script
+  that no longer exists (no test runner is installed). Fix or remove it only when
+  asked.
+- **`build` / `production` image targets** still assume a static `dist/` + nginx;
+  Next emits `.next/`. Only `debugger` is usable today.
 - **GPU** lives in `docker-compose.override.yml`; non-GPU machines must pass
   `-f docker-compose.yml` explicitly.
 
 ## Verification
 
-- **Containers / Vite config:** `docker compose -f docker-compose.yml config -q`,
-  build the `debugger` target, `up -d`, confirm `VITE ... ready`, edit a `.tsx`
-  and a `.scss` and check `[vite] hmr update` in the logs, then `down`.
+- **Containers / Next config:** `docker compose -f docker-compose.yml config -q`,
+  build the `debugger` target, `up -d website`, confirm `Ready in …` in the logs,
+  edit a `.tsx` and a `.scss` and check the page updates, then `down`.
 - **Docs:** run `bash scripts/check-docs.sh` — it parses every Mermaid block and
   checks local links. Do this whenever you touch a `.md`.
 - **`.github` YAML:** `release.yml` and the issue forms must stay valid YAML.

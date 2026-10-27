@@ -65,8 +65,12 @@ WORKDIR ${APP_DIR}
 
 # Sane defaults inherited by every downstream stage.
 ENV NODE_ENV=development \
-    npm_config_fund=false \
-    npm_config_audit=false
+    COREPACK_ENABLE_DOWNLOAD_PROMPT=0
+
+# pnpm is the package manager. Corepack (bundled with Node 24) provides the
+# `pnpm` shim and fetches the exact version pinned in the "packageManager" field
+# of app/package.json on first use - the version is NOT defined here.
+RUN corepack enable
 
 
 # =============================================================================
@@ -88,9 +92,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # --- Global Node.js helpers on PATH -----------------------------------------
 #  Test runners (vitest, @vitest/ui) come from the project's package.json so the
 #  versions stay pinned there. Only truly project-agnostic helpers go here.
-#  npm is NOT upgraded: the version bundled with the Node image is used as-is
-#  (it blocks package install-scripts by default — approve any that are really
-#  needed with `npm install-scripts approve <pkg>`).
+#  These two global CLIs are installed with the `npm` bundled in the Node image
+#  (not upgraded on purpose); everything the app depends on goes through pnpm.
+#  Dependency build scripts are decided in app/pnpm-workspace.yaml (allowBuilds).
 RUN npm install -g \
         serve \
         source-map-explorer
@@ -117,9 +121,9 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
     CMD node -e "process.exit(0)" || exit 1
 
 # Overridden by docker-compose. Typical local commands:
-#   npm run dev                                  -> website (serves WEB_DEV_PORT)
-#   npm run test -- --ui --api.port TEST_UI_PORT -> tests   (serves TEST_UI_PORT)
-CMD ["npm", "run", "dev"]
+#   pnpm dev                                     -> website (serves WEB_DEV_PORT)
+#   pnpm test:ui --api.port TEST_UI_PORT         -> tests   (serves TEST_UI_PORT)
+CMD ["pnpm", "run", "dev"]
 
 
 # =============================================================================
@@ -134,13 +138,13 @@ ENV NODE_ENV=production
 
 # Copy the manifest first so the install layer stays cached until deps change.
 # No lock file is committed (it is regenerated per environment), so this is a
-# resolving `npm install`, not `npm ci`.
-COPY app/package.json ./
-RUN npm install
+# resolving `pnpm install`, not `--frozen-lockfile`.
+COPY app/package.json app/pnpm-workspace.yaml ./
+RUN pnpm install
 
 # Then the sources, and compile.
 COPY app/ ./
-RUN npm run build
+RUN pnpm run build
 
 
 # =============================================================================

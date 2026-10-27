@@ -35,17 +35,18 @@ docker build -f docker/Dockerfile.frontend --target production -t aegir-web:prod
 
 | Stage | From | Contains | Shipped? |
 |-------|------|----------|----------|
-| `base` | `node:24-bookworm-slim` | **only** the Node runtime + `WORKDIR /app` — one place the Node version is set | no |
+| `base` | `node:24-bookworm-slim` | the Node runtime + Corepack-enabled `pnpm` + `WORKDIR /app` — one place the Node version is set | no |
 | `debugger` | `base` | `base` + `git`, `curl`, `procps`, `serve`, `source-map-explorer` | dev / CI |
-| `build` | `base` | `npm install` + `npm run build` → `/app/dist` | no |
+| `build` | `base` | `pnpm install` + `pnpm run build` → `/app/dist` | no |
 | `production` | `nginx:1.27-alpine` | **only** the built static site + SPA fallback + asset caching | ✅ |
 
 - `debugger` is what Compose and the dev-container use.
 - `build` / `production` need `app/package.json`. On a bare scaffold, only
   `debugger` builds — which is all Compose needs.
-- **npm is not upgraded** — the version bundled with the Node image is kept. It
-  blocks package install-scripts by default (fine for React / Vite / Sass /
-  Vitest / GSAP). Approve a genuine need with `npm install-scripts approve <pkg>`.
+- **pnpm via Corepack** — the version is pinned by `"packageManager"` in
+  `app/package.json` (not in the image). pnpm 12 refuses to finish an install while a
+  dependency has an undecided build script, so each one is listed in
+  `app/pnpm-workspace.yaml` (`allowBuilds`). Change with `pnpm approve-builds <pkg>`.
 
 ---
 
@@ -56,7 +57,7 @@ Shared config is defined once as YAML anchors (`x-frontend-build`,
 
 | | `website` | `tests` |
 |-|-----------|---------|
-| command | `npm install && vite` | `npm install && vitest --ui …` |
+| command | `pnpm install && next dev …` | `pnpm install && vitest --ui …` |
 | runs as | `node` (uid 1000) | same |
 | volume | `../app → /app` **only** | same |
 | ports | `5173`, `4173`, `9229` | `51204` |
@@ -64,15 +65,15 @@ Shared config is defined once as YAML anchors (`x-frontend-build`,
 | restart | `unless-stopped` | `on-failure` |
 | depends_on | — | `website` |
 
-- **`npm install` in the command:** deps install into the bind-mounted `app/` on
-  every start. No lock file is committed (`app/package-lock.json` is
-  git-ignored) — npm resolves from `package.json` and writes the lock into the
+- **`pnpm install` in the command:** deps install into the bind-mounted `app/` on
+  every start. No lock file is committed (`app/pnpm-lock.yaml` is
+  git-ignored) — pnpm resolves from `package.json` and writes the lock into the
   bind mount each run.
 - **`user: "node"`** — the shared anchor pins both services to the image's
   unprivileged user, the same identity the dev-container uses (`remoteUser:
   node`). Without it `docker compose up` writes a **root-owned** `node_modules`
   that a later "Reopen in Container" (running as `node`) cannot modify —
-  `EACCES: unlink node_modules/.package-lock.json`. If you already hit that, wipe
+  `EACCES` on `node_modules`. If you already hit that, wipe
   it once: `docker compose run --rm -u 0 website rm -rf node_modules`.
 - **`tests` exits with no test files** (Vitest behaviour, exit 0). `restart:
   on-failure` means that clean exit does not loop; the UI stays resident on
@@ -136,7 +137,7 @@ docker compose down          # or  down -v  to also drop volumes
 | `tests` container keeps stopping | expected with zero test files — add one under `src/` |
 | Port already allocated | change the value in `docker/.env` and `docker compose up` again |
 | `could not select device driver "nvidia"` | no GPU runtime — use `docker compose -f docker-compose.yml up` |
-| `npm warn install-scripts … blocked` | intentional; `npm install-scripts approve <pkg>` if really needed |
+| `ERR_PNPM_IGNORED_BUILDS` | a dependency has an undecided build script — `pnpm approve-builds <pkg>` (or `!<pkg>` to deny) writes it to `app/pnpm-workspace.yaml` |
 | Stale `node_modules` after changing deps | `docker compose down -v` then `up` |
 
 ---

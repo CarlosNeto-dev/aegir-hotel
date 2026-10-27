@@ -1,0 +1,8 @@
+# pnpm settings (pnpm 12 keeps them here, not in package.json).
+# Dependency build scripts must be decided explicitly - an undecided one makes
+# `pnpm install` exit non-zero (ERR_PNPM_IGNORED_BUILDS). Change with:
+#   pnpm approve-builds <pkg>      # allow
+#   pnpm approve-builds '!<pkg>'   # deny
+allowBuilds:
+  '@parcel/watcher': false   # prebuilt binary ships as an optional dep; no source build needed
+  sharp: false               # prebuilt binary ships as an optional dep; script is a check only

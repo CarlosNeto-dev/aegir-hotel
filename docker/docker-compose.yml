@@ -8,9 +8,9 @@
 #  Design
 #    · Every tunable value is an env var with a default → edit docker/.env only.
 #    · Shared config lives in YAML anchors (`x-*`) merged with `<<:` → DRY.
-#    · Both services bind-mount ONLY ../app and run `npm install` on startup
-#      before their long-running process. No lock file is committed — npm
-#      resolves and writes app/package-lock.json into the bind mount each run.
+#    · Both services bind-mount ONLY ../app and run `pnpm install` on startup
+#      before their long-running process. No lock file is committed — pnpm
+#      resolves and writes app/pnpm-lock.yaml into the bind mount each run.
 #    · Services run as the unprivileged `node` user — the SAME identity the
 #      dev-container uses (remoteUser: node) — so node_modules written here and
 #      by "Reopen in Container" never collide on ownership.
@@ -74,8 +74,10 @@ services:
     container_name: aegir-website
     environment:
       NODE_ENV: development
+      # Next.js file watching needs polling on Docker bind mounts (Windows/WSL2/macOS).
+      WATCHPACK_POLLING: "true"
     # Install deps into the mounted volume, then start the dev server.
-    command: sh -c "npm install && npm run dev -- --host 0.0.0.0 --port ${WEB_DEV_PORT:-5173}"
+    command: sh -c "pnpm install && pnpm run dev -H 0.0.0.0 -p ${WEB_DEV_PORT:-5173}"
     ports:
       # website — Vite dev server (hot reload)
       - "${WEB_DEV_PORT:-5173}:${WEB_DEV_PORT:-5173}"
@@ -100,7 +102,7 @@ services:
     restart: on-failure
     environment:
       NODE_ENV: test
-    command: sh -c "npm install && npm run test:ui -- --open=false --api.host 0.0.0.0 --api.port ${TEST_UI_PORT:-51204} --passWithNoTests"
+    command: sh -c "pnpm install && pnpm run test:ui -- --open=false --api.host 0.0.0.0 --api.port ${TEST_UI_PORT:-51204} --passWithNoTests"
     depends_on:
       website:
         condition: service_started

@@ -127,7 +127,7 @@ Precisa de Node `24.x` na máquina e da aplicação já inicializada
 ([`app/README.pt-BR.md`](app/README.pt-BR.md)).
 
 ```bash
-cd app && npm install && npm run dev
+cd app && pnpm install && pnpm dev
 ```
 
 O caminho com Docker é o oficialmente suportado.

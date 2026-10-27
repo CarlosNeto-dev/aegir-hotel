@@ -125,7 +125,7 @@ Needs Node `24.x` on the host and the app already bootstrapped
 ([`app/README.md`](app/README.md)).
 
 ```bash
-cd app && npm install && npm run dev
+cd app && pnpm install && pnpm dev
 ```
 
 The Docker path is the supported one.

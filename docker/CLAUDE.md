@@ -23,13 +23,18 @@ Agent notes for the container setup. Root guidance: [`../CLAUDE.md`](../CLAUDE.m
   bind-mounted `node_modules` written by `docker compose up` and by the
   dev-container (`remoteUser: node`) share one owner. Removing it reintroduces
   the root-owned-`node_modules` → `EACCES` on the next `node`-user install.
-- `app/package-lock.json` is **git-ignored** — every `npm install` (service
+- `app/pnpm-lock.yaml` is **git-ignored** — every `pnpm install` (service
   commands, devcontainer `postCreateCommand`, the `build` stage, CI) resolves it
   fresh. Canonical resolution is in-container (Linux); a host-generated lock is
   never committed and would only be a Windows flakiness source anyway
   (OneDrive/Defender locks).
-- npm is **not** upgraded in the image (install-scripts blocked by default —
-  intentional).
+- pnpm comes from **Corepack** (`RUN corepack enable` in `base`); the version lives
+  in `app/package.json` `"packageManager"`, never in the image. pnpm 12 fails
+  `pnpm install` (`ERR_PNPM_IGNORED_BUILDS`) on any undecided dependency build
+  script, so decisions live in `app/pnpm-workspace.yaml` (`allowBuilds`) — the
+  `build` stage must `COPY` that file with `package.json`. The two global CLIs
+  (`serve`, `source-map-explorer`) still use the image's bundled npm, which is
+  intentionally not upgraded.
 
 ## Before saying "done" after a container/compose change
 

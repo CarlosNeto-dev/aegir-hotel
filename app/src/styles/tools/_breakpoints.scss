@@ -1,0 +1,21 @@
+$tablet: 768px;
+$desktop: 1100px;
+$tv: 2560px;
+
+@mixin from-tablet {
+  @media (min-width: $tablet) {
+    @content;
+  }
+}
+
+@mixin from-desktop {
+  @media (min-width: $desktop) {
+    @content;
+  }
+}
+
+@mixin from-tv {
+  @media (min-width: $tv) {
+    @content;
+  }
+}

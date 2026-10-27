@@ -36,17 +36,18 @@ docker build -f docker/Dockerfile.frontend --target production -t aegir-web:prod
 
 | Estágio | A partir de | Contém | Vai p/ produção? |
 |---------|-------------|--------|------------------|
-| `base` | `node:24-bookworm-slim` | **apenas** o runtime do Node + `WORKDIR /app` — único lugar onde a versão do Node é definida | não |
+| `base` | `node:24-bookworm-slim` | o runtime do Node + `pnpm` via Corepack + `WORKDIR /app` — único lugar onde a versão do Node é definida | não |
 | `debugger` | `base` | `base` + `git`, `curl`, `procps`, `serve`, `source-map-explorer` | dev / CI |
-| `build` | `base` | `npm install` + `npm run build` → `/app/dist` | não |
+| `build` | `base` | `pnpm install` + `pnpm run build` → `/app/dist` | não |
 | `production` | `nginx:1.27-alpine` | **apenas** o site estático compilado + fallback SPA + cache de assets | ✅ |
 
 - O `debugger` é o que o Compose e o dev-container usam.
 - `build` / `production` precisam de `app/package.json`. Num esqueleto novo, só o
   `debugger` compila — que é tudo que o Compose precisa.
-- **O npm não é atualizado** — mantém-se o que vem na imagem do Node. Ele bloqueia
-  install-scripts de pacotes por padrão (ok para React / Vite / Sass / Vitest /
-  GSAP). Aprove uma necessidade real com `npm install-scripts approve <pacote>`.
+- **pnpm via Corepack** — a versão é fixada em `"packageManager"` no
+  `app/package.json` (não na imagem). O pnpm 12 não conclui o install enquanto uma
+  dependência tiver script de build sem decisão, então cada uma é listada em
+  `app/pnpm-workspace.yaml` (`allowBuilds`). Mude com `pnpm approve-builds <pacote>`.
 
 ---
 
@@ -58,7 +59,7 @@ com `<<:`.
 
 | | `website` | `tests` |
 |-|-----------|---------|
-| comando | `npm install && vite` | `npm install && vitest --ui …` |
+| comando | `pnpm install && next dev …` | `pnpm install && vitest --ui …` |
 | roda como | `node` (uid 1000) | igual |
 | volume | `../app → /app` **apenas** | igual |
 | portas | `5173`, `4173`, `9229` | `51204` |
@@ -66,15 +67,15 @@ com `<<:`.
 | restart | `unless-stopped` | `on-failure` |
 | depends_on | — | `website` |
 
-- **`npm install` no comando:** as deps são instaladas no `app/` montado a cada
-  start. Nenhum lock é versionado (`app/package-lock.json` está no
-  `.gitignore`) — o npm resolve a partir do `package.json` e grava o lock no
+- **`pnpm install` no comando:** as deps são instaladas no `app/` montado a cada
+  start. Nenhum lock é versionado (`app/pnpm-lock.yaml` está no
+  `.gitignore`) — o pnpm resolve a partir do `package.json` e grava o lock no
   bind mount a cada execução.
 - **`user: "node"`** — a âncora compartilhada fixa os dois serviços no usuário
   não-privilegiado da imagem, a mesma identidade do dev-container (`remoteUser:
   node`). Sem isso, `docker compose up` grava um `node_modules` **do root** que um
   "Reopen in Container" posterior (rodando como `node`) não consegue alterar —
-  `EACCES: unlink node_modules/.package-lock.json`. Se já aconteceu, limpe uma
+  `EACCES` em `node_modules`. Se já aconteceu, limpe uma
   vez: `docker compose run --rm -u 0 website rm -rf node_modules`.
 - **`tests` sai sem arquivos de teste** (comportamento do Vitest, código 0).
   `restart: on-failure` faz essa saída limpa não entrar em loop; a UI fica
@@ -138,7 +139,7 @@ docker compose down          # ou  down -v  para remover volumes também
 | O container `tests` fica parando | esperado com zero arquivos de teste — adicione um em `src/` |
 | Porta já alocada | mude o valor em `docker/.env` e rode `docker compose up` de novo |
 | `could not select device driver "nvidia"` | sem runtime de GPU — use `docker compose -f docker-compose.yml up` |
-| `npm warn install-scripts … blocked` | intencional; `npm install-scripts approve <pkg>` se realmente precisar |
+| `ERR_PNPM_IGNORED_BUILDS` | uma dependência tem script de build sem decisão — `pnpm approve-builds <pkg>` (ou `!<pkg>` para negar) grava em `app/pnpm-workspace.yaml` |
 | `node_modules` velho após mudar dependências | `docker compose down -v` e depois `up` |
 
 ---

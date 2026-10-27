@@ -2,7 +2,9 @@
 node_modules/
 .pnpm-store/
 #  Lock file is NOT committed: the container / dev-container regenerate it on
-#  every `npm install`. Canonical resolution is Linux, in-container.
+#  every `pnpm install`. Canonical resolution is Linux, in-container.
+app/pnpm-lock.yaml
+#  Legacy npm lock from before the switch to pnpm - never commit it.
 app/package-lock.json
 
 # ---- Build output ------------------------------------------------------
@@ -10,8 +12,12 @@ app/dist/
 app/build/
 *.tsbuildinfo
 
-# ---- Vite / test caches ---------------------------------------------
-.vite/
+# ---- Next.js build output & caches -----------------------------------
+.next/
+app/out/
+next-env.d.ts
+
+# ---- test caches -------------------------------------------------------
 app/coverage/
 *.local
 
@@ -19,7 +25,7 @@ app/coverage/
 .docs-check-tmp/
 
 # ---- Live Sass Compiler output (generated from .scss) -----------------
-#  The app imports .scss through Vite; these files are a standalone build for
+#  Legacy: unused since the move to Next (it compiles .scss itself); these files were a standalone build for
 #  inspection only. They land in one dedicated folder (Live Sass `savePath`)
 #  whose contents are ignored but the folder itself is kept (.gitkeep). The
 #  broad globs are a safety net — .css under src/ is always generated here.
@@ -41,6 +47,7 @@ Thumbs.db
 desktop.ini
 *.log
 npm-debug.log*
+pnpm-debug.log*
 
 # ---- 3D source files (ship exported .glb/.gltf only) -----------------
 *.blend
