@@ -1,11 +1,29 @@
+@use "breakpoints" as *;
+@use "variables" as *;
+
 @mixin focus-ring {
   outline: 2px solid var(--color-wood);
   outline-offset: 3px;
+
+  @include from-tv {
+    outline-width: 4px;
+    outline-offset: 6px;
+  }
+}
+
+@mixin row-center {
+  display: flex;
+  align-items: center;
+}
+
+@mixin backdrop($filter) {
+  backdrop-filter: $filter;
+  -webkit-backdrop-filter: $filter;
 }
 
 @mixin icon-button {
+  @include row-center;
   display: inline-flex;
-  align-items: center;
   justify-content: center;
   width: 3.8rem;
   height: 3.8rem;
@@ -29,5 +47,18 @@
 
   &:focus-visible {
     @include focus-ring;
+  }
+}
+
+@mixin glass {
+  @include backdrop(blur($blur) saturate(1.2));
+  background: var(--color-glass);
+  border: 1px solid var(--color-glass-edge);
+  box-shadow: 0 1rem 3rem -2.2rem var(--color-shadow);
+}
+
+@mixin motion-ok {
+  @media (prefers-reduced-motion: no-preference) {
+    @content;
   }
 }

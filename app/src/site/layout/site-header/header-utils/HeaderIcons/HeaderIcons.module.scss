@@ -2,20 +2,19 @@
 @use "tools/mixins" as *;
 
 .root {
-  display: flex;
-  align-items: center;
-}
+  @include row-center;
 
-.button {
-  @include icon-button;
+  .button {
+    @include icon-button;
 
-  @include from-tablet {
-    width: 3.4rem;
-    height: 3.4rem;
-  }
+    @include from-tablet {
+      width: 3.4rem;
+      height: 3.4rem;
+    }
 
-  @include from-desktop {
-    width: 3.8rem;
-    height: 3.8rem;
+    @include from-desktop {
+      width: 3.8rem;
+      height: 3.8rem;
+    }
   }
 }

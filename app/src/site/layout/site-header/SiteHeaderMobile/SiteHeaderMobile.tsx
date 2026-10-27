@@ -1,9 +1,7 @@
+// "use client" entra aqui quando você escrever o estado do menu (useState)
 import HeaderBrand from "../header-utils/HeaderBrand/HeaderBrand";
 import HeaderCta from "../header-utils/HeaderCta/HeaderCta";
-import HeaderIcons, {
-  IconMenu,
-  IconSettings,
-} from "../header-utils/HeaderIcons/HeaderIcons";
+import HeaderIcons, { IconMenu, IconSettings } from "../header-utils/HeaderIcons/HeaderIcons";
 import HeaderNavList from "../header-utils/HeaderNavList/HeaderNavList";
 import { ACTIONS } from "../header-utils/header-items";
 import styles from "./SiteHeaderMobile.module.scss";
@@ -15,8 +13,7 @@ export default function SiteHeaderMobile() {
         <HeaderBrand />
       </div>
 
-      <div className={styles.actions}>
-        <HeaderIcons showSettings={false} />
+      <div className={styles.nav}>
         <button
           type="button"
           className={styles.menuButton}
@@ -25,18 +22,22 @@ export default function SiteHeaderMobile() {
         >
           <IconMenu />
         </button>
+
+        <nav className={styles.drawer} aria-label="Seções da página" hidden>
+          <HeaderNavList variant="drawer" />
+          <div className={styles.drawerActions}>
+            <button type="button" className={styles.settings}>
+              <IconSettings />
+              {ACTIONS.settings.label}
+            </button>
+            <HeaderCta block />
+          </div>
+        </nav>
       </div>
 
-      <nav className={styles.drawer} aria-label="Seções da página" hidden>
-        <HeaderNavList variant="drawer" />
-        <div className={styles.drawerActions}>
-          <button type="button" className={styles.settings}>
-            <IconSettings />
-            {ACTIONS.settings.label}
-          </button>
-          <HeaderCta block />
-        </div>
-      </nav>
+      <div className={styles.actions}>
+        <HeaderIcons showSettings={false} />
+      </div>
     </div>
   );
 }

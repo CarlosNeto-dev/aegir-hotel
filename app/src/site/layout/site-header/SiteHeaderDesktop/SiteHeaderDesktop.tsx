@@ -11,9 +11,11 @@ export default function SiteHeaderDesktop() {
         <HeaderBrand />
       </div>
 
-      <nav className={styles.nav} aria-label="Seções da página">
-        <HeaderNavList variant="bar" />
-      </nav>
+      <div className={styles.nav}>
+        <nav aria-label="Seções da página">
+          <HeaderNavList variant="bar" />
+        </nav>
+      </div>
 
       <div className={styles.actions}>
         <HeaderIcons />

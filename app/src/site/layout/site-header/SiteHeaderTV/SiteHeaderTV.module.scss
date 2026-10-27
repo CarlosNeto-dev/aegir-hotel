@@ -1,0 +1,129 @@
+@use "tools/breakpoints" as *;
+@use "tools/variables" as *;
+@use "tools/mixins" as *;
+
+$face-height: 10.4rem;
+$side-height: 8rem;
+$marker-height: 3.2rem;
+
+.root {
+  display: none;
+
+  @include from-tv {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    column-gap: 2rem;
+    width: 100%;
+  }
+
+  .account {
+    justify-self: end;
+
+    @include motion-ok {
+      animation: sideInLeft 0.9s 0.25s var(--ease) both;
+    }
+
+    .accountButton {
+      @include glass;
+      height: $side-height;
+      padding: 0 4rem;
+      border-radius: $pill;
+      cursor: pointer;
+      font-family: var(--font-body), system-ui, sans-serif;
+      font-size: 1.7rem;
+      font-weight: 500;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--color-ink);
+      transition: background 0.25s;
+
+      &:hover,
+      &:focus-visible {
+        background: var(--color-glass-hover);
+      }
+
+      &:focus-visible {
+        @include focus-ring;
+      }
+    }
+  }
+
+  .face {
+    @include glass;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    width: clamp(150rem, 66vw, 220rem);
+    height: $face-height;
+    padding: 0 2.4rem;
+    border-radius: $pill;
+
+    @include motion-ok {
+      animation: faceIn 1s var(--ease) both;
+    }
+
+    .navLeft,
+    .navRight {
+      nav {
+        width: 100%;
+      }
+    }
+
+    .brand {
+      @include row-center;
+      gap: 4.8rem;
+      padding-inline: 4.8rem;
+
+      &::before,
+      &::after {
+        content: "";
+        width: 1px;
+        height: $marker-height;
+        background: var(--color-ink);
+        opacity: 0.18;
+      }
+    }
+  }
+
+  .crown {
+    justify-self: start;
+
+    @include motion-ok {
+      animation: sideInRight 0.9s 0.25s var(--ease) both;
+    }
+  }
+}
+
+@keyframes faceIn {
+  from {
+    opacity: 0;
+    transform: translateY(-1.6rem) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes sideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(3.2rem);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes sideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(-3.2rem);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
