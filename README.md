@@ -24,8 +24,7 @@ Docker, so any machine gets the exact same toolchain with a single command.
 
 Planned for later — already accounted for in the stack and the container setup:
 **react-three-fiber / three.js** 3D scenes, **Blender**-exported assets, a
-**database**, and **Python** tooling for the asset/data pipeline. GPU passthrough
-is already wired (opt-in) for that work.
+**database**, and **Python** tooling for the asset/data pipeline.
 
 > ℹ️ The repo is currently a **scaffold**: the container setup is complete and
 > verified, `app/` holds the agreed folder structure, and the application code is
@@ -43,7 +42,7 @@ is already wired (opt-in) for that work.
 | Animation | GSAP `3` | |
 | Build tool | Vite `6` | dev server + HMR + `vite preview` |
 | Tests | Vitest `2` + `@vitest/ui` | runs in its own container |
-| Containers | Docker + Compose v2 | multi-stage image, GPU override |
+| Containers | Docker + Compose v2 | multi-stage image |
 | 3D *(future)* | react-three-fiber, three.js, Blender assets | |
 | Pipeline *(future)* | Python (asset/data tooling), a database | not yet in the containers |
 
@@ -73,7 +72,6 @@ aegir-hotel/
 ├── docker/
 │   ├── Dockerfile.frontend            # multi-stage: base → debugger → build → production
 │   ├── docker-compose.yml             # services: website + tests
-│   ├── docker-compose.override.yml    # opt-in NVIDIA GPU passthrough
 │   ├── .env / .env.example            # every port & version knob
 │   └── README.md · README.pt-BR.md · CLAUDE.md
 ├── scripts/check-docs.sh              # validates every Mermaid diagram + local links
@@ -98,8 +96,7 @@ git clone <this-repo> aegir-hotel
 cd aegir-hotel/docker
 cp .env.example .env
 
-docker compose -f docker-compose.yml up      # no NVIDIA GPU
-docker compose up                            # with NVIDIA GPU + Container Toolkit
+docker compose up
 ```
 
 | URL | What |
@@ -114,7 +111,7 @@ docker compose down          # stop
 docker compose down -v        # stop + drop volumes
 ```
 
-Container internals, GPU notes, the multi-stage build and the hot-reload
+Container internals, the multi-stage build and the hot-reload
 walkthrough live in [`docker/README.md`](docker/README.md).
 
 ---
@@ -146,14 +143,6 @@ dev-container.
 
 ---
 
-## 🎮 GPU
-
-`docker/docker-compose.override.yml` adds NVIDIA GPU access to the `website`
-container and is **merged automatically** by a bare `docker compose up`. Machines
-without a GPU runtime run `docker compose -f docker-compose.yml up` (or delete the
-override file). Detail in [`docker/README.md`](docker/README.md#-gpu).
-
----
 
 ## 🤝 Contributing
 
@@ -177,7 +166,7 @@ GitHub Release.
 | `README.md` · [`README.pt-BR.md`](README.pt-BR.md) | project overview (this page) |
 | [`.github/CONTRIBUTING.md`](.github/CONTRIBUTING.md) · [pt-BR](.github/CONTRIBUTING.pt-BR.md) | **the workflow guide**: environment, branches, issues, PRs, releases |
 | [`app/README.md`](app/README.md) · [pt-BR](app/README.pt-BR.md) | folder structure + step-by-step app bootstrap guide |
-| [`docker/README.md`](docker/README.md) · [pt-BR](docker/README.pt-BR.md) | images, Compose, GPU, hot-reload workflow, troubleshooting |
+| [`docker/README.md`](docker/README.md) · [pt-BR](docker/README.pt-BR.md) | images, Compose, hot-reload workflow, troubleshooting |
 | [`.devcontainer/README.md`](.devcontainer/README.md) · [pt-BR](.devcontainer/README.pt-BR.md) | the VS Code dev-container |
 | [`CLAUDE.md`](CLAUDE.md) | conventions for the Claude Code agent |
 

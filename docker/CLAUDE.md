@@ -15,8 +15,6 @@ Agent notes for the container setup. Root guidance: [`../CLAUDE.md`](../CLAUDE.m
   port in **all** of: `.env`, `.env.example`, `docker-compose.yml`,
   `Dockerfile.frontend`, `.devcontainer/frontend/devcontainer.json`, and both
   root + docker READMEs.
-- `docker-compose.override.yml` = GPU only, opt-in, auto-merged. Non-GPU users
-  pass `-f docker-compose.yml`.
 - `tests` uses `restart: on-failure` (overrides the anchor's `unless-stopped`)
   because Vitest exits 0 on an empty project.
 - The `x-frontend-service` anchor pins `user: "node"` (uid 1000) so the
@@ -40,8 +38,7 @@ Agent notes for the container setup. Root guidance: [`../CLAUDE.md`](../CLAUDE.m
 
 ```bash
 cd docker
-docker compose -f docker-compose.yml config -q   # base valid
-docker compose config -q                          # merged (with GPU) valid
+docker compose config -q                          # compose file valid
 docker build -f Dockerfile.frontend --check ..    # Dockerfile lint
 ```
 Then `up -d`, confirm `VITE … ready`, edit a `.tsx` + a `.scss`, check

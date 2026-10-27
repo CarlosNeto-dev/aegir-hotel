@@ -14,14 +14,10 @@
 #    · Services run as the unprivileged `node` user — the SAME identity the
 #      dev-container uses (remoteUser: node) — so node_modules written here and
 #      by "Reopen in Container" never collide on ownership.
-#    · GPU passthrough is opt-in via docker-compose.override.yml (auto-merged
-#      by `docker compose up`). Machines without an NVIDIA runtime run the
-#      base file explicitly:  docker compose -f docker-compose.yml up
 #
 #  Run from this folder (docker/) so ../ paths and .env resolve:
 #    cd docker
-#    docker compose up                       # website + tests (+ GPU override)
-#    docker compose -f docker-compose.yml up  # website + tests, no GPU
+#    docker compose up                       # website + tests
 #    docker compose up website               # just the site
 # =============================================================================
 

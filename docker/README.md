@@ -10,14 +10,13 @@
 
 Container definitions for the project — **front-end only** for now.
 
-> Quick start, port table and GPU summary live in the root
+> Quick start, port table live in the root
 > [`README.md`](../README.md). This page is the container internals only.
 
 | File | Role |
 |------|------|
 | `Dockerfile.frontend` | multi-stage image: `base → debugger → build → production` |
 | `docker-compose.yml` | services `website` + `tests` |
-| `docker-compose.override.yml` | opt-in NVIDIA GPU passthrough (auto-merged) |
 | `.env` / `.env.example` | the only place to change ports and versions |
 
 Build **context is the repo root** (`context: ..` in Compose), so the single
@@ -81,28 +80,6 @@ Shared config is defined once as YAML anchors (`x-frontend-build`,
 
 ---
 
-## 🎮 GPU
-
-`docker-compose.override.yml` gives the `website` container NVIDIA GPU access —
-for future hardware-accelerated react-three-fiber / WebGL and headless Blender
-renders. Compose merges it automatically on a bare `docker compose up`.
-
-```
-Machine WITH NVIDIA GPU + Container Toolkit
-    docker compose up                        → base + override (GPU on)
-
-Machine WITHOUT GPU support
-    docker compose -f docker-compose.yml up   → base only, override ignored
-    (or delete / rename docker-compose.override.yml)
-```
-
-Requirements: NVIDIA driver on the host, the
-[NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/), and
-(Docker Desktop) GPU enabled with the WSL2 backend. Verify with `nvidia-smi`
-inside the container.
-
----
-
 ## 🔥 Hot-reload workflow (verified end-to-end)
 
 ```bash
@@ -136,7 +113,6 @@ docker compose down          # or  down -v  to also drop volumes
 | Edits don't hot-reload | (1) the editor never saved to disk — dev-container needs `files.autoSave` (set to `onFocusChange` in `.devcontainer/frontend/devcontainer.json`); (2) `usePolling` missing in `vite.config.ts`; (3) you edited a file outside `app/` (only `app/` is mounted); (4) an import whose casing differs from the file name — Vite serves it but drops HMR |
 | `tests` container keeps stopping | expected with zero test files — add one under `src/` |
 | Port already allocated | change the value in `docker/.env` and `docker compose up` again |
-| `could not select device driver "nvidia"` | no GPU runtime — use `docker compose -f docker-compose.yml up` |
 | `ERR_PNPM_IGNORED_BUILDS` | a dependency has an undecided build script — `pnpm approve-builds <pkg>` (or `!<pkg>` to deny) writes it to `app/pnpm-workspace.yaml` |
 | Stale `node_modules` after changing deps | `docker compose down -v` then `up` |
 
