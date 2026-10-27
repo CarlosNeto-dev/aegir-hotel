@@ -28,12 +28,12 @@ Ao usar **Reopen in Container**:
 
 1. `website` + `tests` são construídos e iniciados via Compose.
 2. O editor abre um shell em `/app`.
-3. `postCreateCommand` roda `npm install` — isso resolve e grava o
-   `app/package-lock.json` (que está no `.gitignore`) do zero; não há lock
+3. `postCreateCommand` roda `pnpm install` — isso resolve e grava o
+   `app/pnpm-lock.yaml` (que está no `.gitignore`) do zero; não há lock
    versionado pra sincronizar.
 4. `overrideCommand: true` mantém o container como um shell simples de longa
    duração em vez de rodar o comando de dev-server do Compose — você mesmo inicia
-   `npm run dev` pelo terminal integrado.
+   `pnpm dev` pelo terminal integrado.
 
 Portas encaminhadas: `5173` (Vite), `4173` (preview), `51204` (UI do Vitest),
 `9229` (inspetor do Node) — iguais às do `docker/.env`.
