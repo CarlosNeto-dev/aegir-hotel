@@ -53,3 +53,6 @@ pnpm-debug.log*
 *.blend
 *.blend[0-9]
 *.fbx
+
+# ---- Local machine only (NVIDIA GPU passthrough) ----------------------
+docker/docker-compose.override.yml

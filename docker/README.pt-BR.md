@@ -10,7 +10,7 @@
 
 Definições de containers do projeto — **somente front-end** por enquanto.
 
-> Início rápido, tabela de portas e resumo de GPU estão no
+> Início rápido, e tabela de portas estão no
 > [`README.pt-BR.md`](../README.pt-BR.md) da raiz. Esta página é só o interior
 > dos containers.
 
@@ -18,7 +18,6 @@ Definições de containers do projeto — **somente front-end** por enquanto.
 |---------|-------|
 | `Dockerfile.frontend` | imagem multi-stage: `base → debugger → build → production` |
 | `docker-compose.yml` | serviços `website` + `tests` |
-| `docker-compose.override.yml` | repasse opcional de GPU NVIDIA (mesclado automaticamente) |
 | `.env` / `.env.example` | o único lugar para mudar portas e versões |
 
 O **contexto de build é a raiz do repositório** (`context: ..` no Compose), então
@@ -83,28 +82,6 @@ com `<<:`.
 
 ---
 
-## 🎮 GPU
-
-`docker-compose.override.yml` dá ao container `website` acesso à GPU NVIDIA —
-para o trabalho futuro com react-three-fiber / WebGL acelerado e renders headless
-do Blender. O Compose o mescla automaticamente num `docker compose up` simples.
-
-```
-Máquina COM GPU NVIDIA + Container Toolkit
-    docker compose up                        → base + override (GPU ligada)
-
-Máquina SEM suporte a GPU
-    docker compose -f docker-compose.yml up   → só base, override ignorado
-    (ou apague / renomeie docker-compose.override.yml)
-```
-
-Requisitos: driver NVIDIA no host, o
-[NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/) e
-(Docker Desktop) GPU habilitada com o backend WSL2. Verifique com `nvidia-smi`
-dentro do container.
-
----
-
 ## 🔥 Fluxo de hot-reload (verificado de ponta a ponta)
 
 ```bash
@@ -138,7 +115,6 @@ docker compose down          # ou  down -v  para remover volumes também
 | Edições não fazem hot-reload | (1) o editor não salvou em disco — dev-container precisa de `files.autoSave` (fica em `onFocusChange` no `.devcontainer/frontend/devcontainer.json`); (2) falta `usePolling` no `vite.config.ts`; (3) você editou fora de `app/` (só `app/` é montado); (4) um import com casing diferente do nome do arquivo — o Vite serve mas perde o HMR |
 | O container `tests` fica parando | esperado com zero arquivos de teste — adicione um em `src/` |
 | Porta já alocada | mude o valor em `docker/.env` e rode `docker compose up` de novo |
-| `could not select device driver "nvidia"` | sem runtime de GPU — use `docker compose -f docker-compose.yml up` |
 | `ERR_PNPM_IGNORED_BUILDS` | uma dependência tem script de build sem decisão — `pnpm approve-builds <pkg>` (ou `!<pkg>` para negar) grava em `app/pnpm-workspace.yaml` |
 | `node_modules` velho após mudar dependências | `docker compose down -v` e depois `up` |
 

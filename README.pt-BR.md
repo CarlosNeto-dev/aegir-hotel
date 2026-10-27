@@ -26,8 +26,7 @@ comando.
 Previsto para depois — já considerado na stack e na configuração de containers:
 cenas 3D com **react-three-fiber / three.js**, *assets* exportados do
 **Blender**, um **banco de dados** e ferramentas em **Python** para o pipeline de
-assets/dados. O repasse de **GPU** já está configurado (opcional) para esse
-trabalho.
+assets/dados.
 
 > ℹ️ O repositório é hoje um **esqueleto**: a configuração de containers está
 > completa e testada, `app/` contém a estrutura de pastas definida, e o código da
@@ -45,7 +44,7 @@ trabalho.
 | Animação | GSAP `3` | |
 | Build | Vite `6` | servidor de dev + HMR + `vite preview` |
 | Testes | Vitest `2` + `@vitest/ui` | roda no próprio container |
-| Containers | Docker + Compose v2 | imagem multi-stage, override de GPU |
+| Containers | Docker + Compose v2 | imagem multi-stage |
 | 3D *(futuro)* | react-three-fiber, three.js, assets do Blender | |
 | Pipeline *(futuro)* | Python (ferramentas de asset/dados), um banco de dados | ainda não nos containers |
 
@@ -75,7 +74,6 @@ aegir-hotel/
 ├── docker/
 │   ├── Dockerfile.frontend            # multi-stage: base → debugger → build → production
 │   ├── docker-compose.yml             # serviços: website + tests
-│   ├── docker-compose.override.yml    # repasse opcional de GPU NVIDIA
 │   ├── .env / .env.example            # todas as portas e versões
 │   └── README.md · README.pt-BR.md · CLAUDE.md
 ├── scripts/check-docs.sh              # valida todo diagrama Mermaid + links locais
@@ -100,8 +98,7 @@ git clone <este-repo> aegir-hotel
 cd aegir-hotel/docker
 cp .env.example .env
 
-docker compose -f docker-compose.yml up      # sem GPU NVIDIA
-docker compose up                            # com GPU NVIDIA + Container Toolkit
+docker compose up
 ```
 
 | URL | O quê |
@@ -116,7 +113,7 @@ docker compose down          # parar
 docker compose down -v        # parar + remover volumes
 ```
 
-Detalhes dos containers, notas de GPU, o build multi-stage e o passo a passo de
+Detalhes dos containers, o build multi-stage e o passo a passo de
 hot-reload estão em [`docker/README.pt-BR.md`](docker/README.pt-BR.md).
 
 ---
@@ -148,15 +145,6 @@ Compose e pelo dev-container.
 
 ---
 
-## 🎮 GPU
-
-`docker/docker-compose.override.yml` adiciona acesso à GPU NVIDIA no container
-`website` e é **mesclado automaticamente** por um `docker compose up` simples.
-Máquinas sem suporte a GPU usam `docker compose -f docker-compose.yml up` (ou
-apagam o arquivo de override). Detalhe em
-[`docker/README.pt-BR.md`](docker/README.pt-BR.md#-gpu).
-
----
 
 ## 🤝 Contribuindo
 
@@ -180,7 +168,7 @@ Release.
 | [`README.md`](README.md) · `README.pt-BR.md` | visão geral do projeto (esta página) |
 | [`.github/CONTRIBUTING.pt-BR.md`](.github/CONTRIBUTING.pt-BR.md) · [en](.github/CONTRIBUTING.md) | **o guia de fluxo**: ambiente, branches, issues, PRs, releases |
 | [`app/README.pt-BR.md`](app/README.pt-BR.md) · [en](app/README.md) | estrutura de pastas + guia passo a passo da aplicação |
-| [`docker/README.pt-BR.md`](docker/README.pt-BR.md) · [en](docker/README.md) | imagens, Compose, GPU, fluxo de hot-reload, solução de problemas |
+| [`docker/README.pt-BR.md`](docker/README.pt-BR.md) · [en](docker/README.md) | imagens, Compose, fluxo de hot-reload, solução de problemas |
 | [`.devcontainer/README.pt-BR.md`](.devcontainer/README.pt-BR.md) · [en](.devcontainer/README.md) | o dev-container do VS Code |
 | [`CLAUDE.md`](CLAUDE.md) | convenções para o agente Claude Code |
 

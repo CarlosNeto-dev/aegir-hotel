@@ -20,7 +20,7 @@ still empty placeholders) — `app/CLAUDE.md` is the source of truth for it.
 |------|------|
 | `app/` | the web client; bind-mounted to `/app` in the container. Only this folder is mounted. |
 | `app/src/` | five top-level folders — `app/` (routes), `site/` (2D UI), `scene/` (3D UI), `lib/` (api + data), `styles/` (global SCSS only). Every component is its own folder: `Foo/Foo.tsx` + `Foo/Foo.module.scss`. Details in `app/CLAUDE.md`. |
-| `docker/` | `Dockerfile.frontend` (multi-stage), `docker-compose.yml`, `docker-compose.override.yml` (GPU), `.env`. |
+| `docker/` | `Dockerfile.frontend` (multi-stage), `docker-compose.yml`, `.env`. |
 | `.devcontainer/frontend/` | VS Code dev-container, reuses the compose file. |
 | `.github/` | `CODEOWNERS`, issue/PR templates, `workflows/release.yml` (CI **only** on `v*.*.*` tags), and `CONTRIBUTING.md` (+ `.pt-BR`) = the workflow guide. No `README.md` here — it would replace the root README as the repo home page. |
 | `.dockerignore` | at repo root because compose build `context: ..`. |
@@ -60,8 +60,7 @@ triggers `release.yml` which publishes the GitHub Release.
 ```bash
 cd docker
 cp .env.example .env
-docker compose -f docker-compose.yml up --build   # no GPU
-docker compose up                                 # with GPU (merges override)
+docker compose up --build
 docker compose down [-v]
 ```
 
@@ -97,8 +96,6 @@ test runner installed.
   asked.
 - **`build` / `production` image targets** still assume a static `dist/` + nginx;
   Next emits `.next/`. Only `debugger` is usable today.
-- **GPU** lives in `docker-compose.override.yml`; non-GPU machines must pass
-  `-f docker-compose.yml` explicitly.
 
 ## Verification
 
