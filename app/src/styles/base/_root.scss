@@ -24,4 +24,9 @@
     --header-top: 1.6rem;
     --header-h: 7.2rem;
   }
+
+  @include from-tv {
+    --header-top: 4rem;
+    --header-h: 14.4rem;
+  }
 }

@@ -13,6 +13,9 @@ export const NAV_ITEMS = [
   { id: "reserva", label: "Sua estadia", href: "/#reserva" },
 ] as const satisfies readonly NavItem[];
 
+export const NAV_LEFT = NAV_ITEMS.slice(0, 3);
+export const NAV_RIGHT = NAV_ITEMS.slice(3);
+
 export const BRAND = {
   label: "Aegir",
   href: "/",
