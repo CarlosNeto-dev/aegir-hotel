@@ -7,7 +7,7 @@
 #  Pipeline:  detect → quality (lint · typecheck · test · build) → release
 #
 #  Nothing runs on branch pushes or PRs — this is the release gate only.
-#  Until `app/package.json` exists, `quality` is skipped and the workflow still
+#  Until `front-end/package.json` exists, `quality` is skipped and the workflow still
 #  publishes a GitHub Release for the tag.
 # =============================================================================
 
@@ -40,11 +40,11 @@ jobs:
       - id: check
         name: Is there an app to build?
         run: |
-          if [ -f app/package.json ]; then
+          if [ -f front-end/package.json ]; then
             echo "has_app=true"  >> "$GITHUB_OUTPUT"
           else
             echo "has_app=false" >> "$GITHUB_OUTPUT"
-            echo "::notice::app/package.json not found — quality checks will be skipped."
+            echo "::notice::front-end/package.json not found — quality checks will be skipped."
           fi
 
       - id: node
@@ -61,14 +61,14 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: app
+        working-directory: front-end
     steps:
       - uses: actions/checkout@v4
 
-      # pnpm version comes from "packageManager" in app/package.json.
+      # pnpm version comes from "packageManager" in front-end/package.json.
       - uses: pnpm/action-setup@v4
         with:
-          package_json_file: app/package.json
+          package_json_file: front-end/package.json
 
       # No `cache: pnpm` - it needs a lock file and pnpm-lock.yaml is git-ignored.
       - uses: actions/setup-node@v4
@@ -100,7 +100,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: dist
-          path: app/dist
+          path: front-end/dist
           if-no-files-found: warn
           retention-days: 7
 

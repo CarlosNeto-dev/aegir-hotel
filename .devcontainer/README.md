@@ -30,7 +30,7 @@ On **Reopen in Container**:
 1. `website` + `tests` are built and started via Compose.
 2. The editor opens a shell in `/app`.
 3. `postCreateCommand` runs `pnpm install` — this resolves and writes
-   `app/pnpm-lock.yaml` (git-ignored) from scratch; no committed lock to sync.
+   `front-end/pnpm-lock.yaml` (git-ignored) from scratch; no committed lock to sync.
 4. `overrideCommand: true` keeps the container a plain long-lived shell instead
    of running the Compose dev-server command — you start `pnpm dev` yourself
    from the integrated terminal.
@@ -54,7 +54,7 @@ Forwarded ports: `5173` (Vite), `4173` (preview), `51204` (Vitest UI),
 
 The Live Sass Compiler settings (`liveSassCompile.settings.*`) emit an
 `expanded` `.css` + source map into **one dedicated folder**,
-[`app/src/styles/css/`](../app/src/styles) (`savePath` is workspace-relative and
+[`front-end/app/_styles/css/`](../front-end/app/_styles) (`savePath` is workspace-relative and
 `workspaceFolder` is `/app`) — not next to each `.scss`. `*.module.scss` is on
 the `excludeList`: component styles are compiled by Vite only. The folder's
 contents are git-ignored (the folder itself is kept via `.gitkeep`) — see
@@ -86,7 +86,7 @@ container, it gets a sibling folder and the editor shows a picker on
 
 [🏠 Project overview](../README.md) ·
 [🤝 Contribution workflow](../.github/CONTRIBUTING.md) ·
-[🎨 app/](../app/README.md) ·
+[🎨 app/](../front-end/README.md) ·
 [🐳 docker/](../docker/README.md) ·
 [🤖 CLAUDE.md](CLAUDE.md)
 &nbsp;&nbsp;|&nbsp;&nbsp; 🇧🇷 [Português](README.pt-BR.md)

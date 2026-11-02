@@ -29,7 +29,7 @@ Ao usar **Reopen in Container**:
 1. `website` + `tests` são construídos e iniciados via Compose.
 2. O editor abre um shell em `/app`.
 3. `postCreateCommand` roda `pnpm install` — isso resolve e grava o
-   `app/pnpm-lock.yaml` (que está no `.gitignore`) do zero; não há lock
+   `front-end/pnpm-lock.yaml` (que está no `.gitignore`) do zero; não há lock
    versionado pra sincronizar.
 4. `overrideCommand: true` mantém o container como um shell simples de longa
    duração em vez de rodar o comando de dev-server do Compose — você mesmo inicia
@@ -54,7 +54,7 @@ Portas encaminhadas: `5173` (Vite), `4173` (preview), `51204` (UI do Vitest),
 
 As configurações do Live Sass Compiler (`liveSassCompile.settings.*`) geram um
 `.css` `expanded` + source map em **uma pasta dedicada**,
-[`app/src/styles/css/`](../app/src/styles) (o `savePath` é relativo ao workspace,
+[`front-end/app/_styles/css/`](../front-end/app/_styles) (o `savePath` é relativo ao workspace,
 e o `workspaceFolder` é `/app`) — não ao lado de cada `.scss`. O `*.module.scss`
 está na `excludeList`: os estilos de componente são compilados só pelo Vite. O
 conteúdo da pasta é ignorado pelo git (a pasta em si é mantida por `.gitkeep`) —
@@ -87,7 +87,7 @@ seletor no "Reopen in Container".
 
 [🏠 Visão geral](../README.pt-BR.md) ·
 [🤝 Fluxo de contribuição](../.github/CONTRIBUTING.pt-BR.md) ·
-[🎨 app/](../app/README.pt-BR.md) ·
+[🎨 app/](../front-end/README.pt-BR.md) ·
 [🐳 docker/](../docker/README.pt-BR.md) ·
 [🤖 CLAUDE.md](CLAUDE.md)
 &nbsp;&nbsp;|&nbsp;&nbsp; 🇬🇧 [English](README.md)

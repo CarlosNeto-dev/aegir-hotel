@@ -40,12 +40,12 @@ docker build -f docker/Dockerfile.frontend --target production -t aegir-web:prod
 | `production` | `nginx:1.27-alpine` | **only** the built static site + SPA fallback + asset caching | ✅ |
 
 - `debugger` is what Compose and the dev-container use.
-- `build` / `production` need `app/package.json`. On a bare scaffold, only
+- `build` / `production` need `front-end/package.json`. On a bare scaffold, only
   `debugger` builds — which is all Compose needs.
 - **pnpm via Corepack** — the version is pinned by `"packageManager"` in
-  `app/package.json` (not in the image). pnpm 12 refuses to finish an install while a
+  `front-end/package.json` (not in the image). pnpm 12 refuses to finish an install while a
   dependency has an undecided build script, so each one is listed in
-  `app/pnpm-workspace.yaml` (`allowBuilds`). Change with `pnpm approve-builds <pkg>`.
+  `front-end/pnpm-workspace.yaml` (`allowBuilds`). Change with `pnpm approve-builds <pkg>`.
 
 ---
 
@@ -58,14 +58,14 @@ Shared config is defined once as YAML anchors (`x-frontend-build`,
 |-|-----------|---------|
 | command | `pnpm install && next dev …` | `pnpm install && vitest --ui …` |
 | runs as | `node` (uid 1000) | same |
-| volume | `../app → /app` **only** | same |
+| volume | `../front-end → /app` **only** | same |
 | ports | `5173`, `4173`, `9229` | `51204` |
 | healthcheck | `node -e "process.exit(0)"` (liveness) | same |
 | restart | `unless-stopped` | `on-failure` |
 | depends_on | — | `website` |
 
-- **`pnpm install` in the command:** deps install into the bind-mounted `app/` on
-  every start. No lock file is committed (`app/pnpm-lock.yaml` is
+- **`pnpm install` in the command:** deps install into the bind-mounted `front-end/` on
+  every start. No lock file is committed (`front-end/pnpm-lock.yaml` is
   git-ignored) — pnpm resolves from `package.json` and writes the lock into the
   bind mount each run.
 - **`user: "node"`** — the shared anchor pins both services to the image's
@@ -89,7 +89,7 @@ docker compose logs -f website        # wait for "VITE vX ready in …"
 
 | Edit | Result |
 |------|--------|
-| `app/src/**/*.tsx` | `[vite] (client) hmr update …`, module swapped, React state kept |
+| `front-end/app/**/*.tsx` | `[vite] (client) hmr update …`, module swapped, React state kept |
 | `.scss` / `.module.scss` | style re-injected, no reload, class hashes stable |
 | `app/vite.config.ts` | Vite restarts the dev server itself |
 | `*.test.tsx` (with `tests` up) | affected tests re-run, Vitest UI updates |
@@ -110,10 +110,10 @@ docker compose down          # or  down -v  to also drop volumes
 
 | Symptom | Cause / fix |
 |---------|-------------|
-| Edits don't hot-reload | (1) the editor never saved to disk — dev-container needs `files.autoSave` (set to `onFocusChange` in `.devcontainer/frontend/devcontainer.json`); (2) `usePolling` missing in `vite.config.ts`; (3) you edited a file outside `app/` (only `app/` is mounted); (4) an import whose casing differs from the file name — Vite serves it but drops HMR |
-| `tests` container keeps stopping | expected with zero test files — add one under `src/` |
+| Edits don't hot-reload | (1) the editor never saved to disk — dev-container needs `files.autoSave` (set to `onFocusChange` in `.devcontainer/frontend/devcontainer.json`); (2) `usePolling` missing in `vite.config.ts`; (3) you edited a file outside `front-end/` (only `front-end/` is mounted); (4) an import whose casing differs from the file name — Vite serves it but drops HMR |
+| `tests` container keeps stopping | expected with zero test files — add one under `app/` |
 | Port already allocated | change the value in `docker/.env` and `docker compose up` again |
-| `ERR_PNPM_IGNORED_BUILDS` | a dependency has an undecided build script — `pnpm approve-builds <pkg>` (or `!<pkg>` to deny) writes it to `app/pnpm-workspace.yaml` |
+| `ERR_PNPM_IGNORED_BUILDS` | a dependency has an undecided build script — `pnpm approve-builds <pkg>` (or `!<pkg>` to deny) writes it to `front-end/pnpm-workspace.yaml` |
 | Stale `node_modules` after changing deps | `docker compose down -v` then `up` |
 
 ---
@@ -122,7 +122,7 @@ docker compose down          # or  down -v  to also drop volumes
 
 [🏠 Project overview](../README.md) ·
 [🤝 Contribution workflow](../.github/CONTRIBUTING.md) ·
-[🎨 app/](../app/README.md) ·
+[🎨 app/](../front-end/README.md) ·
 [🧩 .devcontainer/](../.devcontainer/README.md) ·
 [🤖 CLAUDE.md](CLAUDE.md)
 &nbsp;&nbsp;|&nbsp;&nbsp; 🇧🇷 [Português](README.pt-BR.md)

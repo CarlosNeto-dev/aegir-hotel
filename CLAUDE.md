@@ -11,15 +11,15 @@ assets, a database, and **Python** pipeline tooling. Python is *documented* as
 future in the stack list but is **not** in the containers — do not add a
 backend/Python service unless asked.
 
-The repo is a **scaffold**: `app/` holds the Next.js skeleton (most files are
-still empty placeholders) — `app/CLAUDE.md` is the source of truth for it.
+The repo is a **scaffold**: `front-end/` holds the Next.js skeleton (most files are
+still empty placeholders) — `front-end/CLAUDE.md` is the source of truth for it.
 
 ## Layout
 
 | Path | What |
 |------|------|
-| `app/` | the web client; bind-mounted to `/app` in the container. Only this folder is mounted. |
-| `app/src/` | five top-level folders — `app/` (routes), `site/` (2D UI), `scene/` (3D UI), `lib/` (api + data), `styles/` (global SCSS only). Every component is its own folder: `Foo/Foo.tsx` + `Foo/Foo.module.scss`. Details in `app/CLAUDE.md`. |
+| `front-end/` | the web client; bind-mounted to `/app` in the container. Only this folder is mounted. |
+| `front-end/app/` | routes (App Router) + `_shared/` (shared header, panels, overlays, `lib/` api + data) + `_styles/` (global SCSS). Every component is its own folder: `Foo/Foo.tsx` + `Foo/Foo.module.scss`. Only route folders (URL segments) are Portuguese; everything else is English. Details in `front-end/CLAUDE.md`. |
 | `docker/` | `Dockerfile.frontend` (multi-stage), `docker-compose.yml`, `.env`. |
 | `.devcontainer/frontend/` | VS Code dev-container, reuses the compose file. |
 | `.github/` | `CODEOWNERS`, issue/PR templates, `workflows/release.yml` (CI **only** on `v*.*.*` tags), and `CONTRIBUTING.md` (+ `.pt-BR`) = the workflow guide. No `README.md` here — it would replace the root README as the repo home page. |
@@ -72,11 +72,11 @@ test runner installed.
 
 - Components: `PascalCase` folder + files, default export.
 - Hooks: `useThing.ts`, one per file.
-- Import alias: `@/` → `src/`.
-- Styles: `Foo.module.scss` beside `Foo.tsx`; globals only in `src/styles/`.
-  The global sheet is `src/styles/main.scss`, imported once in
-  `src/app/layout.tsx`. Next compiles SCSS natively (`sass` package), and
-  `next.config.ts` sets `sassOptions.includePaths` to `src/styles` so any module
+- Import alias: `@/` → the `front-end/` root (e.g. `@/app/_shared/…`).
+- Styles: `Foo.module.scss` beside `Foo.tsx`; globals only in `app/_styles/`.
+  The global sheet is `app/_styles/main.scss`, imported once in
+  `app/layout.tsx` (`./_styles/main.scss`). Next compiles SCSS natively (`sass` package), and
+  `next.config.ts` sets `sassOptions.includePaths` to `app/_styles` so any module
   can `@use "tools/variables" as *;`.
 
 ## Gotchas
@@ -86,11 +86,11 @@ test runner installed.
 - **Next's dev flags are `-H` / `-p`**, not `--host` / `--port`
   (`next dev -H 0.0.0.0 -p 5173`).
 - **Package manager is pnpm** (via Corepack; version pinned in
-  `app/package.json` `"packageManager"`). pnpm 12 **fails `pnpm install`**
+  `front-end/package.json` `"packageManager"`). pnpm 12 **fails `pnpm install`**
   (`ERR_PNPM_IGNORED_BUILDS`) on any dependency build script nobody decided on;
-  decisions live in `app/pnpm-workspace.yaml` (`allowBuilds`). Add one with
+  decisions live in `front-end/pnpm-workspace.yaml` (`allowBuilds`). Add one with
   `pnpm approve-builds <pkg>` (or `'!<pkg>'` to deny). Never use `npm install`
-  in `app/` — it would create a competing `package-lock.json`.
+  in `front-end/` — it would create a competing `package-lock.json`.
 - **`tests` service is currently broken** — it runs `pnpm run test:ui`, a script
   that no longer exists (no test runner is installed). Fix or remove it only when
   asked.
