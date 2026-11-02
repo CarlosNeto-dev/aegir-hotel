@@ -41,12 +41,12 @@ docker build -f docker/Dockerfile.frontend --target production -t aegir-web:prod
 | `production` | `nginx:1.27-alpine` | **apenas** o site estático compilado + fallback SPA + cache de assets | ✅ |
 
 - O `debugger` é o que o Compose e o dev-container usam.
-- `build` / `production` precisam de `app/package.json`. Num esqueleto novo, só o
+- `build` / `production` precisam de `front-end/package.json`. Num esqueleto novo, só o
   `debugger` compila — que é tudo que o Compose precisa.
 - **pnpm via Corepack** — a versão é fixada em `"packageManager"` no
-  `app/package.json` (não na imagem). O pnpm 12 não conclui o install enquanto uma
+  `front-end/package.json` (não na imagem). O pnpm 12 não conclui o install enquanto uma
   dependência tiver script de build sem decisão, então cada uma é listada em
-  `app/pnpm-workspace.yaml` (`allowBuilds`). Mude com `pnpm approve-builds <pacote>`.
+  `front-end/pnpm-workspace.yaml` (`allowBuilds`). Mude com `pnpm approve-builds <pacote>`.
 
 ---
 
@@ -60,14 +60,14 @@ com `<<:`.
 |-|-----------|---------|
 | comando | `pnpm install && next dev …` | `pnpm install && vitest --ui …` |
 | roda como | `node` (uid 1000) | igual |
-| volume | `../app → /app` **apenas** | igual |
+| volume | `../front-end → /app` **apenas** | igual |
 | portas | `5173`, `4173`, `9229` | `51204` |
 | healthcheck | `node -e "process.exit(0)"` (liveness) | igual |
 | restart | `unless-stopped` | `on-failure` |
 | depends_on | — | `website` |
 
-- **`pnpm install` no comando:** as deps são instaladas no `app/` montado a cada
-  start. Nenhum lock é versionado (`app/pnpm-lock.yaml` está no
+- **`pnpm install` no comando:** as deps são instaladas no `front-end/` montado a cada
+  start. Nenhum lock é versionado (`front-end/pnpm-lock.yaml` está no
   `.gitignore`) — o pnpm resolve a partir do `package.json` e grava o lock no
   bind mount a cada execução.
 - **`user: "node"`** — a âncora compartilhada fixa os dois serviços no usuário
@@ -91,7 +91,7 @@ docker compose logs -f website        # aguarde "VITE vX ready in …"
 
 | Edição | Resultado |
 |--------|-----------|
-| `app/src/**/*.tsx` | `[vite] (client) hmr update …`, módulo trocado, estado do React mantido |
+| `front-end/app/**/*.tsx` | `[vite] (client) hmr update …`, módulo trocado, estado do React mantido |
 | `.scss` / `.module.scss` | estilo reinjetado, sem reload, hashes de classe estáveis |
 | `app/vite.config.ts` | o Vite reinicia o servidor de dev sozinho |
 | `*.test.tsx` (com `tests` no ar) | testes afetados re-executam, UI do Vitest atualiza |
@@ -112,10 +112,10 @@ docker compose down          # ou  down -v  para remover volumes também
 
 | Sintoma | Causa / correção |
 |---------|------------------|
-| Edições não fazem hot-reload | (1) o editor não salvou em disco — dev-container precisa de `files.autoSave` (fica em `onFocusChange` no `.devcontainer/frontend/devcontainer.json`); (2) falta `usePolling` no `vite.config.ts`; (3) você editou fora de `app/` (só `app/` é montado); (4) um import com casing diferente do nome do arquivo — o Vite serve mas perde o HMR |
-| O container `tests` fica parando | esperado com zero arquivos de teste — adicione um em `src/` |
+| Edições não fazem hot-reload | (1) o editor não salvou em disco — dev-container precisa de `files.autoSave` (fica em `onFocusChange` no `.devcontainer/frontend/devcontainer.json`); (2) falta `usePolling` no `vite.config.ts`; (3) você editou fora de `front-end/` (só `front-end/` é montado); (4) um import com casing diferente do nome do arquivo — o Vite serve mas perde o HMR |
+| O container `tests` fica parando | esperado com zero arquivos de teste — adicione um em `app/` |
 | Porta já alocada | mude o valor em `docker/.env` e rode `docker compose up` de novo |
-| `ERR_PNPM_IGNORED_BUILDS` | uma dependência tem script de build sem decisão — `pnpm approve-builds <pkg>` (ou `!<pkg>` para negar) grava em `app/pnpm-workspace.yaml` |
+| `ERR_PNPM_IGNORED_BUILDS` | uma dependência tem script de build sem decisão — `pnpm approve-builds <pkg>` (ou `!<pkg>` para negar) grava em `front-end/pnpm-workspace.yaml` |
 | `node_modules` velho após mudar dependências | `docker compose down -v` e depois `up` |
 
 ---
@@ -124,7 +124,7 @@ docker compose down          # ou  down -v  para remover volumes também
 
 [🏠 Visão geral](../README.pt-BR.md) ·
 [🤝 Fluxo de contribuição](../.github/CONTRIBUTING.pt-BR.md) ·
-[🎨 app/](../app/README.pt-BR.md) ·
+[🎨 app/](../front-end/README.pt-BR.md) ·
 [🧩 .devcontainer/](../.devcontainer/README.pt-BR.md) ·
 [🤖 CLAUDE.md](CLAUDE.md)
 &nbsp;&nbsp;|&nbsp;&nbsp; 🇬🇧 [English](README.md)

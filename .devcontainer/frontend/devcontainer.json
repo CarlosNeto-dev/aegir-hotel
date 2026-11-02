@@ -7,7 +7,7 @@
 //    2. starts it (plus `tests` via depends_on),
 //    3. opens a shell in /app,
 //    4. runs `pnpm install` after creation (regenerates the git-ignored
-//       app/pnpm-lock.yaml — nothing to keep in sync).
+//       front-end/pnpm-lock.yaml — nothing to keep in sync).
 //
 //  Ports mirror docker/docker-compose.yml and docker/.env.
 // =============================================================================
@@ -58,13 +58,13 @@
         // Live Sass Compiler — standalone build of the GLOBAL stylesheet only.
         // Output goes to one dedicated folder (savePath is workspace-relative,
         // workspaceFolder is /app), NOT next to each .scss. The app itself never
-        // reads this CSS — Vite compiles .scss on import. src/styles/css/ is
+        // reads this CSS — Vite compiles .scss on import. app/_styles/css/ is
         // git-ignored. *.module.scss is excluded: those are Vite-only.
         "liveSassCompile.settings.formats": [
           {
             "format": "expanded",
             "extensionName": ".css",
-            "savePath": "/src/styles/css"
+            "savePath": "/app/_styles/css"
           }
         ],
         "liveSassCompile.settings.excludeList": [

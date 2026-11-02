@@ -141,10 +141,10 @@ git push upstream v1.2.0        # ← the only trigger for GitHub Actions
 ```
 
 [`workflows/release.yml`](workflows/release.yml) runs **only** on a `v*.*.*` tag.
-Pipeline: `detect` (find `app/package.json`, read `NODE_VERSION` from
+Pipeline: `detect` (find `front-end/package.json`, read `NODE_VERSION` from
 `docker/.env.example`) → `quality` (`pnpm install`, then lint · format · typecheck ·
 test · `pnpm audit` · build, each `--if-present`) → `release` (`gh release create`
-with generated notes and the built `dist/` zipped). Until `app/package.json`
+with generated notes and the built `dist/` zipped). Until `front-end/package.json`
 exists, `quality` is skipped and the workflow still publishes a Release for the
 tag. **That Release is the final, deliverable artifact.**
 
@@ -153,7 +153,7 @@ tag. **That Release is the final, deliverable artifact.**
 ## 🧭 Related docs
 
 [🏠 Project overview](../README.md) ·
-[🎨 app/](../app/README.md) ·
+[🎨 app/](../front-end/README.md) ·
 [🐳 docker/](../docker/README.md) ·
 [🧩 .devcontainer/](../.devcontainer/README.md) ·
 [🤖 CLAUDE.md](../CLAUDE.md)

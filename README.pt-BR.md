@@ -29,8 +29,8 @@ cenas 3D com **react-three-fiber / three.js**, *assets* exportados do
 assets/dados.
 
 > ℹ️ O repositório é hoje um **esqueleto**: a configuração de containers está
-> completa e testada, `app/` contém a estrutura de pastas definida, e o código da
-> aplicação é adicionado seguindo o [`app/README.pt-BR.md`](app/README.pt-BR.md).
+> completa e testada, `front-end/` contém a estrutura de pastas definida, e o código da
+> aplicação é adicionado seguindo o [`front-end/README.pt-BR.md`](front-end/README.pt-BR.md).
 
 ---
 
@@ -64,12 +64,11 @@ aegir-hotel/
 ├── .devcontainer/
 │   ├── frontend/devcontainer.json     # dev-container VS Code / Codespaces (reusa o compose)
 │   └── README.md · README.pt-BR.md · CLAUDE.md
-├── app/                               # o cliente web — montado como volume no container
-│   ├── index.html                     # documento de entrada do Vite
+├── front-end/                         # o cliente web — montado como volume no container
 │   ├── public/                        # arquivos estáticos servidos como estão
-│   ├── src/
-│   │   ├── assets/ components/ hooks/ lib/ pages/ scenes/ styles/ types/
-│   │   └── …                          # por funcionalidade: Foo.tsx + Foo.module.scss juntos
+│   ├── next.config.ts · tsconfig.json · package.json · pnpm-workspace.yaml
+│   ├── app/                           # rotas + _shared/ (compartilhado) + _styles/ (SCSS global)
+│   │                                  # uma pasta por componente: Foo/Foo.tsx + Foo/Foo.module.scss
 │   └── README.md · README.pt-BR.md · CLAUDE.md
 ├── docker/
 │   ├── Dockerfile.frontend            # multi-stage: base → debugger → build → production
@@ -121,7 +120,7 @@ hot-reload estão em [`docker/README.pt-BR.md`](docker/README.pt-BR.md).
 ## 💻 Desenvolvimento local sem Docker (opcional)
 
 Precisa de Node `24.x` na máquina e da aplicação já inicializada
-([`app/README.pt-BR.md`](app/README.pt-BR.md)).
+([`front-end/README.pt-BR.md`](front-end/README.pt-BR.md)).
 
 ```bash
 cd app && pnpm install && pnpm dev
@@ -167,7 +166,7 @@ Release.
 |---------|----------|
 | [`README.md`](README.md) · `README.pt-BR.md` | visão geral do projeto (esta página) |
 | [`.github/CONTRIBUTING.pt-BR.md`](.github/CONTRIBUTING.pt-BR.md) · [en](.github/CONTRIBUTING.md) | **o guia de fluxo**: ambiente, branches, issues, PRs, releases |
-| [`app/README.pt-BR.md`](app/README.pt-BR.md) · [en](app/README.md) | estrutura de pastas + guia passo a passo da aplicação |
+| [`front-end/README.pt-BR.md`](front-end/README.pt-BR.md) · [en](front-end/README.md) | estrutura de pastas + guia passo a passo da aplicação |
 | [`docker/README.pt-BR.md`](docker/README.pt-BR.md) · [en](docker/README.md) | imagens, Compose, fluxo de hot-reload, solução de problemas |
 | [`.devcontainer/README.pt-BR.md`](.devcontainer/README.pt-BR.md) · [en](.devcontainer/README.md) | o dev-container do VS Code |
 | [`CLAUDE.md`](CLAUDE.md) | convenções para o agente Claude Code |

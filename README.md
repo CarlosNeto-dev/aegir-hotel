@@ -27,8 +27,8 @@ Planned for later — already accounted for in the stack and the container setup
 **database**, and **Python** tooling for the asset/data pipeline.
 
 > ℹ️ The repo is currently a **scaffold**: the container setup is complete and
-> verified, `app/` holds the agreed folder structure, and the application code is
-> added by following [`app/README.md`](app/README.md).
+> verified, `front-end/` holds the agreed folder structure, and the application code is
+> added by following [`front-end/README.md`](front-end/README.md).
 
 ---
 
@@ -62,12 +62,11 @@ aegir-hotel/
 ├── .devcontainer/
 │   ├── frontend/devcontainer.json     # VS Code / Codespaces dev-container (reuses compose)
 │   └── README.md · README.pt-BR.md · CLAUDE.md
-├── app/                               # the web client — bind-mounted into the container
-│   ├── index.html                     # Vite entry document
+├── front-end/                         # the web client — bind-mounted into the container
 │   ├── public/                        # static assets served as-is
-│   ├── src/
-│   │   ├── assets/ components/ hooks/ lib/ pages/ scenes/ styles/ types/
-│   │   └── …                          # feature-first: Foo.tsx + Foo.module.scss together
+│   ├── next.config.ts · tsconfig.json · package.json · pnpm-workspace.yaml
+│   ├── app/                           # routes + _shared/ (shared) + _styles/ (global SCSS)
+│   │                                  # one folder per component: Foo/Foo.tsx + Foo/Foo.module.scss
 │   └── README.md · README.pt-BR.md · CLAUDE.md
 ├── docker/
 │   ├── Dockerfile.frontend            # multi-stage: base → debugger → build → production
@@ -119,7 +118,7 @@ walkthrough live in [`docker/README.md`](docker/README.md).
 ## 💻 Local development without Docker (optional)
 
 Needs Node `24.x` on the host and the app already bootstrapped
-([`app/README.md`](app/README.md)).
+([`front-end/README.md`](front-end/README.md)).
 
 ```bash
 cd app && pnpm install && pnpm dev
@@ -165,7 +164,7 @@ GitHub Release.
 |------|----------|
 | `README.md` · [`README.pt-BR.md`](README.pt-BR.md) | project overview (this page) |
 | [`.github/CONTRIBUTING.md`](.github/CONTRIBUTING.md) · [pt-BR](.github/CONTRIBUTING.pt-BR.md) | **the workflow guide**: environment, branches, issues, PRs, releases |
-| [`app/README.md`](app/README.md) · [pt-BR](app/README.pt-BR.md) | folder structure + step-by-step app bootstrap guide |
+| [`front-end/README.md`](front-end/README.md) · [pt-BR](front-end/README.pt-BR.md) | folder structure + step-by-step app bootstrap guide |
 | [`docker/README.md`](docker/README.md) · [pt-BR](docker/README.pt-BR.md) | images, Compose, hot-reload workflow, troubleshooting |
 | [`.devcontainer/README.md`](.devcontainer/README.md) · [pt-BR](.devcontainer/README.pt-BR.md) | the VS Code dev-container |
 | [`CLAUDE.md`](CLAUDE.md) | conventions for the Claude Code agent |

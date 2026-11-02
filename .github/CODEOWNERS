@@ -20,9 +20,9 @@
 *                    @CarlosNeto-dev @member-2 @member-3 @member-4 @member-5
 
 # ---- Application code ------------------------------------------------------
-/app/                @CarlosNeto-dev @member-2 @member-3
-/app/src/scenes/     @CarlosNeto-dev @member-3
-/app/src/styles/     @CarlosNeto-dev @member-2
+/front-end/          @CarlosNeto-dev @member-2 @member-3
+/front-end/app/ambientes-3d/  @CarlosNeto-dev @member-3
+/front-end/app/_styles/  @CarlosNeto-dev @member-2
 
 # ---- Containers & environment -------------------------------------------
 /docker/             @CarlosNeto-dev @member-4
