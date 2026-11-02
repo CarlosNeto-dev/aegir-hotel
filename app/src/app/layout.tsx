@@ -8,11 +8,13 @@ const fontTitle = Playfair_Display({
   variable: "--font-title",
   display: "swap",
 });
+
 const fontMono = JetBrains_Mono({
   subsets: ["latin"],
   variable: "--font-mono",
   display: "swap",
 });
+
 const fontBody = Inter({
   subsets: ["latin"],
   variable: "--font-body",
