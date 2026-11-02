@@ -29,9 +29,32 @@ cenas 3D com **react-three-fiber / three.js**, *assets* exportados do
 assets/dados. O repasse de **GPU** já está configurado (opcional) para esse
 trabalho.
 
-> ℹ️ O repositório é hoje um **esqueleto**: a configuração de containers está
-> completa e testada, `app/` contém a estrutura de pastas definida, e o código da
-> aplicação é adicionado seguindo o [`app/README.pt-BR.md`](app/README.pt-BR.md).
+> ℹ️ O repositório é hoje um **esqueleto**. **Nesta branch** o cliente web é apenas
+> um **esqueleto de pastas e arquivos** — veja
+> [Propósito desta branch](#-propósito-desta-branch).
+
+---
+
+## 🎯 Propósito desta branch
+
+A `frontend-architecture-organization` existe para uma coisa: **organizar a
+arquitetura do front-end**. Ela carrega somente a **estrutura de pastas e
+arquivos** do cliente web (`front-end/`), para que o time todo veja, revise e
+concorde onde cada peça fica antes de qualquer código ser escrito.
+
+- **Só a estrutura.** Todo arquivo `.ts` / `.tsx` / `.scss` dentro de
+  `front-end/app/` é **vazio de propósito**; cada pasta que os contém mantém um
+  `.gitkeep`.
+- **Quatro arquivos reais** registram as decisões: `package.json` (pnpm),
+  `next.config.ts` (`includePaths` do SCSS), `tsconfig.json` (o alias `@/*`) e
+  `pnpm-workspace.yaml`.
+- **Ela não compila, e isso é esperado** — um `page.tsx` vazio não é um módulo. O
+  código é escrito em branches de funcionalidade, em cima deste esqueleto.
+- **Fora do escopo:** Docker, dev-container e CI não foram redesenhados aqui; só os
+  caminhos do host passaram a apontar para `front-end/`. Os comandos deles e a
+  tabela de stack abaixo ainda descrevem a configuração anterior com Vite + npm.
+- **As regras da estrutura** (rotas em português, todo o resto em inglês, uma
+  pasta por componente…) estão em [`front-end/README.pt-BR.md`](front-end/README.pt-BR.md).
 
 ---
 
@@ -65,12 +88,11 @@ aegir-hotel/
 ├── .devcontainer/
 │   ├── frontend/devcontainer.json     # dev-container VS Code / Codespaces (reusa o compose)
 │   └── README.md · README.pt-BR.md · CLAUDE.md
-├── app/                               # o cliente web — montado como volume no container
-│   ├── index.html                     # documento de entrada do Vite
+├── front-end/                         # o esqueleto do cliente web — montado como volume no container
 │   ├── public/                        # arquivos estáticos servidos como estão
-│   ├── src/
-│   │   ├── assets/ components/ hooks/ lib/ pages/ scenes/ styles/ types/
-│   │   └── …                          # por funcionalidade: Foo.tsx + Foo.module.scss juntos
+│   ├── next.config.ts · tsconfig.json · package.json · pnpm-workspace.yaml
+│   ├── app/                           # rotas + _shared/ (compartilhado) + _styles/ (SCSS global)
+│   │                                  # arquivos vazios de propósito: Foo/Foo.tsx + Foo/Foo.module.scss
 │   └── README.md · README.pt-BR.md · CLAUDE.md
 ├── docker/
 │   ├── Dockerfile.frontend            # multi-stage: base → debugger → build → production
@@ -124,10 +146,10 @@ hot-reload estão em [`docker/README.pt-BR.md`](docker/README.pt-BR.md).
 ## 💻 Desenvolvimento local sem Docker (opcional)
 
 Precisa de Node `24.x` na máquina e da aplicação já inicializada
-([`app/README.pt-BR.md`](app/README.pt-BR.md)).
+([`front-end/README.pt-BR.md`](front-end/README.pt-BR.md)).
 
 ```bash
-cd app && npm install && npm run dev
+cd front-end && npm install && npm run dev
 ```
 
 O caminho com Docker é o oficialmente suportado.
@@ -179,7 +201,7 @@ Release.
 |---------|----------|
 | [`README.md`](README.md) · `README.pt-BR.md` | visão geral do projeto (esta página) |
 | [`.github/CONTRIBUTING.pt-BR.md`](.github/CONTRIBUTING.pt-BR.md) · [en](.github/CONTRIBUTING.md) | **o guia de fluxo**: ambiente, branches, issues, PRs, releases |
-| [`app/README.pt-BR.md`](app/README.pt-BR.md) · [en](app/README.md) | estrutura de pastas + guia passo a passo da aplicação |
+| [`front-end/README.pt-BR.md`](front-end/README.pt-BR.md) · [en](front-end/README.md) | a arquitetura: estrutura de pastas e regras do cliente web |
 | [`docker/README.pt-BR.md`](docker/README.pt-BR.md) · [en](docker/README.md) | imagens, Compose, GPU, fluxo de hot-reload, solução de problemas |
 | [`.devcontainer/README.pt-BR.md`](.devcontainer/README.pt-BR.md) · [en](.devcontainer/README.md) | o dev-container do VS Code |
 | [`CLAUDE.md`](CLAUDE.md) | convenções para o agente Claude Code |

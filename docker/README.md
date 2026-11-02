@@ -41,7 +41,7 @@ docker build -f docker/Dockerfile.frontend --target production -t aegir-web:prod
 | `production` | `nginx:1.27-alpine` | **only** the built static site + SPA fallback + asset caching | ✅ |
 
 - `debugger` is what Compose and the dev-container use.
-- `build` / `production` need `app/package.json`. On a bare scaffold, only
+- `build` / `production` need `front-end/package.json`. On a bare scaffold, only
   `debugger` builds — which is all Compose needs.
 - **npm is not upgraded** — the version bundled with the Node image is kept. It
   blocks package install-scripts by default (fine for React / Vite / Sass /
@@ -58,14 +58,14 @@ Shared config is defined once as YAML anchors (`x-frontend-build`,
 |-|-----------|---------|
 | command | `npm install && vite` | `npm install && vitest --ui …` |
 | runs as | `node` (uid 1000) | same |
-| volume | `../app → /app` **only** | same |
+| volume | `../front-end → /app` **only** | same |
 | ports | `5173`, `4173`, `9229` | `51204` |
 | healthcheck | `node -e "process.exit(0)"` (liveness) | same |
 | restart | `unless-stopped` | `on-failure` |
 | depends_on | — | `website` |
 
-- **`npm install` in the command:** deps install into the bind-mounted `app/` on
-  every start. No lock file is committed (`app/package-lock.json` is
+- **`npm install` in the command:** deps install into the bind-mounted `front-end/` on
+  every start. No lock file is committed (`front-end/package-lock.json` is
   git-ignored) — npm resolves from `package.json` and writes the lock into the
   bind mount each run.
 - **`user: "node"`** — the shared anchor pins both services to the image's
@@ -145,7 +145,7 @@ docker compose down          # or  down -v  to also drop volumes
 
 [🏠 Project overview](../README.md) ·
 [🤝 Contribution workflow](../.github/CONTRIBUTING.md) ·
-[🎨 app/](../app/README.md) ·
+[🎨 front-end/](../front-end/README.md) ·
 [🧩 .devcontainer/](../.devcontainer/README.md) ·
 [🤖 CLAUDE.md](CLAUDE.md)
 &nbsp;&nbsp;|&nbsp;&nbsp; 🇧🇷 [Português](README.pt-BR.md)

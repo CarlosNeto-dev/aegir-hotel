@@ -42,7 +42,7 @@ docker build -f docker/Dockerfile.frontend --target production -t aegir-web:prod
 | `production` | `nginx:1.27-alpine` | **apenas** o site estático compilado + fallback SPA + cache de assets | ✅ |
 
 - O `debugger` é o que o Compose e o dev-container usam.
-- `build` / `production` precisam de `app/package.json`. Num esqueleto novo, só o
+- `build` / `production` precisam de `front-end/package.json`. Num esqueleto novo, só o
   `debugger` compila — que é tudo que o Compose precisa.
 - **O npm não é atualizado** — mantém-se o que vem na imagem do Node. Ele bloqueia
   install-scripts de pacotes por padrão (ok para React / Vite / Sass / Vitest /
@@ -60,14 +60,14 @@ com `<<:`.
 |-|-----------|---------|
 | comando | `npm install && vite` | `npm install && vitest --ui …` |
 | roda como | `node` (uid 1000) | igual |
-| volume | `../app → /app` **apenas** | igual |
+| volume | `../front-end → /app` **apenas** | igual |
 | portas | `5173`, `4173`, `9229` | `51204` |
 | healthcheck | `node -e "process.exit(0)"` (liveness) | igual |
 | restart | `unless-stopped` | `on-failure` |
 | depends_on | — | `website` |
 
-- **`npm install` no comando:** as deps são instaladas no `app/` montado a cada
-  start. Nenhum lock é versionado (`app/package-lock.json` está no
+- **`npm install` no comando:** as deps são instaladas no `front-end/` montado a cada
+  start. Nenhum lock é versionado (`front-end/package-lock.json` está no
   `.gitignore`) — o npm resolve a partir do `package.json` e grava o lock no
   bind mount a cada execução.
 - **`user: "node"`** — a âncora compartilhada fixa os dois serviços no usuário
@@ -147,7 +147,7 @@ docker compose down          # ou  down -v  para remover volumes também
 
 [🏠 Visão geral](../README.pt-BR.md) ·
 [🤝 Fluxo de contribuição](../.github/CONTRIBUTING.pt-BR.md) ·
-[🎨 app/](../app/README.pt-BR.md) ·
+[🎨 front-end/](../front-end/README.pt-BR.md) ·
 [🧩 .devcontainer/](../.devcontainer/README.pt-BR.md) ·
 [🤖 CLAUDE.md](CLAUDE.md)
 &nbsp;&nbsp;|&nbsp;&nbsp; 🇬🇧 [English](README.md)

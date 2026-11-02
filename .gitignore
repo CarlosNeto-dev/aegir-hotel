@@ -3,16 +3,16 @@ node_modules/
 .pnpm-store/
 #  Lock file is NOT committed: the container / dev-container regenerate it on
 #  every `npm install`. Canonical resolution is Linux, in-container.
-app/package-lock.json
+front-end/package-lock.json
 
 # ---- Build output ------------------------------------------------------
-app/dist/
-app/build/
+front-end/dist/
+front-end/build/
 *.tsbuildinfo
 
 # ---- Vite / test caches ---------------------------------------------
 .vite/
-app/coverage/
+front-end/coverage/
 *.local
 
 # ---- scripts/check-docs.sh scratch --------------------------------
@@ -23,10 +23,10 @@ app/coverage/
 #  inspection only. They land in one dedicated folder (Live Sass `savePath`)
 #  whose contents are ignored but the folder itself is kept (.gitkeep). The
 #  broad globs are a safety net — .css under src/ is always generated here.
-app/src/styles/css/*
-!app/src/styles/css/.gitkeep
-app/src/**/*.css
-app/src/**/*.css.map
+front-end/app/_styles/css/*
+!front-end/app/_styles/css/.gitkeep
+front-end/app/**/*.css
+front-end/app/**/*.css.map
 
 # ---- Environment -----------------------------------------------------
 docker/.env

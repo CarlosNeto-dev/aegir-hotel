@@ -141,11 +141,11 @@ git push upstream v1.2.0        # ← único gatilho do GitHub Actions
 ```
 
 [`workflows/release.yml`](workflows/release.yml) roda **apenas** numa tag
-`v*.*.*`. Pipeline: `detect` (acha `app/package.json`, lê `NODE_VERSION` de
+`v*.*.*`. Pipeline: `detect` (acha `front-end/package.json`, lê `NODE_VERSION` de
 `docker/.env.example`) → `quality` (`npm install`, depois lint · format · typecheck ·
 test · `npm audit` · build, cada um `--if-present`) → `release` (`gh release
 create` com notas geradas e o `dist/` compilado zipado). Enquanto não existir
-`app/package.json`, o `quality` é pulado e o workflow ainda publica um Release
+`front-end/package.json`, o `quality` é pulado e o workflow ainda publica um Release
 para a tag. **Esse Release é o artefato final entregável.**
 
 ---
@@ -153,7 +153,7 @@ para a tag. **Esse Release é o artefato final entregável.**
 ## 🧭 Documentação relacionada
 
 [🏠 Visão geral](../README.pt-BR.md) ·
-[🎨 app/](../app/README.pt-BR.md) ·
+[🎨 front-end/](../front-end/README.pt-BR.md) ·
 [🐳 docker/](../docker/README.pt-BR.md) ·
 [🧩 .devcontainer/](../.devcontainer/README.pt-BR.md) ·
 [🤖 CLAUDE.md](../CLAUDE.md)

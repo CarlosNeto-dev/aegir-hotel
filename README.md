@@ -27,9 +27,32 @@ Planned for later — already accounted for in the stack and the container setup
 **database**, and **Python** tooling for the asset/data pipeline. GPU passthrough
 is already wired (opt-in) for that work.
 
-> ℹ️ The repo is currently a **scaffold**: the container setup is complete and
-> verified, `app/` holds the agreed folder structure, and the application code is
-> added by following [`app/README.md`](app/README.md).
+> ℹ️ The repo is currently a **scaffold**. On **this branch** the web client is only
+> a **folder and file skeleton** — see
+> [Purpose of this branch](#-purpose-of-this-branch).
+
+---
+
+## 🎯 Purpose of this branch
+
+`frontend-architecture-organization` exists for one thing: **organizing the
+front-end architecture**. It carries only the **folder and file structure** of the
+web client (`front-end/`), so the whole team can see, review and agree on where
+every piece lives before any code is written.
+
+- **Structure only.** Every `.ts` / `.tsx` / `.scss` file under `front-end/app/` is
+  **empty on purpose**; each folder that holds them keeps a `.gitkeep`.
+- **Four real files** record the decisions: `package.json` (pnpm),
+  `next.config.ts` (SCSS `includePaths`), `tsconfig.json` (the `@/*` alias) and
+  `pnpm-workspace.yaml`.
+- **It does not build, and that is expected** — an empty `page.tsx` is not a module.
+  The code is written in feature branches, on top of this skeleton.
+- **Out of scope:** Docker, dev-container and CI were not redesigned here; only
+  their host paths now point to `front-end/`. Their commands and the tech-stack
+  table below still describe the earlier Vite + npm setup.
+- **The rules of the structure** (routes in Portuguese, everything else in
+  English, one folder per component…) live in
+  [`front-end/README.md`](front-end/README.md).
 
 ---
 
@@ -63,12 +86,11 @@ aegir-hotel/
 ├── .devcontainer/
 │   ├── frontend/devcontainer.json     # VS Code / Codespaces dev-container (reuses compose)
 │   └── README.md · README.pt-BR.md · CLAUDE.md
-├── app/                               # the web client — bind-mounted into the container
-│   ├── index.html                     # Vite entry document
+├── front-end/                         # the web client skeleton — bind-mounted into the container
 │   ├── public/                        # static assets served as-is
-│   ├── src/
-│   │   ├── assets/ components/ hooks/ lib/ pages/ scenes/ styles/ types/
-│   │   └── …                          # feature-first: Foo.tsx + Foo.module.scss together
+│   ├── next.config.ts · tsconfig.json · package.json · pnpm-workspace.yaml
+│   ├── app/                           # routes + _shared/ (shared) + _styles/ (global SCSS)
+│   │                                  # files empty on purpose: Foo/Foo.tsx + Foo/Foo.module.scss
 │   └── README.md · README.pt-BR.md · CLAUDE.md
 ├── docker/
 │   ├── Dockerfile.frontend            # multi-stage: base → debugger → build → production
@@ -122,10 +144,10 @@ walkthrough live in [`docker/README.md`](docker/README.md).
 ## 💻 Local development without Docker (optional)
 
 Needs Node `24.x` on the host and the app already bootstrapped
-([`app/README.md`](app/README.md)).
+([`front-end/README.md`](front-end/README.md)).
 
 ```bash
-cd app && npm install && npm run dev
+cd front-end && npm install && npm run dev
 ```
 
 The Docker path is the supported one.
@@ -176,7 +198,7 @@ GitHub Release.
 |------|----------|
 | `README.md` · [`README.pt-BR.md`](README.pt-BR.md) | project overview (this page) |
 | [`.github/CONTRIBUTING.md`](.github/CONTRIBUTING.md) · [pt-BR](.github/CONTRIBUTING.pt-BR.md) | **the workflow guide**: environment, branches, issues, PRs, releases |
-| [`app/README.md`](app/README.md) · [pt-BR](app/README.pt-BR.md) | folder structure + step-by-step app bootstrap guide |
+| [`front-end/README.md`](front-end/README.md) · [pt-BR](front-end/README.pt-BR.md) | the architecture: folder structure and rules of the web client |
 | [`docker/README.md`](docker/README.md) · [pt-BR](docker/README.pt-BR.md) | images, Compose, GPU, hot-reload workflow, troubleshooting |
 | [`.devcontainer/README.md`](.devcontainer/README.md) · [pt-BR](.devcontainer/README.pt-BR.md) | the VS Code dev-container |
 | [`CLAUDE.md`](CLAUDE.md) | conventions for the Claude Code agent |

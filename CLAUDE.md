@@ -10,16 +10,20 @@ react-three-fiber / three.js, Blender assets, a database, and **Python** pipelin
 tooling. Python is *documented* as future in the stack list but is **not** in the
 containers — do not add a backend/Python service unless asked.
 
-The repo is a **scaffold**: container setup is complete and verified; `app/`
-holds the folder skeleton only.
+This branch (`frontend-architecture-organization`) is the **architecture
+skeleton**: `front-end/` holds only the folder and file structure of the
+Next.js App Router client. Every `.ts` / `.tsx` / `.scss` file is **empty on
+purpose** (each folder that holds them keeps a `.gitkeep`), so it does not build.
+Docker, dev-container and CI were not redesigned: only their host paths point to
+`front-end/`, and their commands still describe the earlier Vite + npm setup.
+`front-end/CLAUDE.md` is the source of truth for the structure.
 
 ## Layout
 
 | Path | What |
 |------|------|
-| `app/` | the web client; bind-mounted to `/app` in the container. Only this folder is mounted. |
-| `app/index.html` | Vite entry — keep it at `app/` root, never in `src/`. |
-| `app/src/` | feature-first: `Foo.tsx` + `Foo.module.scss` + `Foo.test.tsx` co-located. `src/styles/` is **global SCSS only**. |
+| `front-end/` | the web client skeleton; bind-mounted to `/app` in the container. Only this folder is mounted. |
+| `front-end/app/` | routes (App Router) + `_shared/` (header, panels, overlays, `lib/` api + data) + `_styles/` (global SCSS). One folder per component: `Foo/Foo.tsx` + `Foo/Foo.module.scss`. Only route folders (URL segments) are Portuguese; everything else is English. |
 | `docker/` | `Dockerfile.frontend` (multi-stage), `docker-compose.yml`, `docker-compose.override.yml` (GPU), `.env`. |
 | `.devcontainer/frontend/` | VS Code dev-container, reuses the compose file. |
 | `.github/` | `CODEOWNERS`, issue/PR templates, `workflows/release.yml` (CI **only** on `v*.*.*` tags), and `CONTRIBUTING.md` (+ `.pt-BR`) = the workflow guide. No `README.md` here — it would replace the root README as the repo home page. |
@@ -72,14 +76,9 @@ Ports (from `docker/.env`): `5173` dev server, `4173` preview, `51204` Vitest UI
 
 - Components: `PascalCase` folder + files, default export.
 - Hooks: `useThing.ts`, one per file.
-- Import alias: `@/` → `src/`.
+- Import alias: `@/` → the `front-end/` root (e.g. `@/app/_shared/…`).
 - Tests: `*.test.tsx` next to the component, `@testing-library/react` + Vitest.
-- Styles: `*.module.scss` beside the component; globals only in `src/styles/`.
-  The global sheet is `src/styles/main.scss`, imported once in `src/main.tsx`.
-  Vite compiles SCSS (modern Dart Sass API) on import — that is the only path the
-  app uses. `glenn2223.live-sass` is an optional extra that writes a standalone
-  build to `app/src/styles/css/` (git-ignored, folder kept via `.gitkeep`;
-  `*.module.scss` excluded); the app never imports those files.
+- Styles: `Foo.module.scss` beside `Foo.tsx`; globals only in `front-end/app/_styles/` (`main.scss`, imported once in `app/layout.tsx`). Next compiles SCSS natively; `next.config.ts` sets `sassOptions.includePaths` to `app/_styles`.
 
 ## Gotchas
 
@@ -91,7 +90,7 @@ Ports (from `docker/.env`): `5173` dev server, `4173` preview, `51204` Vitest UI
   `npm install-scripts approve <pkg>`.
 - **`tests` service exits with no test files** (Vitest behaviour). `restart:
   on-failure` stops it looping. It stays resident once a `*.test.tsx` exists.
-- **`build` / `production` image targets need `app/package.json` + lock file.**
+- **`build` / `production` image targets need `front-end/package.json` + lock file.**
   Only `debugger` builds on a bare scaffold.
 - **GPU** lives in `docker-compose.override.yml`; non-GPU machines must pass
   `-f docker-compose.yml` explicitly.
