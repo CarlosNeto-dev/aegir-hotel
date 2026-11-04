@@ -1,32 +1,30 @@
-@use "tools/breakpoints" as *;
-
 :root {
+  color-scheme: light;
   --color-paper: #f4f0ea;
+  --color-paper-rgb: 244, 240, 234;
+  --color-white: #fbf9f5;
   --color-ink: #171614;
-  --color-grey: #77716a;
-  --color-grey-light: #a69f95;
+  --color-gray: #77716a;
   --color-line: #e1dbd1;
   --color-wood: #9c6438;
-
+  --color-shadow-rgb: 60, 45, 30;
   --color-glass: rgba(251, 249, 245, 0.3);
-  --color-glass-edge: rgba(255, 255, 255, 0.55);
+  --color-glass-border: rgba(255, 255, 255, 0.55);
   --color-glass-hover: rgba(255, 255, 255, 0.7);
-  --color-card: rgba(251, 249, 245, 0.97);
-  --color-shadow: rgba(60, 45, 30, 0.35);
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+}
 
-  --ease: cubic-bezier(0.22, 1, 0.36, 1);
-  --gutter: clamp(2rem, 4vw, 5.6rem);
-
-  --header-top: 1.2rem;
-  --header-h: 5.8rem;
-
-  @include from-tablet {
-    --header-top: 1.6rem;
-    --header-h: 7.2rem;
-  }
-
-  @include from-tv {
-    --header-top: 4rem;
-    --header-h: 14.4rem;
-  }
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --color-paper: #12110f;
+  --color-paper-rgb: 18, 17, 15;
+  --color-white: #1a1815;
+  --color-ink: #f1ece4;
+  --color-gray: #a59d92;
+  --color-line: rgba(241, 236, 228, 0.13);
+  --color-wood: #c88a55;
+  --color-shadow-rgb: 0, 0, 0;
+  --color-glass: rgba(24, 22, 20, 0.62);
+  --color-glass-border: rgba(255, 255, 255, 0.13);
+  --color-glass-hover: rgba(255, 255, 255, 0.13);
 }

@@ -1,43 +1,20 @@
-import type { Metadata } from "next";
-import { Inter, JetBrains_Mono, Playfair_Display } from "next/font/google";
-import SiteHeaderLayout from "@/app/_shared/site-header/SiteHeaderLayout/SiteHeaderLayout";
+import type { ReactNode } from "react";
+import { SiteHeaderLayout } from "./_shared/site-header/SiteHeaderLayout/SiteHeaderLayout";
+import { ThemeToggle } from "./_shared/theme-toggle/ThemeToggle";
 import "./_styles/main.scss";
 
-const fontTitle = Playfair_Display({
-  subsets: ["latin"],
-  variable: "--font-title",
-  display: "swap",
-});
+const themeScript = `(function(){try{var t=localStorage.getItem("theme");if(!t){t=matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"}document.documentElement.dataset.theme=t}catch(e){}})()`;
 
-const fontMono = JetBrains_Mono({
-  subsets: ["latin"],
-  variable: "--font-mono",
-  display: "swap",
-});
-
-const fontBody = Inter({
-  subsets: ["latin"],
-  variable: "--font-body",
-  display: "swap",
-});
-
-export const metadata: Metadata = {
-  title: { default: "Aegir", template: "%s · Aegir" },
-};
-
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html
-      lang="pt-BR"
-      className={`${fontTitle.variable} ${fontMono.variable} ${fontBody.variable}`}
-    >
+    <html lang="pt-BR" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
       <body>
         <SiteHeaderLayout />
         {children}
+        <ThemeToggle />
       </body>
     </html>
   );
