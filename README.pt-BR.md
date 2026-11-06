@@ -14,9 +14,7 @@
 
 **🌐 Idioma:** [English](README.md) · **Português**
 
-> ⚠️ **Em andamento:** este projeto muda o tempo todo, e nenhuma das imagens abaixo mostra ainda o produto final.
-
-![Aegir Hotel no computador e no celular](docs/images/hero.jpg)
+> ⚠️ **Em andamento:** este projeto muda o tempo todo.
 
 ---
 
@@ -41,12 +39,6 @@ O **Aegir** é um hotel fictício de frente para o mar, no litoral da Bahia, em 
 - **Reserva:** datas, hóspedes e suíte com estimativa na hora, e uma etapa de login antes do pagamento.
 - **Painel de ajustes e tema escuro:** tema, cursor, efeitos e qualidade gráfica, com o tema escuro aplicado antes de a página aparecer.
 - **Celular:** o menu vira um leque de cartas que se arrasta para o lado, e cada seção se adapta a uma coluna.
-
-![Visualizador 3D com o hotel ao pôr do sol](docs/images/3d-viewer.jpg)
-
-![Planta do térreo, maquete e fachada em 3D](docs/images/architecture.jpg)
-
-![Versão para celular](docs/images/mobile.jpg)
 
 ---
 
