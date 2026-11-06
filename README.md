@@ -14,9 +14,8 @@
 
 **🌐 Language:** **English** · [Português](README.pt-BR.md)
 
-> ⚠️ **Work in progress:** this project changes constantly, and none of the images below shows the final product yet.
+> ⚠️ **Work in progress:** this project changes constantly.
 
-![Aegir Hotel on desktop and mobile](docs/images/hero.jpg)
 
 ---
 
@@ -41,12 +40,6 @@ This is a university team project at **UNIESP**, developed by a team of 5.
 - **Booking flow:** dates, guests and suite with an instant estimate, plus a sign-in step before payment.
 - **Settings panel and dark theme:** theme, cursor, effects and graphics quality, with the dark theme applied before the page appears.
 - **Mobile:** the menu becomes a fan of cards you swipe through, and every section adapts to one column.
-
-![3D viewer with the hotel at sunset](docs/images/3d-viewer.jpg)
-
-![Ground floor plan, scale model and facade in 3D](docs/images/architecture.jpg)
-
-![Mobile version](docs/images/mobile.jpg)
 
 ---
 
