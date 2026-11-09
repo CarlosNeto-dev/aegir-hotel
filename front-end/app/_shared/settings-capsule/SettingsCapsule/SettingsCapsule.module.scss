@@ -1,0 +1,41 @@
+@use "tools/breakpoints" as *;
+@use "tools/variables" as *;
+@use "tools/mixins" as *;
+
+.root {
+  @include glass;
+  @include row-center;
+  position: fixed;
+  right: max(1.4rem, env(safe-area-inset-right, 0px));
+  bottom: calc(1.6rem + env(safe-area-inset-bottom, 0px));
+  z-index: $z-floating;
+  gap: 0.2rem;
+  padding: 0.4rem;
+  border-radius: $pill;
+  transition:
+    opacity 0.25s linear,
+    visibility 0s;
+
+  .divider {
+    flex: none;
+    width: 1px;
+    height: 2rem;
+    background: var(--color-line);
+  }
+
+  &[data-layer] {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition:
+      opacity 0.25s linear,
+      visibility 0s linear 0.25s;
+  }
+
+  @include from-tv {
+    right: 4.8rem;
+    bottom: 4.8rem;
+    transform: scale(1.5);
+    transform-origin: 100% 100%;
+  }
+}

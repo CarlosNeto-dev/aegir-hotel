@@ -1,0 +1,108 @@
+@use "tools/breakpoints" as *;
+@use "tools/mixins" as *;
+
+.root {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+
+  .legend {
+    margin-bottom: 1.2rem;
+    padding: 0;
+    color: var(--color-grey);
+    font: 500 1.05rem/1 var(--font-mono);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+
+    @include from-tv {
+      margin-bottom: 2rem;
+      font-size: 1.8rem;
+    }
+  }
+
+  .row {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.8rem;
+
+    @include from-tv {
+      gap: 1.6rem;
+    }
+  }
+
+  .option {
+    display: flex;
+    cursor: pointer;
+  }
+
+  .input {
+    @include visually-hidden;
+  }
+
+  .pill {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.6rem;
+    min-height: 7.2rem;
+    padding: 1rem 0.6rem;
+    border: 1px solid var(--color-line);
+    border-radius: 1.2rem;
+    color: var(--color-grey);
+    font: 500 1.2rem/1 var(--font-body);
+    transition:
+      border-color 0.2s linear,
+      color 0.2s linear;
+
+    @include from-tv {
+      min-height: 13rem;
+      border-radius: 2rem;
+      font-size: 2rem;
+    }
+  }
+
+  .sample {
+    color: var(--color-ink);
+    font-family: var(--font-title);
+    line-height: 1;
+  }
+
+  [data-id="normal"] .sample {
+    font-size: 1.8rem;
+  }
+
+  [data-id="large"] .sample {
+    font-size: 2.2rem;
+  }
+
+  [data-id="larger"] .sample {
+    font-size: 2.7rem;
+  }
+
+  @include from-tv {
+    [data-id="normal"] .sample {
+      font-size: 3.2rem;
+    }
+
+    [data-id="large"] .sample {
+      font-size: 4rem;
+    }
+
+    [data-id="larger"] .sample {
+      font-size: 4.8rem;
+    }
+  }
+
+  .input:checked ~ .pill {
+    border-color: var(--color-ink);
+    box-shadow: inset 0 0 0 1px var(--color-ink);
+    color: var(--color-ink);
+  }
+
+  .input:focus-visible ~ .pill {
+    @include focus-ring;
+  }
+}
