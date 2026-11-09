@@ -1,0 +1,71 @@
+@use "tools/breakpoints" as *;
+@use "tools/mixins" as *;
+
+.root {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+
+  .legend {
+    margin-bottom: 1.2rem;
+    padding: 0;
+    color: var(--color-grey);
+    font: 500 1.05rem/1 var(--font-mono);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+
+    @include from-tv {
+      margin-bottom: 2rem;
+      font-size: 1.8rem;
+    }
+  }
+
+  .current {
+    color: var(--color-ink);
+  }
+
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+
+    @include from-tv {
+      gap: 2rem;
+    }
+  }
+
+  .swatch {
+    display: flex;
+    cursor: pointer;
+  }
+
+  .input,
+  .name {
+    @include visually-hidden;
+  }
+
+  .dot {
+    width: 3.2rem;
+    height: 3.2rem;
+    border: 0.3rem solid var(--color-paper);
+    border-radius: 50%;
+    background: var(--swatch);
+    box-shadow: 0 0 0 1px var(--color-line);
+    transition: box-shadow 0.2s linear;
+
+    @include from-tv {
+      width: 6rem;
+      height: 6rem;
+      border-width: 0.5rem;
+    }
+  }
+
+  .input:checked ~ .dot {
+    box-shadow: 0 0 0 2px var(--color-ink);
+  }
+
+  .input:focus-visible ~ .dot {
+    @include focus-ring;
+  }
+}

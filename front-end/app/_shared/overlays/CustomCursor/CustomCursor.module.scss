@@ -1,0 +1,188 @@
+@use "tools/variables" as *;
+
+$line: 1.5px;
+
+.root {
+  position: fixed;
+  inset: 0;
+  z-index: $z-cursor;
+  overflow: hidden;
+  color: var(--cursor-color, var(--color-ink));
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s linear;
+
+  &[data-visible] {
+    opacity: 1;
+  }
+
+  .follower,
+  .pointer,
+  .trail {
+    position: absolute;
+    top: 0;
+    left: 0;
+    will-change: transform;
+  }
+
+  .ring,
+  .mark,
+  .trailDot {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: none;
+    translate: -50% -50%;
+    transition:
+      scale 0.25s var(--ease),
+      rotate 0.25s var(--ease),
+      opacity 0.2s linear,
+      background 0.2s linear;
+  }
+
+  &[data-shape="circle"] {
+    .ring {
+      display: block;
+      width: 1.4rem;
+      height: 1.4rem;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    &[data-hover] .ring {
+      scale: 2.6;
+      opacity: 0.3;
+    }
+
+    &[data-pressed] .ring {
+      scale: 0.8;
+    }
+  }
+
+  &[data-shape="ring"] {
+    .ring {
+      display: block;
+      width: 3.2rem;
+      height: 3.2rem;
+      border: $line solid currentColor;
+      border-radius: 50%;
+    }
+
+    &[data-hover] .ring {
+      scale: 1.5;
+    }
+
+    &[data-pressed] .ring {
+      scale: 0.85;
+    }
+  }
+
+  &[data-shape="dot"] {
+    .mark {
+      display: block;
+      width: 0.8rem;
+      height: 0.8rem;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    &[data-hover] .mark {
+      scale: 1.8;
+    }
+
+    &[data-pressed] .mark {
+      scale: 0.7;
+    }
+  }
+
+  &[data-shape="ring-dot"] {
+    .ring {
+      display: block;
+      width: 3.6rem;
+      height: 3.6rem;
+      border: $line solid currentColor;
+      border-radius: 50%;
+    }
+
+    .mark {
+      display: block;
+      width: 0.6rem;
+      height: 0.6rem;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    &[data-hover] .ring {
+      scale: 1.4;
+    }
+
+    &[data-pressed] .ring {
+      scale: 0.8;
+    }
+  }
+
+  &[data-shape="crosshair"] {
+    .mark {
+      display: block;
+      width: 2.6rem;
+      height: 2.6rem;
+      background:
+        linear-gradient(currentColor, currentColor) center / 100% $line
+          no-repeat,
+        linear-gradient(currentColor, currentColor) center / $line 100%
+          no-repeat;
+      mask: radial-gradient(circle, transparent 0.35rem, #000 0.4rem);
+    }
+
+    &[data-hover] .mark {
+      rotate: 45deg;
+      scale: 1.2;
+    }
+
+    &[data-pressed] .mark {
+      scale: 0.8;
+    }
+  }
+
+  &[data-shape="diamond"] {
+    .ring {
+      display: block;
+      width: 1.3rem;
+      height: 1.3rem;
+      border: $line solid currentColor;
+      rotate: 45deg;
+    }
+
+    &[data-hover] .ring {
+      scale: 1.4;
+      background: currentColor;
+    }
+
+    &[data-pressed] .ring {
+      scale: 0.8;
+    }
+  }
+
+  &[data-shape="trail"] {
+    .mark {
+      display: block;
+      width: 0.8rem;
+      height: 0.8rem;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    .trailDot {
+      display: block;
+      width: calc(0.8rem * (1 - var(--step) / 12));
+      height: calc(0.8rem * (1 - var(--step) / 12));
+      border-radius: 50%;
+      background: currentColor;
+      opacity: calc((1 - var(--step) / 10) * 0.5);
+    }
+
+    &[data-hover] .mark {
+      scale: 1.8;
+    }
+  }
+}

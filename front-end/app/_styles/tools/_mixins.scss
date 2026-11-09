@@ -2,15 +2,40 @@
 @use "variables" as *;
 
 @mixin focus-ring {
-  outline: 2px solid var(--color-focus);
-  outline-offset: 3px;
-  box-shadow: 0 0 0 2px var(--color-focus-halo);
+  outline: var(--focus-width) solid var(--color-focus);
+  outline-offset: var(--focus-offset);
+  box-shadow: 0 0 0 var(--focus-width) var(--color-focus-halo);
 
-  @include from-tv {
-    outline-width: 4px;
-    outline-offset: 6px;
-    box-shadow: 0 0 0 4px var(--color-focus-halo);
+  :global(:root[data-focus="thick"]) & {
+    outline-width: calc(var(--focus-width) * 2);
+    outline-offset: calc(var(--focus-offset) + var(--focus-width));
   }
+
+  :global(:root[data-focus="glow"]) & {
+    outline-color: transparent;
+    box-shadow:
+      0 0 0 var(--focus-width) var(--color-focus),
+      0 0 2rem 0.4rem color-mix(in srgb, var(--color-focus) 45%, transparent);
+  }
+
+  :global(:root[data-focus="fill"]) & {
+    outline-color: transparent;
+    background: var(--color-focus);
+    color: var(--color-focus-text);
+    box-shadow: none;
+  }
+}
+
+@mixin visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 @mixin row-center {
@@ -157,7 +182,7 @@
 
 @mixin label-open {
   gap: 0.8rem;
-  padding: 0 1.8rem;
+  padding: 0 1.6rem;
 
   .text {
     max-width: 9rem;
@@ -165,19 +190,17 @@
   }
 }
 
-@mixin floating-button {
-  @include glass;
-  @include hover-line(1.6rem, 0.8rem);
+@mixin capsule-button {
+  @include hover-line(1.4rem, 0.6rem);
   @include row-center;
-  position: fixed;
-  bottom: calc(1.6rem + env(safe-area-inset-bottom, 0px));
-  z-index: $z-floating;
   justify-content: center;
   gap: 0;
-  min-width: 5.2rem;
-  height: 5.2rem;
-  padding: 0 1.6rem;
+  min-width: 4.4rem;
+  height: 4.4rem;
+  padding: 0 1.25rem;
+  border: 0;
   border-radius: $pill;
+  background: none;
   color: var(--color-ink);
   cursor: pointer;
   font-family: var(--font-body), system-ui, sans-serif;
@@ -188,10 +211,7 @@
   white-space: nowrap;
   transition:
     gap 0.35s var(--ease),
-    padding 0.35s var(--ease),
-    bottom 0.45s var(--ease),
-    opacity 0.25s linear,
-    visibility 0.25s;
+    padding 0.35s var(--ease);
 
   svg {
     flex: none;
@@ -232,16 +252,8 @@
   }
 
   @include from-tv {
-    bottom: 4.8rem;
-    transform: scale(1.5);
-
     &::after {
       display: none;
-    }
-
-    &:focus-visible {
-      background: var(--color-ink);
-      color: var(--color-paper);
     }
   }
 }

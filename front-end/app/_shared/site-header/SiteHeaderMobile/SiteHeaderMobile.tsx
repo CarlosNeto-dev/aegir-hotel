@@ -1,6 +1,5 @@
 "use client";
 
-import { usePathname } from "next/navigation";
 import {
   useCallback,
   useEffect,
@@ -10,7 +9,7 @@ import {
   type KeyboardEvent,
   type PointerEvent,
 } from "react";
-import { ACTIONS, CTA, NAV_ITEMS } from "../header-utils/header-items";
+import { CTA, NAV_ITEMS } from "../header-utils/header-items";
 import type { SectionId } from "../header-utils/header-items";
 import HeaderBrand from "../header-utils/HeaderBrand/HeaderBrand";
 import HeaderAccount from "../header-utils/HeaderAccount/HeaderAccount";
@@ -19,11 +18,9 @@ import {
   IconChevronRight,
   IconClose,
   IconMenu,
-  IconSettings,
 } from "../header-utils/HeaderIcons/HeaderIcons";
 import LequeHint from "../header-utils/LequeHint/LequeHint";
 import { usePanels } from "../../panels/PanelProvider/PanelProvider";
-import { hasSettings } from "../../panels/settings-panel/settings-routes";
 import styles from "./SiteHeaderMobile.module.scss";
 
 type SiteHeaderMobileProps = { activeId?: SectionId };
@@ -49,7 +46,6 @@ export default function SiteHeaderMobile({ activeId }: SiteHeaderMobileProps) {
     NAV_ITEMS.findIndex((item) => item.id === activeId),
   );
 
-  const pathname = usePathname();
   const { layer, open, close } = usePanels();
   const isOpen = layer === "menu";
   const [selected, setSelected] = useState(currentIndex);
@@ -256,18 +252,6 @@ export default function SiteHeaderMobile({ activeId }: SiteHeaderMobileProps) {
           </nav>
 
           <div className={styles.foot}>
-            {hasSettings(pathname) && (
-              <button
-                type="button"
-                className={styles.settings}
-                aria-expanded={false}
-                aria-controls={ACTIONS.settings.controls}
-                onClick={() => open("settings")}
-              >
-                <IconSettings />
-                <span>{ACTIONS.settings.label}</span>
-              </button>
-            )}
             <a className={styles.cta} href={CTA.href} onClick={close}>
               {CTA.label}
             </a>
