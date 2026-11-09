@@ -1,0 +1,19 @@
+@use "tools/breakpoints" as *;
+@use "tools/mixins" as *;
+
+.root {
+  .button {
+    @include floating-button;
+    left: max(1.4rem, env(safe-area-inset-left, 0px));
+    display: none;
+
+    @include from-tablet {
+      display: flex;
+    }
+
+    @include from-tv {
+      left: 4.8rem;
+      transform-origin: 0 100%;
+    }
+  }
+}

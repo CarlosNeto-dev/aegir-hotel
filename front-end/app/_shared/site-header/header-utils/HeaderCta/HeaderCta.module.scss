@@ -7,10 +7,9 @@
 
   .link {
     @include row-center;
-    display: inline-flex;
     justify-content: center;
     min-height: clamp(3.4rem, 3rem + 0.5vw, 3.8rem);
-    padding: 0 clamp(1.4rem, 0.9rem + 0.7vw, 2rem);
+    padding: 0 clamp(1.2rem, 0.9rem + 0.4vw, 1.6rem);
     border-radius: $pill;
     font-family: var(--font-body), system-ui, sans-serif;
     font-size: clamp(1rem, 0.8286rem + 0.2232vw, 1.15rem);
@@ -18,8 +17,9 @@
     letter-spacing: 0.14em;
     text-transform: uppercase;
     white-space: nowrap;
-    color: var(--color-paper);
-    background: var(--color-ink);
+    color: var(--color-cta-text);
+    background: var(--color-cta);
+    box-shadow: inset 0 0 0 1px var(--color-cta-edge);
     transition: background 0.25s;
 
     @include from-tv {

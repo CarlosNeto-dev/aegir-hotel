@@ -1,6 +1,6 @@
-import { SectionId } from "../header-utils/header-items";
+import type { SectionId } from "../header-utils/header-items";
 import SiteHeaderDesktop from "../SiteHeaderDesktop/SiteHeaderDesktop";
-import { SiteHeaderMobile } from "../SiteHeaderMobile/SiteHeaderMobile";
+import SiteHeaderMobile from "../SiteHeaderMobile/SiteHeaderMobile";
 import SiteHeaderTV from "../SiteHeaderTV/SiteHeaderTV";
 import styles from "./SiteHeaderLayout.module.scss";
 

@@ -1,3 +1,4 @@
+@use "tools/breakpoints" as *;
 @use "tools/variables" as *;
 
 .root {
@@ -12,8 +13,8 @@
 
   .header {
     position: relative;
-    border-radius: 99.9rem;
-    box-shadow: 0 1rem 3rem -2.2rem rgba(60, 45, 30, 0.35);
+    border-radius: $pill;
+    box-shadow: 0 1rem 3rem -2.2rem var(--color-shadow);
     pointer-events: auto;
 
     &::before {
@@ -21,10 +22,18 @@
       position: absolute;
       inset: 0;
       z-index: -1;
-      border: 1px solid var(--color-glass-border);
+      border: 1px solid var(--color-glass-edge);
       border-radius: inherit;
       background: var(--color-glass);
-      backdrop-filter: blur(1.4rem) saturate(1.2);
+      backdrop-filter: blur($blur) saturate(1.2);
+    }
+
+    @include from-tv {
+      box-shadow: none;
+
+      &::before {
+        display: none;
+      }
     }
   }
 }

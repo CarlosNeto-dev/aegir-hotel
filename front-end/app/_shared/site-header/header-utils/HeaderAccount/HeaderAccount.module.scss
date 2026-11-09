@@ -1,0 +1,5 @@
+@use "tools/mixins" as *;
+
+.root {
+  @include labeled-button;
+}

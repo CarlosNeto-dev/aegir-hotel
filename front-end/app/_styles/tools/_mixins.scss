@@ -2,12 +2,14 @@
 @use "variables" as *;
 
 @mixin focus-ring {
-  outline: 2px solid var(--color-wood);
+  outline: 2px solid var(--color-focus);
   outline-offset: 3px;
+  box-shadow: 0 0 0 2px var(--color-focus-halo);
 
   @include from-tv {
     outline-width: 4px;
     outline-offset: 6px;
+    box-shadow: 0 0 0 4px var(--color-focus-halo);
   }
 }
 
@@ -19,35 +21,6 @@
 @mixin backdrop($filter) {
   backdrop-filter: $filter;
   -webkit-backdrop-filter: $filter;
-}
-
-@mixin icon-button {
-  @include row-center;
-  display: inline-flex;
-  justify-content: center;
-  width: 3.8rem;
-  height: 3.8rem;
-  padding: 0;
-  border: 0;
-  border-radius: 50%;
-  background: none;
-  color: inherit;
-  cursor: pointer;
-  transition: background 0.2s;
-
-  svg {
-    width: 2rem;
-    height: 2rem;
-  }
-
-  &:hover,
-  &[aria-expanded="true"] {
-    background: var(--color-glass-hover);
-  }
-
-  &:focus-visible {
-    @include focus-ring;
-  }
 }
 
 @mixin glass {
@@ -63,9 +36,53 @@
   }
 }
 
+@mixin line-in {
+  transform: scaleX(1);
+  transform-origin: left;
+  transition: transform 0.3s linear 0.15s;
+}
+
+@mixin hover-line($inset: 0, $bottom: -0.6rem) {
+  position: relative;
+
+  &::after {
+    content: "";
+    position: absolute;
+    right: $inset;
+    bottom: $bottom;
+    left: $inset;
+    height: 0.2rem;
+    background: currentColor;
+    pointer-events: none;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.15s linear;
+  }
+
+  &:focus-visible::after,
+  &:active::after {
+    @include line-in;
+  }
+
+  @media (hover: hover) {
+    &:hover::after {
+      @include line-in;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    &::after,
+    &:hover::after,
+    &:focus-visible::after,
+    &:active::after {
+      transition: none;
+    }
+  }
+}
+
 @mixin icon-button {
-  display: inline-flex;
-  align-items: center;
+  @include hover-line(1.1rem, 0.5rem);
+  @include row-center;
   justify-content: center;
   width: 3.8rem;
   height: 3.8rem;
@@ -75,15 +92,156 @@
   background: none;
   color: var(--color-ink);
   cursor: pointer;
-  transition: background 0.2s;
-
-  &:hover,
-  &[aria-expanded="true"] {
-    background: var(--color-glass-hover);
-  }
 
   svg {
     width: 1.7rem;
     height: 1.7rem;
+  }
+
+  &[aria-expanded="true"]::after {
+    @include line-in;
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+@mixin labeled-button {
+  @include hover-line(1.4rem, 0.8rem);
+  @include row-center;
+  gap: 0.8rem;
+  height: 4.4rem;
+  padding: 0 1.4rem;
+  border: 0;
+  border-radius: $pill;
+  background: none;
+  color: var(--color-ink);
+  cursor: pointer;
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-size: 1.3rem;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+
+  svg {
+    flex: none;
+    width: 1.8rem;
+    height: 1.8rem;
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+
+  @include from-tv {
+    gap: 1.2rem;
+    height: 8rem;
+    padding: 0 2.8rem;
+    font-size: 2.2rem;
+
+    svg {
+      width: 2.8rem;
+      height: 2.8rem;
+    }
+
+    &::after {
+      right: 2.8rem;
+      bottom: 1.8rem;
+      left: 2.8rem;
+      height: 0.3rem;
+    }
+  }
+}
+
+@mixin label-open {
+  gap: 0.8rem;
+  padding: 0 1.8rem;
+
+  .text {
+    max-width: 9rem;
+    opacity: 1;
+  }
+}
+
+@mixin floating-button {
+  @include glass;
+  @include hover-line(1.6rem, 0.8rem);
+  @include row-center;
+  position: fixed;
+  bottom: calc(1.6rem + env(safe-area-inset-bottom, 0px));
+  z-index: $z-floating;
+  justify-content: center;
+  gap: 0;
+  min-width: 5.2rem;
+  height: 5.2rem;
+  padding: 0 1.6rem;
+  border-radius: $pill;
+  color: var(--color-ink);
+  cursor: pointer;
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-size: 1.3rem;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  transition:
+    gap 0.35s var(--ease),
+    padding 0.35s var(--ease),
+    bottom 0.45s var(--ease),
+    opacity 0.25s linear,
+    visibility 0.25s;
+
+  svg {
+    flex: none;
+    width: 1.9rem;
+    height: 1.9rem;
+  }
+
+  .text {
+    display: inline-block;
+    max-width: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition:
+      max-width 0.35s var(--ease),
+      opacity 0.2s linear;
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+    @include label-open;
+  }
+
+  @media (hover: hover) {
+    &:hover {
+      @include label-open;
+    }
+  }
+
+  @media (hover: none) {
+    @include label-open;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    &,
+    .text {
+      transition: none;
+    }
+  }
+
+  @include from-tv {
+    bottom: 4.8rem;
+    transform: scale(1.5);
+
+    &::after {
+      display: none;
+    }
+
+    &:focus-visible {
+      background: var(--color-ink);
+      color: var(--color-paper);
+    }
   }
 }
