@@ -1,0 +1,55 @@
+@use "tools/breakpoints" as *;
+@use "tools/mixins" as *;
+
+.root {
+  .button {
+    @include floating-button;
+    right: max(1.4rem, env(safe-area-inset-right, 0px));
+
+    @include from-tv {
+      right: 4.8rem;
+      transform-origin: 100% 100%;
+    }
+  }
+
+  .icon {
+    display: grid;
+    flex: none;
+    width: 1.9rem;
+    height: 1.9rem;
+
+    svg {
+      grid-area: 1 / 1;
+      transition:
+        transform 0.55s var(--ease),
+        opacity 0.3s linear;
+
+      @media (prefers-reduced-motion: reduce) {
+        transition: none;
+      }
+    }
+
+    .sun {
+      opacity: 0;
+      transform: rotate(-120deg) scale(0.4);
+    }
+  }
+
+  &[data-layer="menu"] .button {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+}
+
+:global(:root[data-theme="dark"]) .root .icon {
+  .moon {
+    opacity: 0;
+    transform: rotate(120deg) scale(0.4);
+  }
+
+  .sun {
+    opacity: 1;
+    transform: none;
+  }
+}

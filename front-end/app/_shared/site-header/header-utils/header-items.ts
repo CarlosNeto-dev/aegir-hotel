@@ -59,7 +59,7 @@ export const CTA = { label: "Reservar", href: "#reserva" } as const;
 
 export const ACTIONS = {
   account: { label: "Entrar", controls: "painel-conta" },
-  settings: { label: "Ajustes do site", controls: "painel-ajustes" },
+  settings: { label: "Ajustes", controls: "painel-ajustes" },
 } as const;
 
 export const NAV_LEFT = NAV_ITEMS.slice(0, 3);

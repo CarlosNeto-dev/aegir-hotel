@@ -4,7 +4,8 @@
 .root {
   display: none;
   height: 5.6rem;
-  padding: 0 0.5rem 0 clamp(1.8rem, 1.4rem + 0.6vw, 2.2rem);
+  padding: 0 calc((5.6rem - clamp(3.4rem, 3rem + 0.5vw, 3.8rem)) / 2) 0
+    clamp(1.8rem, 1.4rem + 0.6vw, 2.2rem);
   gap: clamp(0.6rem, 0.2rem + 0.5vw, 1rem);
 
   @include from-tablet {
@@ -26,7 +27,9 @@
 
   .actions {
     @include row-center;
-    gap: 0.4rem;
-    margin-left: 0.6rem;
+    gap: calc(
+      clamp(0.7rem, -0.1rem + 1.0417vw, 1.4rem) +
+        clamp(0.6rem, 0.2rem + 0.5vw, 1rem)
+    );
   }
 }

@@ -1,6 +1,8 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import {
+  useCallback,
   useEffect,
   useId,
   useRef,
@@ -11,19 +13,25 @@ import {
 import { ACTIONS, CTA, NAV_ITEMS } from "../header-utils/header-items";
 import type { SectionId } from "../header-utils/header-items";
 import HeaderBrand from "../header-utils/HeaderBrand/HeaderBrand";
+import HeaderAccount from "../header-utils/HeaderAccount/HeaderAccount";
 import {
+  IconChevronLeft,
+  IconChevronRight,
   IconClose,
   IconMenu,
   IconSettings,
-  IconUser,
 } from "../header-utils/HeaderIcons/HeaderIcons";
+import LequeHint from "../header-utils/LequeHint/LequeHint";
+import { usePanels } from "../../panels/PanelProvider/PanelProvider";
+import { hasSettings } from "../../panels/settings-panel/settings-routes";
 import styles from "./SiteHeaderMobile.module.scss";
 
 type SiteHeaderMobileProps = { activeId?: SectionId };
 
-const TABLET_MIN = 700;
+const TABLET_MIN = 768;
 const CARD_STEP = 74;
 const CARD_ANGLE = 12;
+const HINT_IDLE_MS = 3000;
 const total = NAV_ITEMS.length;
 
 function nearest(value: number) {
@@ -34,18 +42,22 @@ function pad(value: number) {
   return String(value).padStart(2, "0");
 }
 
-export function SiteHeaderMobile({ activeId }: SiteHeaderMobileProps) {
+export default function SiteHeaderMobile({ activeId }: SiteHeaderMobileProps) {
   const menuId = useId();
   const currentIndex = Math.max(
     0,
     NAV_ITEMS.findIndex((item) => item.id === activeId),
   );
 
-  const [isOpen, setIsOpen] = useState(false);
+  const pathname = usePathname();
+  const { layer, open, close } = usePanels();
+  const isOpen = layer === "menu";
   const [selected, setSelected] = useState(currentIndex);
   const [dragShift, setDragShift] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
-  const [progress, setProgress] = useState(0);
+  const [showHint, setShowHint] = useState(false);
+  const [hintRun, setHintRun] = useState(0);
+  const hintTimer = useRef<number | null>(null);
   const dragStart = useRef<number | null>(null);
   const didDrag = useRef(false);
 
@@ -53,34 +65,56 @@ export function SiteHeaderMobile({ activeId }: SiteHeaderMobileProps) {
   const shownIndex = ((Math.round(position) % total) + total) % total;
   const shown = NAV_ITEMS[shownIndex];
 
-  useEffect(() => {
-    if (!isOpen) return;
-    document.documentElement.style.overflow = "hidden";
-    return () => {
-      document.documentElement.style.overflow = "";
-    };
-  }, [isOpen]);
+  const scheduleHint = useCallback(() => {
+    if (hintTimer.current) window.clearTimeout(hintTimer.current);
+    hintTimer.current = window.setTimeout(() => {
+      setHintRun((run) => run + 1);
+      setShowHint(true);
+    }, HINT_IDLE_MS);
+  }, []);
 
   useEffect(() => {
+    if (!isOpen) {
+      setShowHint(false);
+      return;
+    }
+    scheduleHint();
+    return () => {
+      if (hintTimer.current) window.clearTimeout(hintTimer.current);
+    };
+  }, [isOpen, scheduleHint]);
+
+  useEffect(() => {
+    if (!isOpen) return;
     const query = window.matchMedia(`(min-width: ${TABLET_MIN}px)`);
     function closeOnTablet(event: MediaQueryListEvent) {
-      if (event.matches) setIsOpen(false);
+      if (event.matches) close();
     }
     query.addEventListener("change", closeOnTablet);
     return () => query.removeEventListener("change", closeOnTablet);
-  }, []);
+  }, [isOpen, close]);
 
   function toggleMenu() {
-    if (!isOpen) {
-      const max = document.documentElement.scrollHeight - window.innerHeight;
-      setProgress(max > 0 ? Math.round((window.scrollY / max) * 100) : 0);
-      setSelected(currentIndex);
+    if (isOpen) {
+      close();
+      return;
     }
-    setIsOpen(!isOpen);
+    setSelected(currentIndex);
+    open("menu");
+  }
+
+  function registerActivity() {
+    setShowHint(false);
+    scheduleHint();
+  }
+
+  function goBy(step: number) {
+    registerActivity();
+    setSelected((selected + step + total) % total);
   }
 
   function goTo(id: string) {
-    setIsOpen(false);
+    close();
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
   }
 
@@ -94,6 +128,7 @@ export function SiteHeaderMobile({ activeId }: SiteHeaderMobileProps) {
   }
 
   function handlePointerDown(event: PointerEvent<HTMLElement>) {
+    registerActivity();
     dragStart.current = event.clientX;
     didDrag.current = false;
   }
@@ -120,8 +155,8 @@ export function SiteHeaderMobile({ activeId }: SiteHeaderMobileProps) {
   }
 
   function handleKeyDown(event: KeyboardEvent<HTMLElement>) {
-    if (event.key === "ArrowRight") setSelected((selected + 1) % total);
-    if (event.key === "ArrowLeft") setSelected((selected - 1 + total) % total);
+    if (event.key === "ArrowRight") goBy(1);
+    if (event.key === "ArrowLeft") goBy(-1);
   }
 
   return (
@@ -134,12 +169,12 @@ export function SiteHeaderMobile({ activeId }: SiteHeaderMobileProps) {
         <button
           type="button"
           className={styles.button}
-          aria-label={isOpen ? "Fechar menu" : "Abrir menu"}
           aria-expanded={isOpen}
           aria-controls={menuId}
           onClick={toggleMenu}
         >
           {isOpen ? <IconClose /> : <IconMenu />}
+          <span>{isOpen ? "Fechar" : "Menu"}</span>
         </button>
 
         <div
@@ -195,18 +230,45 @@ export function SiteHeaderMobile({ activeId }: SiteHeaderMobileProps) {
                 </button>
               );
             })}
+
+            <button
+              type="button"
+              className={`${styles.arrow} ${styles.prev}`}
+              aria-label="Seção anterior"
+              onPointerDown={(event) => event.stopPropagation()}
+              onClick={() => goBy(-1)}
+            >
+              <IconChevronLeft />
+            </button>
+            <button
+              type="button"
+              className={`${styles.arrow} ${styles.next}`}
+              aria-label="Próxima seção"
+              onPointerDown={(event) => event.stopPropagation()}
+              onClick={() => goBy(1)}
+            >
+              <IconChevronRight />
+            </button>
+
+            {isOpen && showHint && (
+              <LequeHint key={hintRun} onDone={registerActivity} />
+            )}
           </nav>
 
-          <p className={styles.progress}>
-            Você já viu <b>{progress}%</b> da página
-          </p>
-
           <div className={styles.foot}>
-            <a
-              className={styles.cta}
-              href={CTA.href}
-              onClick={() => setIsOpen(false)}
-            >
+            {hasSettings(pathname) && (
+              <button
+                type="button"
+                className={styles.settings}
+                aria-expanded={false}
+                aria-controls={ACTIONS.settings.controls}
+                onClick={() => open("settings")}
+              >
+                <IconSettings />
+                <span>{ACTIONS.settings.label}</span>
+              </button>
+            )}
+            <a className={styles.cta} href={CTA.href} onClick={close}>
               {CTA.label}
             </a>
           </div>
@@ -214,24 +276,7 @@ export function SiteHeaderMobile({ activeId }: SiteHeaderMobileProps) {
       </div>
 
       <div className={styles.actions}>
-        <button
-          type="button"
-          className={styles.button}
-          aria-label={ACTIONS.settings.label}
-          aria-controls={ACTIONS.settings.controls}
-          aria-expanded={false}
-        >
-          <IconSettings />
-        </button>
-        <button
-          type="button"
-          className={styles.button}
-          aria-label={ACTIONS.account.label}
-          aria-controls={ACTIONS.account.controls}
-          aria-expanded={false}
-        >
-          <IconUser />
-        </button>
+        <HeaderAccount />
       </div>
     </div>
   );

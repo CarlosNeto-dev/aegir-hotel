@@ -1,4 +1,5 @@
 @use "tools/breakpoints" as *;
+@use "tools/variables" as *;
 @use "tools/mixins" as *;
 
 .root {
@@ -13,11 +14,11 @@
   }
 
   .brand {
-    margin-right: 2.2rem;
+    margin-right: 1.2rem;
   }
 
   .button {
-    @include icon-button;
+    @include labeled-button;
   }
 
   .toggle {
@@ -39,13 +40,13 @@
       opacity: 0;
       visibility: hidden;
       transition:
-        opacity 0.35s var(--ease-out),
+        opacity 0.35s var(--ease),
         visibility 0s 0.35s;
 
       &.open {
         opacity: 1;
         visibility: visible;
-        transition: opacity 0.35s var(--ease-out);
+        transition: opacity 0.35s var(--ease);
       }
 
       .info {
@@ -64,7 +65,7 @@
         .title {
           margin: 0;
           font: 400 clamp(3.4rem, min(12vw, 7.2svh), 5.6rem) / 1.02
-            var(--font-serif);
+            var(--font-title);
           letter-spacing: -0.01em;
           color: var(--color-ink);
         }
@@ -73,7 +74,7 @@
           margin: 0;
           font-size: 1.5rem;
           line-height: 1.5;
-          color: var(--color-gray);
+          color: var(--color-grey);
         }
       }
 
@@ -111,8 +112,8 @@
           cursor: inherit;
           transform-origin: 50% var(--card-radius);
           transition:
-            transform 0.45s var(--ease-out),
-            opacity 0.45s var(--ease-out);
+            transform 0.45s var(--ease),
+            opacity 0.45s var(--ease);
           will-change: transform, opacity;
 
           &::after {
@@ -127,8 +128,7 @@
           }
 
           &:focus-visible {
-            outline: 0.2rem solid var(--color-wood);
-            outline-offset: 0.3rem;
+            @include focus-ring;
           }
 
           .cardHere {
@@ -137,8 +137,8 @@
             right: 0.8rem;
             z-index: 1;
             padding: 0.4rem 0.6rem;
-            border-radius: 99.9rem;
-            background: var(--color-wood);
+            border-radius: $pill;
+            background: var(--color-badge);
             color: #fbf9f5;
             font: 500 0.8rem/1 var(--font-mono);
             letter-spacing: 0.14em;
@@ -163,35 +163,68 @@
             b {
               display: block;
               margin-top: 0.4rem;
-              font: 400 1.5rem/1.1 var(--font-serif);
+              font: 400 1.5rem/1.1 var(--font-title);
             }
           }
         }
       }
 
-      .progress {
-        margin: 0;
-        font: 400 1.1rem/1 var(--font-mono);
-        letter-spacing: 0.14em;
-        text-transform: uppercase;
-        color: var(--color-gray);
+      .arrow {
+        position: absolute;
+        top: calc(50% - var(--card-h) * 0.26 - 2.2rem);
+        z-index: 110;
+        display: grid;
+        place-items: center;
+        width: 4.4rem;
+        height: 4.4rem;
+        padding: 0;
+        border: 0;
+        border-radius: 50%;
+        background: rgba(var(--color-paper-rgb), 0.88);
+        color: var(--color-ink);
+        box-shadow: 0 0.6rem 1.8rem rgba(var(--color-shadow-rgb), 0.22);
+        cursor: pointer;
 
-        b {
-          font-weight: 400;
-          color: var(--color-ink);
+        svg {
+          width: 2rem;
+          height: 2rem;
+        }
+
+        &:focus-visible {
+          @include focus-ring;
+        }
+
+        &.prev {
+          left: 1rem;
+        }
+
+        &.next {
+          right: 1rem;
         }
       }
 
       .foot {
+        display: flex;
+        gap: 1rem;
+
+        .settings {
+          @include labeled-button;
+          height: 4.6rem;
+          padding: 0 2rem;
+          border: 1px solid var(--color-line);
+        }
+
         .cta {
+          flex: 1;
           display: flex;
           align-items: center;
           justify-content: center;
           min-height: 4.6rem;
-          border-radius: 99.9rem;
-          background: var(--color-ink);
-          color: var(--color-paper);
-          font: 500 1.2rem/1 var(--font-sans);
+          border-radius: $pill;
+          background: var(--color-cta);
+          color: var(--color-cta-text);
+          box-shadow: inset 0 0 0 1px var(--color-cta-edge);
+          font: 500 1.2rem/1 var(--font-body);
           letter-spacing: 0.16em;
           text-transform: uppercase;
           text-decoration: none;
