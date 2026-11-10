@@ -40,7 +40,20 @@
     --color-glass-edge: rgba(241, 236, 228, 0.5);
   }
 
+  &[data-speed="slow"] {
+    --pace: 1.4;
+  }
+
+  &[data-speed="fast"] {
+    --pace: 0.65;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    --move: 0;
+  }
+
   &[data-reduce-motion] {
+    --move: 0;
     scroll-behavior: auto;
 
     *:not([data-keep-motion], [data-keep-motion] *),
