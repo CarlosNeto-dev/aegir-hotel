@@ -1,14 +1,8 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { prefersLessMotion } from "../../../../lib/motion";
 import styles from "./DemoVideo.module.scss";
-
-function prefersLessMotion() {
-  return (
-    document.documentElement.hasAttribute("data-reduce-motion") ||
-    window.matchMedia("(prefers-reduced-motion: reduce)").matches
-  );
-}
 
 export default function DemoVideo({ src }: { src: string }) {
   const videoRef = useRef<HTMLVideoElement>(null);

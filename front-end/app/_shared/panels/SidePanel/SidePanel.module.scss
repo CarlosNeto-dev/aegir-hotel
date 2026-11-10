@@ -1,0 +1,159 @@
+@use "tools/breakpoints" as *;
+@use "tools/variables" as *;
+@use "tools/mixins" as *;
+
+$gutter: 2.4rem;
+
+.root {
+  position: fixed;
+  inset: 0;
+  z-index: $z-panel;
+  visibility: hidden;
+  pointer-events: none;
+  transition: visibility 0s linear 0.45s;
+
+  .backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(var(--color-shadow-rgb), 0.28);
+    opacity: 0;
+    transition: opacity 0.3s linear;
+  }
+
+  .panel {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    background: var(--color-paper);
+    color: var(--color-ink);
+    transform: translateX(100%);
+    transition: transform 0.45s var(--ease);
+
+    @include from-tablet {
+      inset: 1.2rem 1.2rem 1.2rem auto;
+      width: min(44rem, calc(100% - 2.4rem));
+      border: 1px solid var(--color-line);
+      border-radius: 2.4rem;
+      box-shadow: 0 2rem 6rem -2rem var(--color-shadow);
+      transform: translateX(calc(100% + 2.4rem));
+    }
+
+    @include from-tv {
+      inset: 4.8rem 4.8rem 4.8rem auto;
+      width: 80rem;
+      border-radius: 4rem;
+      transform: translateX(calc(100% + 9.6rem));
+    }
+  }
+
+  .head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1.6rem;
+    padding: calc(2.4rem + env(safe-area-inset-top, 0px))
+      max($gutter, env(safe-area-inset-right, 0px)) 2rem
+      max($gutter, env(safe-area-inset-left, 0px));
+    border-bottom: 1px solid var(--color-line);
+
+    @include from-tablet {
+      padding: 2.4rem $gutter 2rem;
+    }
+
+    @include from-tv {
+      padding: 4.8rem 4.8rem 4rem;
+    }
+
+    .heading {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+
+    .eyebrow {
+      color: var(--color-grey);
+      font: 500 1.1rem/1 var(--font-mono);
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+
+      @include from-tv {
+        font-size: 2rem;
+      }
+    }
+
+    .title {
+      font: 400 3.2rem/1 var(--font-title);
+      text-wrap: balance;
+
+      @include from-tv {
+        font-size: 6.4rem;
+      }
+    }
+
+    .close {
+      @include labeled-button;
+      flex: none;
+      border: 1px solid var(--color-line);
+    }
+  }
+
+  .body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 0.8rem max($gutter, env(safe-area-inset-right, 0px)) 0.8rem
+      max($gutter, env(safe-area-inset-left, 0px));
+
+    @include from-tablet {
+      padding: 0.8rem $gutter;
+    }
+
+    @include from-tv {
+      padding: 1.6rem 4.8rem;
+    }
+  }
+
+  .foot {
+    padding: 1.6rem max($gutter, env(safe-area-inset-right, 0px))
+      calc(1.6rem + env(safe-area-inset-bottom, 0px))
+      max($gutter, env(safe-area-inset-left, 0px));
+    border-top: 1px solid var(--color-line);
+    color: var(--color-grey);
+    font: 500 1.1rem/1.4 var(--font-mono);
+    letter-spacing: 0.06em;
+
+    @include from-tablet {
+      padding: 1.6rem $gutter;
+    }
+
+    @include from-tv {
+      padding: 3.2rem 4.8rem;
+      font-size: 2rem;
+    }
+  }
+
+  &[data-open] {
+    visibility: visible;
+    pointer-events: auto;
+    transition: none;
+
+    .backdrop {
+      opacity: 1;
+    }
+
+    .panel {
+      transform: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    &,
+    .backdrop,
+    .panel {
+      transition: none;
+    }
+  }
+}
