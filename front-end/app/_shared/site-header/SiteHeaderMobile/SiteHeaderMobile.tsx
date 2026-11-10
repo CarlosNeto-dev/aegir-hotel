@@ -1,5 +1,6 @@
 "use client";
 
+import { usePathname, useRouter } from "next/navigation";
 import {
   useCallback,
   useEffect,
@@ -10,7 +11,6 @@ import {
   type PointerEvent,
 } from "react";
 import { CTA, NAV_ITEMS } from "../header-utils/header-items";
-import type { SectionId } from "../header-utils/header-items";
 import HeaderBrand from "../header-utils/HeaderBrand/HeaderBrand";
 import HeaderAccount from "../header-utils/HeaderAccount/HeaderAccount";
 import {
@@ -20,10 +20,11 @@ import {
   IconMenu,
 } from "../header-utils/HeaderIcons/HeaderIcons";
 import LequeHint from "../header-utils/LequeHint/LequeHint";
+import SectionLink from "../header-utils/SectionLink/SectionLink";
+import { useActiveId } from "../header-hooks/ActiveSectionProvider";
+import { scrollToSection } from "../header-hooks/scroll-to-section";
 import { usePanels } from "../../panels/PanelProvider/PanelProvider";
 import styles from "./SiteHeaderMobile.module.scss";
-
-type SiteHeaderMobileProps = { activeId?: SectionId };
 
 const TABLET_MIN = 768;
 const CARD_STEP = 74;
@@ -39,12 +40,13 @@ function pad(value: number) {
   return String(value).padStart(2, "0");
 }
 
-export default function SiteHeaderMobile({ activeId }: SiteHeaderMobileProps) {
+export default function SiteHeaderMobile() {
   const menuId = useId();
-  const currentIndex = Math.max(
-    0,
-    NAV_ITEMS.findIndex((item) => item.id === activeId),
-  );
+  const pathname = usePathname();
+  const router = useRouter();
+  const activeId = useActiveId();
+  const activeIndex = NAV_ITEMS.findIndex((item) => item.id === activeId);
+  const currentIndex = Math.max(0, activeIndex);
 
   const { layer, open, close } = usePanels();
   const isOpen = layer === "menu";
@@ -111,7 +113,11 @@ export default function SiteHeaderMobile({ activeId }: SiteHeaderMobileProps) {
 
   function goTo(id: string) {
     close();
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+    if (pathname === "/") {
+      scrollToSection(id);
+      return;
+    }
+    router.push(`/#${id}`);
   }
 
   function handleCardClick(index: number) {
@@ -180,7 +186,7 @@ export default function SiteHeaderMobile({ activeId }: SiteHeaderMobileProps) {
           <div className={styles.info}>
             <span className={styles.counter}>
               {pad(shownIndex + 1)} / {pad(total)}
-              {shownIndex === currentIndex ? " · Você está aqui" : ""}
+              {shownIndex === activeIndex ? " · Você está aqui" : ""}
             </span>
             <h2 className={styles.title}>{shown.label}</h2>
             <p className={styles.summary}>{shown.summary}</p>
@@ -216,7 +222,7 @@ export default function SiteHeaderMobile({ activeId }: SiteHeaderMobileProps) {
                   }}
                   onClick={() => handleCardClick(index)}
                 >
-                  {index === currentIndex && (
+                  {index === activeIndex && (
                     <span className={styles.cardHere}>Aqui</span>
                   )}
                   <span className={styles.cardText}>
@@ -252,9 +258,13 @@ export default function SiteHeaderMobile({ activeId }: SiteHeaderMobileProps) {
           </nav>
 
           <div className={styles.foot}>
-            <a className={styles.cta} href={CTA.href} onClick={close}>
+            <SectionLink
+              href={CTA.href}
+              className={styles.cta}
+              onNavigate={close}
+            >
               {CTA.label}
-            </a>
+            </SectionLink>
           </div>
         </div>
       </div>

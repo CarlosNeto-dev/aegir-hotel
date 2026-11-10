@@ -1,5 +1,5 @@
-import Link from "next/link";
 import { CTA } from "../header-items";
+import SectionLink from "../SectionLink/SectionLink";
 import styles from "./HeaderCta.module.scss";
 
 type HeaderCtaProps = {
@@ -13,9 +13,13 @@ export default function HeaderCta({
 }: HeaderCtaProps) {
   return (
     <div className={`${styles.root} ${block ? styles.block : ""}`}>
-      <Link href={CTA.href} className={styles.link} onClick={onNavigate}>
+      <SectionLink
+        href={CTA.href}
+        className={styles.link}
+        onNavigate={onNavigate}
+      >
         {CTA.label}
-      </Link>
+      </SectionLink>
     </div>
   );
 }
