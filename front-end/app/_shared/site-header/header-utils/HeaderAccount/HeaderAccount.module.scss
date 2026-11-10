@@ -1,5 +1,35 @@
+@use "tools/breakpoints" as *;
 @use "tools/mixins" as *;
 
 .root {
   @include labeled-button;
+  gap: 0;
+  min-width: 0;
+  max-width: 100%;
+
+  .avatar {
+    --avatar-size: 2.4rem;
+
+    @include from-tv {
+      --avatar-size: 4rem;
+    }
+  }
+
+  .label {
+    display: none;
+    min-width: 0;
+    max-width: 12ch;
+    margin-left: 0.8rem;
+    overflow: hidden;
+    line-height: 1.4;
+    text-overflow: ellipsis;
+
+    @include from-tablet {
+      display: block;
+    }
+
+    @include from-tv {
+      margin-left: 1.2rem;
+    }
+  }
 }
