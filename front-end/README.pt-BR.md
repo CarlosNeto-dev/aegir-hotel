@@ -51,9 +51,12 @@ front-end/
     ├── redefinir-senha/                 # /redefinir-senha (sem loading.tsx)
     ├── _shared/                  # compartilhado por todas as rotas
     │   ├── site-header/              #   SiteHeaderLayout/ Mobile/ Desktop/ TV/ · header-hooks/ · header-utils/
-    │   ├── panels/                     #   PanelProvider/ · settings-panel/SettingsPanel/
-    │   ├── overlays/               #   SiteLoader/
-    │   └── lib/                  #   api/{core, endpoints}/ · data/
+    │   ├── panels/                     #   PanelProvider/ · SidePanel/ · settings-panel/
+    │   ├── settings-capsule/           #   cápsula fixa de Tema + Ajustes
+    │   ├── smooth-scroll/              #   SmoothScrollProvider (Lenis + ScrollTrigger)
+    │   ├── auth/                       #   AuthProvider/ · GuestAvatar/
+    │   ├── overlays/               #   SiteLoader/ · SectionCurtain/ · CustomCursor/ · TouchEffect/
+    │   └── lib/                  #   gsap.ts · section-nav.ts · motion.ts · api/{core, endpoints}/ · data/
     └── _styles/                        # SOMENTE SCSS GLOBAL: main.scss · base/ · tools/
 ```
 
@@ -140,7 +143,9 @@ Verificado em 2026-11-02 numa cópia limpa no Windows (`pnpm install`, `tsc`, `n
 | Alvo Docker `build` / `production` | ❌ espera um `dist/` estático + nginx; o Next gera `.next/` |
 | Hot reload no Docker | ✅ `WATCHPACK_POLLING=true` definido no compose; edições de SCSS aparecem em ~4-20s |
 
-Não instalados (adicione quando precisar, pergunte antes): GSAP, react-three-fiber /
+Instalados para animação: GSAP 3.15 + @gsap/react 2.1 (ScrollTrigger) e Lenis 1.3.
+
+Não instalados (adicione quando precisar, pergunte antes): react-three-fiber /
 three / drei, Vitest + Testing Library, ESLint, Prettier, Stylelint.
 
 ---

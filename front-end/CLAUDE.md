@@ -14,13 +14,13 @@ site header, `layout.tsx` and the landing `page.tsx` already have the user's cod
 Each folder holding empty `.ts`/`.tsx` files carries a `.gitkeep`.
 
 Present: `package.json` (`"packageManager": "pnpm@12.15.0"`; `next 15.0.3`, `react`/`react-dom` 19 RC, `sass`,
-`typescript`, `@types/*`), `next.config.ts` (`sassOptions`), `tsconfig.json`
+`typescript`, `@types/*`, `gsap 3.15` + `@gsap/react 2.1` (ScrollTrigger), `lenis 1.3` for smooth scroll), `next.config.ts` (`sassOptions`), `tsconfig.json`
 (Next default + `@/*` → `./*`), `pnpm-workspace.yaml` (`allowBuilds` — required, see
 `../docker/CLAUDE.md`), `public/photos/`, `public/scenes/`, `app/`. Use **pnpm**, never npm.
 The folder is bind-mounted to `/app` in the container; the host folder is `front-end/`.
 
 **Not installed** (add only when needed, ask first): ESLint, Prettier, Stylelint,
-Vitest + Testing Library, GSAP, three / react-three-fiber / drei.
+Vitest + Testing Library, three / react-three-fiber / drei.
 
 ## Layout (`app/`)
 
@@ -47,10 +47,16 @@ pagamentos/                  /pagamentos            (payments-layout/PaymentsMai
 redefinir-senha/             /redefinir-senha       (reset-password-layout/ResetPasswordMain/; no loading.tsx)
 _shared/
   site-header/              SiteHeaderLayout/ SiteHeaderMobile/ SiteHeaderDesktop/ SiteHeaderTV/
-                               header-hooks/ (.gitkeep)  header-utils/{header-items.ts, HeaderBrand/ HeaderCta/ HeaderIcons/ HeaderNavList/}
-  panels/                     PanelProvider/ (no .module.scss)  settings-panel/SettingsPanel/
-  overlays/               SiteLoader/
-  lib/                  api/{core/{client,types}.ts, endpoints/{auth,bookings,payments,chat}.ts}  data/{places,photos}.ts
+                               header-hooks/{ActiveSectionProvider.tsx, useActiveSection.ts, useHeaderHidden.ts, scroll-to-section.ts}
+                               header-utils/{header-items.ts, HeaderAccount/ HeaderBrand/ HeaderCta/ HeaderIcons/ HeaderNavList/ LequeHint/ SectionLink/}
+  panels/                     PanelProvider/ (no .module.scss)  SidePanel/
+                               settings-panel/{SettingsPanel/ SettingsProvider/ settings-controls/ settings-sections/ settings-utils/}
+  settings-capsule/          SettingsCapsule/ SettingsButton/ ThemeToggle/   (fixed Theme + Settings capsule)
+  smooth-scroll/             SmoothScrollProvider/ (Lenis + ScrollTrigger; no .module.scss)
+  auth/                      AuthProvider/ GuestAvatar/ auth-utils.ts
+  overlays/               SiteLoader/ SectionCurtain/ CustomCursor/ TouchEffect/
+  lib/                  gsap.ts section-nav.ts motion.ts header-bottom.ts scroll-frame.ts
+                               api/{core/{client,types}.ts, endpoints/{auth,bookings,payments,chat}.ts}  data/{places,photos,day-moments}.ts
 _styles/                    GLOBAL SCSS only (see below)
 ```
 
