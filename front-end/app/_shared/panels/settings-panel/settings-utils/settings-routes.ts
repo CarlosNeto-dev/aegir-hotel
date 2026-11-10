@@ -17,19 +17,19 @@ const SECTIONS: Record<Exclude<SettingsSectionId, "pointer">, SectionText> = {
   },
   letters: {
     label: "Efeito das letras",
-    summary: "O sumiço suave dos textos durante a rolagem.",
+    summary: "As letras dos títulos entram e somem uma a uma durante a rolagem.",
   },
   graphics: {
     label: "Gráficos",
-    summary: "Barra de progresso e recorte das fotos.",
+    summary: "O que aparece desenhado na página.",
   },
   speed: {
     label: "Velocidade",
-    summary: "O tempo das animações da página.",
+    summary: "O tempo das animações e o quanto você rola em cada parte.",
   },
   accessibility: {
     label: "Acessibilidade",
-    summary: "Tamanho do texto, contraste, movimento, links e foco.",
+    summary: "Tamanho do texto, contraste, movimento e foco.",
   },
 };
 
@@ -53,11 +53,6 @@ const ROUTES = [
     match: (pathname: string) => pathname === "/",
     label: "Página inicial",
     sections: ["presets", "pointer", "letters", "graphics", "speed", "accessibility"],
-  },
-  {
-    match: (pathname: string) => pathname.startsWith("/ambientes-3d"),
-    label: "Ambientes 3D",
-    sections: ["pointer"],
   },
   {
     match: (pathname: string) => pathname.startsWith("/pagamentos"),

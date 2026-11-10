@@ -1,8 +1,10 @@
 :root {
   color-scheme: light;
-  --font-title: "Playfair Display", Georgia, serif;
-  --font-body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  --font-title: var(--font-title-web, "Playfair Display"), Georgia, serif;
+  --font-body:
+    var(--font-body-web, "Inter"), system-ui, -apple-system, "Segoe UI",
+    sans-serif;
+  --font-mono: var(--font-mono-web, "JetBrains Mono"), ui-monospace, monospace;
   --color-paper: #f4f0ea;
   --color-paper-rgb: 244, 240, 234;
   --color-white: #fbf9f5;
@@ -11,6 +13,9 @@
   --color-grey-light: #a8a199;
   --color-line: #e1dbd1;
   --color-wood: #9c6438;
+  --color-black: rgba(0, 0, 0, 1);
+  --color-progress-bar: var(--color-ink);
+  --color-dusk: #f0c9a4;
   --color-badge: #171614;
   --color-cta: #171614;
   --color-cta-text: #f4f0ea;
@@ -30,6 +35,9 @@
   --color-glass-edge: rgba(255, 255, 255, 0.55);
   --color-glass-hover: rgba(255, 255, 255, 0.7);
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --gutter: clamp(2rem, 5.2vw, 16rem);
+  --pace: 1;
+  --move: 1;
 }
 
 :root[data-theme="dark"] {
@@ -42,6 +50,8 @@
   --color-grey-light: #6f685f;
   --color-line: rgba(241, 236, 228, 0.13);
   --color-wood: #c88a55;
+  --color-dusk: #4a2a17;
+  --color-progress-bar: rgba(255, 255, 255, 1);
   --color-cta: #2b2825;
   --color-cta-text: #f1ece4;
   --color-cta-edge: rgba(241, 236, 228, 0.22);
