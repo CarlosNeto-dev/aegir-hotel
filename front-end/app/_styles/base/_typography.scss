@@ -1,0 +1,14 @@
+body {
+  font-family:
+    var(--font-body),
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    sans-serif;
+  font-size: 1.6rem;
+  font-weight: 300;
+  line-height: 1.65;
+  color: var(--color-ink);
+  background: var(--color-paper);
+  -webkit-font-smoothing: antialiased;
+}

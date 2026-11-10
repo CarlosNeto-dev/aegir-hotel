@@ -1,0 +1,50 @@
+@use "tools/breakpoints" as *;
+@use "tools/variables" as *;
+
+.root {
+  position: fixed;
+  top: 1.6rem;
+  right: 0;
+  left: 0;
+  z-index: $z-header;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+
+  .header {
+    position: relative;
+    min-width: 0;
+    max-width: calc(100% - 2rem);
+    border-radius: $pill;
+    transition:
+      translate 0.5s var(--ease),
+      opacity 0.35s linear;
+    box-shadow: 0 1rem 3rem -2.2rem var(--color-shadow);
+    pointer-events: auto;
+
+    &::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      border: 1px solid var(--color-glass-edge);
+      border-radius: inherit;
+      background: var(--color-glass);
+      backdrop-filter: blur($blur) saturate(1.2);
+    }
+
+    @include from-tv {
+      box-shadow: none;
+
+      &::before {
+        display: none;
+      }
+    }
+  }
+
+  &[data-hidden]:not(:has(:focus-visible)) .header {
+    opacity: 0;
+    translate: 0 calc(-100% - 2.4rem);
+    pointer-events: none;
+  }
+}

@@ -1,0 +1,454 @@
+@use "sass:math";
+@use "breakpoints" as *;
+@use "variables" as *;
+
+@function fluid-value($min, $max, $from: 390px, $to: 1440px) {
+  $min-px: math.div($min, 1rem) * 10px;
+  $max-px: math.div($max, 1rem) * 10px;
+  $slope: math.div($max-px - $min-px, $to - $from);
+  $base: math.div($min-px - $slope * $from, 10px) * 1rem;
+  $low: math.min($min, $max);
+  $high: math.max($min, $max);
+
+  @return clamp(#{$low}, #{$base} + #{$slope * 100vw}, #{$high});
+}
+
+@function fluid-extra($delta, $from: 1440px, $to: 2560px) {
+  $slope: math.div(math.div($delta, 1rem) * 10px, $to - $from);
+  $base: math.div(-$slope * $from, 10px) * 1rem;
+  $low: math.min(0rem, $delta);
+  $high: math.max(0rem, $delta);
+
+  @return clamp(#{$low}, #{$base} + #{$slope * 100vw}, #{$high});
+}
+
+@mixin fluid($property, $phone, $desktop, $tv: null) {
+  @if $tv and $tv != $desktop {
+    #{$property}: calc(
+      #{fluid-value($phone, $desktop)} + #{fluid-extra($tv - $desktop)}
+    );
+  } @else {
+    #{$property}: fluid-value($phone, $desktop);
+  }
+}
+
+@mixin kicker {
+  @include row-center;
+  gap: 1.2rem;
+  color: var(--color-grey);
+  font-family: var(--font-mono);
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  @include fluid(font-size, 1rem, 1.1rem, 1.9rem);
+
+  &::before {
+    content: "";
+    flex: none;
+    width: 2.8rem;
+    height: 1px;
+    background: currentColor;
+    opacity: 0.6;
+  }
+}
+
+@mixin display($phone, $desktop, $tv) {
+  font-family: var(--font-title);
+  font-weight: 400;
+  line-height: 1.06;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+  @include fluid(font-size, $phone, $desktop, $tv);
+
+  em {
+    font-style: italic;
+  }
+}
+
+@mixin copy {
+  color: var(--color-grey);
+  font-family: var(--font-body);
+  font-weight: 300;
+  line-height: 1.6;
+  @include fluid(font-size, 1.45rem, 1.55rem, 2.6rem);
+}
+
+@mixin focus-ring {
+  outline: var(--focus-width) solid var(--color-focus);
+  outline-offset: var(--focus-offset);
+  box-shadow: 0 0 0 var(--focus-width) var(--color-focus-halo);
+
+  :global(:root[data-focus="thick"]) & {
+    outline-width: calc(var(--focus-width) * 2);
+    outline-offset: calc(var(--focus-offset) + var(--focus-width));
+  }
+
+  :global(:root[data-focus="glow"]) & {
+    outline-color: transparent;
+    box-shadow:
+      0 0 0 var(--focus-width) var(--color-focus),
+      0 0 2rem 0.4rem color-mix(in srgb, var(--color-focus) 45%, transparent);
+  }
+
+  :global(:root[data-focus="fill"]) & {
+    outline-color: transparent;
+    background: var(--color-focus);
+    color: var(--color-focus-text);
+    box-shadow: none;
+  }
+}
+
+@mixin visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@mixin row-center {
+  display: flex;
+  align-items: center;
+}
+
+@mixin backdrop($filter) {
+  backdrop-filter: $filter;
+  -webkit-backdrop-filter: $filter;
+}
+
+@mixin glass {
+  @include backdrop(blur($blur) saturate(1.2));
+  background: var(--color-glass);
+  border: 1px solid var(--color-glass-edge);
+  box-shadow: 0 1rem 3rem -2.2rem var(--color-shadow);
+}
+
+@mixin motion-ok {
+  @media (prefers-reduced-motion: no-preference) {
+    @content;
+  }
+}
+
+@mixin line-in {
+  transform: scaleX(1);
+  transform-origin: left;
+  transition: transform 0.3s linear 0.15s;
+}
+
+@mixin hover-line($inset: 0, $bottom: -0.6rem) {
+  position: relative;
+
+  &::after {
+    content: "";
+    position: absolute;
+    right: $inset;
+    bottom: $bottom;
+    left: $inset;
+    height: 0.2rem;
+    background: currentColor;
+    pointer-events: none;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.15s linear;
+  }
+
+  &:focus-visible::after,
+  &:active::after {
+    @include line-in;
+  }
+
+  @media (hover: hover) {
+    &:hover::after {
+      @include line-in;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    &::after,
+    &:hover::after,
+    &:focus-visible::after,
+    &:active::after {
+      transition: none;
+    }
+  }
+}
+
+@mixin icon-button {
+  @include row-center;
+  justify-content: center;
+  width: 3.8rem;
+  height: 3.8rem;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: var(--color-ink);
+  cursor: pointer;
+  @include hover-line(1.1rem, 0.5rem);
+
+  svg {
+    width: 1.7rem;
+    height: 1.7rem;
+  }
+
+  &[aria-expanded="true"]::after {
+    @include line-in;
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+@mixin labeled-button {
+  @include row-center;
+  gap: 0.8rem;
+  height: 4.4rem;
+  padding: 0 1.4rem;
+  border: 0;
+  border-radius: $pill;
+  background: none;
+  color: var(--color-ink);
+  cursor: pointer;
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-size: 1.3rem;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  @include hover-line(1.4rem, 0.8rem);
+
+  svg {
+    flex: none;
+    width: 1.8rem;
+    height: 1.8rem;
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+
+  @include from-tv {
+    gap: 1.2rem;
+    height: 8rem;
+    padding: 0 2.8rem;
+    font-size: 2.2rem;
+
+    svg {
+      width: 2.8rem;
+      height: 2.8rem;
+    }
+
+    &::after {
+      right: 2.8rem;
+      bottom: 1.8rem;
+      left: 2.8rem;
+      height: 0.3rem;
+    }
+  }
+}
+
+@mixin label-open {
+  gap: 0.8rem;
+  padding: 0 1.6rem;
+
+  .text {
+    max-width: 9rem;
+    opacity: 1;
+  }
+}
+
+@mixin capsule-button {
+  @include row-center;
+  justify-content: center;
+  gap: 0;
+  min-width: 4.4rem;
+  height: 4.4rem;
+  padding: 0 1.25rem;
+  border: 0;
+  border-radius: $pill;
+  background: none;
+  color: var(--color-ink);
+  cursor: pointer;
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-size: 1.3rem;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  transition:
+    gap 0.35s var(--ease),
+    padding 0.35s var(--ease);
+  @include hover-line(1.4rem, 0.6rem);
+
+  svg {
+    flex: none;
+    width: 1.9rem;
+    height: 1.9rem;
+  }
+
+  .text {
+    display: inline-block;
+    max-width: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition:
+      max-width 0.35s var(--ease),
+      opacity 0.2s linear;
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+    @include label-open;
+  }
+
+  @media (hover: hover) {
+    &:hover {
+      @include label-open;
+    }
+  }
+
+  @media (hover: none) {
+    @include label-open;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    &,
+    .text {
+      transition: none;
+    }
+  }
+
+  @include from-tv {
+    &::after {
+      display: none;
+    }
+  }
+}
+
+@mixin pill-button($variant: solid) {
+  @include row-center;
+  justify-content: center;
+  width: 100%;
+  min-height: 4.8rem;
+  padding: 0 2rem;
+  border: 0;
+  border-radius: $pill;
+  cursor: pointer;
+  font: 500 1.2rem/1 var(--font-body);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  transition:
+    background 0.25s linear,
+    box-shadow 0.25s linear;
+
+  @if $variant == solid {
+    background: var(--color-cta);
+    color: var(--color-cta-text);
+    box-shadow: inset 0 0 0 1px var(--color-cta-edge);
+
+    @media (hover: hover) {
+      &:hover {
+        background: var(--color-wood);
+      }
+    }
+  } @else {
+    background: none;
+    color: var(--color-ink);
+    box-shadow: inset 0 0 0 1px var(--color-line);
+
+    @media (hover: hover) {
+      &:hover {
+        box-shadow: inset 0 0 0 1px var(--color-ink);
+      }
+    }
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+
+  @include from-tv {
+    min-height: 8rem;
+    font-size: 2rem;
+  }
+}
+
+@mixin text-button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-ink);
+  cursor: pointer;
+  font: 500 1.3rem/1.4 var(--font-body);
+  text-decoration: underline;
+  text-decoration-color: var(--color-grey-light);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.3em;
+  transition: text-decoration-color 0.2s linear;
+
+  @media (hover: hover) {
+    &:hover {
+      text-decoration-color: currentColor;
+    }
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+    border-radius: 0.4rem;
+  }
+
+  @include from-tv {
+    font-size: 2.2rem;
+  }
+}
+
+@mixin input-box {
+  width: 100%;
+  height: 4.8rem;
+  padding: 0 1.6rem;
+  border: 1px solid var(--color-line);
+  border-radius: 1.2rem;
+  background: var(--color-white);
+  color: var(--color-ink);
+  font: 400 1.5rem/1 var(--font-body);
+  transition: border-color 0.2s linear;
+
+  &::placeholder {
+    color: var(--color-grey-light);
+  }
+
+  &:hover {
+    border-color: var(--color-grey-light);
+  }
+
+  &:focus {
+    border-color: var(--color-ink);
+    outline: none;
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+
+  @include from-tv {
+    height: 8rem;
+    padding: 0 2.8rem;
+    border-radius: 2rem;
+    font-size: 2.4rem;
+  }
+}
+
+@mixin field-label {
+  color: var(--color-grey);
+  font-family: var(--font-mono);
+  line-height: 1;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  @include fluid(font-size, 0.95rem, 1rem, 1.7rem);
+}

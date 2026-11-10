@@ -6,7 +6,8 @@
 //    1. builds the `website` service (frontend `debugger` stage),
 //    2. starts it (plus `tests` via depends_on),
 //    3. opens a shell in /app,
-//    4. runs `npm install` after creation.
+//    4. runs `pnpm install` after creation (regenerates the git-ignored
+//       front-end/pnpm-lock.yaml — nothing to keep in sync).
 //
 //  Ports mirror docker/docker-compose.yml and docker/.env.
 // =============================================================================
@@ -32,7 +33,7 @@
     "9229":  { "label": "debug · Node inspector" }
   },
 
-  "postCreateCommand": "npm install",
+  "postCreateCommand": "pnpm install",
   "remoteUser": "node",
 
   "customizations": {
@@ -47,11 +48,29 @@
         "slevesque.shader"
       ],
       "settings": {
+        // Write the buffer to disk on focus change (switch to browser / terminal
+        // / another file). Without this the editor default is "off": edits stay
+        // in the buffer, the file on the bind mount never changes, and Vite HMR
+        // has nothing to react to until the tab is closed.
+        "files.autoSave": "onFocusChange",
         "editor.formatOnSave": true,
         "editor.defaultFormatter": "esbenp.prettier-vscode",
-        // Live Sass Compiler — emit a CSS (+ map) sibling next to each .scss.
+        // Live Sass Compiler — standalone build of the GLOBAL stylesheet only.
+        // Output goes to one dedicated folder (savePath is workspace-relative,
+        // workspaceFolder is /app), NOT next to each .scss. The app itself never
+        // reads this CSS — Vite compiles .scss on import. app/_styles/css/ is
+        // git-ignored. *.module.scss is excluded: those are Vite-only.
         "liveSassCompile.settings.formats": [
-          { "format": "expanded", "extensionName": ".css", "savePath": "~/" }
+          {
+            "format": "expanded",
+            "extensionName": ".css",
+            "savePath": "/app/_styles/css"
+          }
+        ],
+        "liveSassCompile.settings.excludeList": [
+          "**/node_modules/**",
+          ".vscode/**",
+          "**/*.module.scss"
         ],
         "liveSassCompile.settings.generateMap": true,
         "liveSassCompile.settings.autoprefix": ["defaults"]

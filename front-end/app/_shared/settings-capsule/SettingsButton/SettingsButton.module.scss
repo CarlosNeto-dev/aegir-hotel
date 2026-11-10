@@ -1,0 +1,9 @@
+@use "tools/mixins" as *;
+
+.root {
+  display: flex;
+
+  .button {
+    @include capsule-button;
+  }
+}

@@ -1,0 +1,31 @@
+@use "tools/breakpoints" as *;
+@use "tools/mixins" as *;
+
+.root {
+  @include row-center;
+
+  .link {
+    font-family: var(--font-title), Georgia, serif;
+    font-weight: 400;
+    line-height: 1;
+    text-transform: uppercase;
+    color: var(--color-ink);
+    font-size: clamp(1.85rem, 1.7357rem + 0.3571vw, 2.25rem);
+    letter-spacing: clamp(0.5rem, 0.4286rem + 0.2232vw, 0.75rem);
+
+    @media (max-width: 419px) {
+      font-size: clamp(1.5rem, 4.7vw, 1.85rem);
+      letter-spacing: clamp(0.3rem, 1.28vw, 0.5rem);
+    }
+
+    @include from-tv {
+      margin-right: -2rem;
+      font-size: 5.6rem;
+      letter-spacing: 2rem;
+    }
+
+    &:focus-visible {
+      @include focus-ring;
+    }
+  }
+}

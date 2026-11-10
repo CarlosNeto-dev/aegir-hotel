@@ -26,12 +26,11 @@ comando.
 Previsto para depois — já considerado na stack e na configuração de containers:
 cenas 3D com **react-three-fiber / three.js**, *assets* exportados do
 **Blender**, um **banco de dados** e ferramentas em **Python** para o pipeline de
-assets/dados. O repasse de **GPU** já está configurado (opcional) para esse
-trabalho.
+assets/dados.
 
 > ℹ️ O repositório é hoje um **esqueleto**: a configuração de containers está
-> completa e testada, `app/` contém a estrutura de pastas definida, e o código da
-> aplicação é adicionado seguindo o [`app/README.pt-BR.md`](app/README.pt-BR.md).
+> completa e testada, `front-end/` contém a estrutura de pastas definida, e o código da
+> aplicação é adicionado seguindo o [`front-end/README.pt-BR.md`](front-end/README.pt-BR.md).
 
 ---
 
@@ -45,7 +44,7 @@ trabalho.
 | Animação | GSAP `3` | |
 | Build | Vite `6` | servidor de dev + HMR + `vite preview` |
 | Testes | Vitest `2` + `@vitest/ui` | roda no próprio container |
-| Containers | Docker + Compose v2 | imagem multi-stage, override de GPU |
+| Containers | Docker + Compose v2 | imagem multi-stage |
 | 3D *(futuro)* | react-three-fiber, three.js, assets do Blender | |
 | Pipeline *(futuro)* | Python (ferramentas de asset/dados), um banco de dados | ainda não nos containers |
 
@@ -65,17 +64,15 @@ aegir-hotel/
 ├── .devcontainer/
 │   ├── frontend/devcontainer.json     # dev-container VS Code / Codespaces (reusa o compose)
 │   └── README.md · README.pt-BR.md · CLAUDE.md
-├── app/                               # o cliente web — montado como volume no container
-│   ├── index.html                     # documento de entrada do Vite
+├── front-end/                         # o cliente web — montado como volume no container
 │   ├── public/                        # arquivos estáticos servidos como estão
-│   ├── src/
-│   │   ├── assets/ components/ hooks/ lib/ pages/ scenes/ styles/ types/
-│   │   └── …                          # por funcionalidade: Foo.tsx + Foo.module.scss juntos
+│   ├── next.config.ts · tsconfig.json · package.json · pnpm-workspace.yaml
+│   ├── app/                           # rotas + _shared/ (compartilhado) + _styles/ (SCSS global)
+│   │                                  # uma pasta por componente: Foo/Foo.tsx + Foo/Foo.module.scss
 │   └── README.md · README.pt-BR.md · CLAUDE.md
 ├── docker/
 │   ├── Dockerfile.frontend            # multi-stage: base → debugger → build → production
 │   ├── docker-compose.yml             # serviços: website + tests
-│   ├── docker-compose.override.yml    # repasse opcional de GPU NVIDIA
 │   ├── .env / .env.example            # todas as portas e versões
 │   └── README.md · README.pt-BR.md · CLAUDE.md
 ├── scripts/check-docs.sh              # valida todo diagrama Mermaid + links locais
@@ -100,8 +97,7 @@ git clone <este-repo> aegir-hotel
 cd aegir-hotel/docker
 cp .env.example .env
 
-docker compose -f docker-compose.yml up      # sem GPU NVIDIA
-docker compose up                            # com GPU NVIDIA + Container Toolkit
+docker compose up
 ```
 
 | URL | O quê |
@@ -116,7 +112,7 @@ docker compose down          # parar
 docker compose down -v        # parar + remover volumes
 ```
 
-Detalhes dos containers, notas de GPU, o build multi-stage e o passo a passo de
+Detalhes dos containers, o build multi-stage e o passo a passo de
 hot-reload estão em [`docker/README.pt-BR.md`](docker/README.pt-BR.md).
 
 ---
@@ -124,10 +120,10 @@ hot-reload estão em [`docker/README.pt-BR.md`](docker/README.pt-BR.md).
 ## 💻 Desenvolvimento local sem Docker (opcional)
 
 Precisa de Node `24.x` na máquina e da aplicação já inicializada
-([`app/README.pt-BR.md`](app/README.pt-BR.md)).
+([`front-end/README.pt-BR.md`](front-end/README.pt-BR.md)).
 
 ```bash
-cd app && npm install && npm run dev
+cd app && pnpm install && pnpm dev
 ```
 
 O caminho com Docker é o oficialmente suportado.
@@ -148,15 +144,6 @@ Compose e pelo dev-container.
 
 ---
 
-## 🎮 GPU
-
-`docker/docker-compose.override.yml` adiciona acesso à GPU NVIDIA no container
-`website` e é **mesclado automaticamente** por um `docker compose up` simples.
-Máquinas sem suporte a GPU usam `docker compose -f docker-compose.yml up` (ou
-apagam o arquivo de override). Detalhe em
-[`docker/README.pt-BR.md`](docker/README.pt-BR.md#-gpu).
-
----
 
 ## 🤝 Contribuindo
 
@@ -179,8 +166,8 @@ Release.
 |---------|----------|
 | [`README.md`](README.md) · `README.pt-BR.md` | visão geral do projeto (esta página) |
 | [`.github/CONTRIBUTING.pt-BR.md`](.github/CONTRIBUTING.pt-BR.md) · [en](.github/CONTRIBUTING.md) | **o guia de fluxo**: ambiente, branches, issues, PRs, releases |
-| [`app/README.pt-BR.md`](app/README.pt-BR.md) · [en](app/README.md) | estrutura de pastas + guia passo a passo da aplicação |
-| [`docker/README.pt-BR.md`](docker/README.pt-BR.md) · [en](docker/README.md) | imagens, Compose, GPU, fluxo de hot-reload, solução de problemas |
+| [`front-end/README.pt-BR.md`](front-end/README.pt-BR.md) · [en](front-end/README.md) | estrutura de pastas + guia passo a passo da aplicação |
+| [`docker/README.pt-BR.md`](docker/README.pt-BR.md) · [en](docker/README.md) | imagens, Compose, fluxo de hot-reload, solução de problemas |
 | [`.devcontainer/README.pt-BR.md`](.devcontainer/README.pt-BR.md) · [en](.devcontainer/README.md) | o dev-container do VS Code |
 | [`CLAUDE.md`](CLAUDE.md) | convenções para o agente Claude Code |
 

@@ -1,0 +1,17 @@
+@use "tools/mixins" as *;
+
+.root {
+  @include row-center;
+  flex: none;
+  justify-content: center;
+  width: var(--avatar-size, 2.4rem);
+  height: var(--avatar-size, 2.4rem);
+  border-radius: 50%;
+  background: var(--color-ink);
+  color: var(--color-paper);
+  font-family: var(--font-title);
+  font-size: calc(var(--avatar-size, 2.4rem) * 0.38);
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: 0.04em;
+}
