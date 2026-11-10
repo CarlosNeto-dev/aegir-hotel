@@ -1,24 +1,38 @@
 # ---- Dependencies -------------------------------------------------------
 node_modules/
 .pnpm-store/
+#  Lock file is NOT committed: the container / dev-container regenerate it on
+#  every `pnpm install`. Canonical resolution is Linux, in-container.
+front-end/pnpm-lock.yaml
+#  Legacy npm lock from before the switch to pnpm - never commit it.
+front-end/package-lock.json
 
 # ---- Build output ------------------------------------------------------
-app/dist/
-app/build/
+front-end/dist/
+front-end/build/
 *.tsbuildinfo
 
-# ---- Vite / test caches ---------------------------------------------
-.vite/
-app/coverage/
+# ---- Next.js build output & caches -----------------------------------
+.next/
+front-end/out/
+next-env.d.ts
+
+# ---- test caches -------------------------------------------------------
+front-end/coverage/
 *.local
 
 # ---- scripts/check-docs.sh scratch --------------------------------
 .docs-check-tmp/
 
 # ---- Live Sass Compiler output (generated from .scss) -----------------
-#  Remove these two lines if you decide to commit compiled CSS.
-app/src/**/*.css
-app/src/**/*.css.map
+#  Legacy: unused since the move to Next (it compiles .scss itself); these files were a standalone build for
+#  inspection only. They land in one dedicated folder (Live Sass `savePath`)
+#  whose contents are ignored but the folder itself is kept (.gitkeep). The
+#  broad globs are a safety net — .css under app/ is always generated here.
+front-end/app/_styles/css/*
+!front-end/app/_styles/css/.gitkeep
+front-end/app/**/*.css
+front-end/app/**/*.css.map
 
 # ---- Environment -----------------------------------------------------
 docker/.env
@@ -33,8 +47,12 @@ Thumbs.db
 desktop.ini
 *.log
 npm-debug.log*
+pnpm-debug.log*
 
 # ---- 3D source files (ship exported .glb/.gltf only) -----------------
 *.blend
 *.blend[0-9]
 *.fbx
+
+# ---- Local machine only (NVIDIA GPU passthrough) ----------------------
+docker/docker-compose.override.yml

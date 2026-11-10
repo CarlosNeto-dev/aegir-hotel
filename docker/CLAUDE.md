@@ -15,19 +15,30 @@ Agent notes for the container setup. Root guidance: [`../CLAUDE.md`](../CLAUDE.m
   port in **all** of: `.env`, `.env.example`, `docker-compose.yml`,
   `Dockerfile.frontend`, `.devcontainer/frontend/devcontainer.json`, and both
   root + docker READMEs.
-- `docker-compose.override.yml` = GPU only, opt-in, auto-merged. Non-GPU users
-  pass `-f docker-compose.yml`.
 - `tests` uses `restart: on-failure` (overrides the anchor's `unless-stopped`)
   because Vitest exits 0 on an empty project.
-- npm is **not** upgraded in the image (install-scripts blocked by default —
-  intentional).
+- The `x-frontend-service` anchor pins `user: "node"` (uid 1000) so the
+  bind-mounted `node_modules` written by `docker compose up` and by the
+  dev-container (`remoteUser: node`) share one owner. Removing it reintroduces
+  the root-owned-`node_modules` → `EACCES` on the next `node`-user install.
+- `front-end/pnpm-lock.yaml` is **git-ignored** — every `pnpm install` (service
+  commands, devcontainer `postCreateCommand`, the `build` stage, CI) resolves it
+  fresh. Canonical resolution is in-container (Linux); a host-generated lock is
+  never committed and would only be a Windows flakiness source anyway
+  (OneDrive/Defender locks).
+- pnpm comes from **Corepack** (`RUN corepack enable` in `base`); the version lives
+  in `front-end/package.json` `"packageManager"`, never in the image. pnpm 12 fails
+  `pnpm install` (`ERR_PNPM_IGNORED_BUILDS`) on any undecided dependency build
+  script, so decisions live in `front-end/pnpm-workspace.yaml` (`allowBuilds`) — the
+  `build` stage must `COPY` that file with `package.json`. The two global CLIs
+  (`serve`, `source-map-explorer`) still use the image's bundled npm, which is
+  intentionally not upgraded.
 
 ## Before saying "done" after a container/compose change
 
 ```bash
 cd docker
-docker compose -f docker-compose.yml config -q   # base valid
-docker compose config -q                          # merged (with GPU) valid
+docker compose config -q                          # compose file valid
 docker build -f Dockerfile.frontend --check ..    # Dockerfile lint
 ```
 Then `up -d`, confirm `VITE … ready`, edit a `.tsx` + a `.scss`, check

@@ -29,9 +29,10 @@ On **Reopen in Container**:
 
 1. `website` + `tests` are built and started via Compose.
 2. The editor opens a shell in `/app`.
-3. `postCreateCommand` runs `npm install`.
+3. `postCreateCommand` runs `pnpm install` — this resolves and writes
+   `front-end/pnpm-lock.yaml` (git-ignored) from scratch; no committed lock to sync.
 4. `overrideCommand: true` keeps the container a plain long-lived shell instead
-   of running the Compose dev-server command — you start `npm run dev` yourself
+   of running the Compose dev-server command — you start `pnpm dev` yourself
    from the integrated terminal.
 
 Forwarded ports: `5173` (Vite), `4173` (preview), `51204` (Vitest UI),
@@ -52,8 +53,23 @@ Forwarded ports: `5173` (Vite), `4173` (preview), `51204` (Vitest UI),
 | `slevesque.shader` | GLSL syntax (future r3f shaders) |
 
 The Live Sass Compiler settings (`liveSassCompile.settings.*`) emit an
-`expanded` `.css` + source map next to each `.scss`. Those files are git-ignored
-— see [`../.gitignore`](../.gitignore).
+`expanded` `.css` + source map into **one dedicated folder**,
+[`front-end/app/_styles/css/`](../front-end/app/_styles) (`savePath` is workspace-relative and
+`workspaceFolder` is `/app`) — not next to each `.scss`. `*.module.scss` is on
+the `excludeList`: component styles are compiled by Vite only. The folder's
+contents are git-ignored (the folder itself is kept via `.gitkeep`) — see
+[`../.gitignore`](../.gitignore).
+
+This CSS is for inspection / standalone use; **the app never imports it**. Vite
+compiles `.scss` on import (`src/main.tsx` → `import "./styles/main.scss"`).
+
+### `files.autoSave: onFocusChange`
+
+Set on purpose. The editor default is `off` — an unsaved buffer never reaches
+the bind-mounted file, so Vite HMR has nothing to react to until you close the
+tab. `onFocusChange` writes the file the moment you switch to the browser or the
+terminal, which is exactly when you want HMR to fire. Reload the window after
+changing this (`Dev Containers: Rebuild` not needed — it's an editor setting).
 
 ---
 
@@ -70,7 +86,7 @@ container, it gets a sibling folder and the editor shows a picker on
 
 [🏠 Project overview](../README.md) ·
 [🤝 Contribution workflow](../.github/CONTRIBUTING.md) ·
-[🎨 app/](../app/README.md) ·
+[🎨 app/](../front-end/README.md) ·
 [🐳 docker/](../docker/README.md) ·
 [🤖 CLAUDE.md](CLAUDE.md)
 &nbsp;&nbsp;|&nbsp;&nbsp; 🇧🇷 [Português](README.pt-BR.md)

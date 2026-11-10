@@ -1,0 +1,12 @@
+@use "tools/breakpoints" as *;
+
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 2.4rem;
+  min-width: 0;
+
+  @include from-tv {
+    gap: 4rem;
+  }
+}

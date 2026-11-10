@@ -1,0 +1,32 @@
+@use "tools/breakpoints" as *;
+@use "tools/variables" as *;
+@use "tools/mixins" as *;
+
+.root {
+  position: fixed;
+  inset: 0;
+  z-index: $z-curtain;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.4rem;
+  padding: 0 var(--gutter);
+  background: var(--color-paper);
+  text-align: center;
+  visibility: hidden;
+  pointer-events: none;
+  clip-path: inset(100% 0 0 0);
+
+  @include from-tv {
+    gap: 3rem;
+  }
+
+  .kicker {
+    @include kicker;
+  }
+
+  .label {
+    @include display(3.4rem, 6.4rem, 11.2rem);
+  }
+}

@@ -1,0 +1,70 @@
+:root {
+  color-scheme: light;
+  --font-title: var(--font-title-web, "Playfair Display"), Georgia, serif;
+  --font-body:
+    var(--font-body-web, "Inter"), system-ui, -apple-system, "Segoe UI",
+    sans-serif;
+  --font-mono: var(--font-mono-web, "JetBrains Mono"), ui-monospace, monospace;
+  --color-paper: #f4f0ea;
+  --color-paper-rgb: 244, 240, 234;
+  --color-white: #fbf9f5;
+  --color-ink: #171614;
+  --color-grey: #77716a;
+  --color-grey-light: #a8a199;
+  --color-line: #e1dbd1;
+  --color-wood: #9c6438;
+  --color-black: rgba(0, 0, 0, 1);
+  --color-progress-bar: var(--color-ink);
+  --color-dusk: #f0c9a4;
+  --color-badge: #171614;
+  --color-cta: #171614;
+  --color-cta-text: #f4f0ea;
+  --color-cta-edge: transparent;
+  --color-focus: #171614;
+  --color-focus-halo: #f4f0ea;
+  --color-focus-text: #f4f0ea;
+  --color-moss: #3f5a3c;
+  --color-sea: #2c6a86;
+  --color-sand: #a8854f;
+  --color-clay: #b0533a;
+  --focus-width: 2px;
+  --focus-offset: 3px;
+  --color-shadow: rgba(60, 45, 30, 0.35);
+  --color-shadow-rgb: 60, 45, 30;
+  --color-glass: rgba(251, 249, 245, 0.3);
+  --color-glass-edge: rgba(255, 255, 255, 0.55);
+  --color-glass-hover: rgba(255, 255, 255, 0.7);
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --gutter: clamp(2rem, 5.2vw, 16rem);
+  --pace: 1;
+  --move: 1;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --color-paper: #12110f;
+  --color-paper-rgb: 18, 17, 15;
+  --color-white: #1a1815;
+  --color-ink: #f1ece4;
+  --color-grey: #a59d92;
+  --color-grey-light: #6f685f;
+  --color-line: rgba(241, 236, 228, 0.13);
+  --color-wood: #c88a55;
+  --color-dusk: #4a2a17;
+  --color-progress-bar: rgba(255, 255, 255, 1);
+  --color-cta: #2b2825;
+  --color-cta-text: #f1ece4;
+  --color-cta-edge: rgba(241, 236, 228, 0.22);
+  --color-focus: #f1ece4;
+  --color-focus-halo: #12110f;
+  --color-focus-text: #12110f;
+  --color-moss: #8fb08a;
+  --color-sea: #78b7d4;
+  --color-sand: #d9bd8c;
+  --color-clay: #e08a6f;
+  --color-shadow: rgba(0, 0, 0, 0.6);
+  --color-shadow-rgb: 0, 0, 0;
+  --color-glass: rgba(24, 22, 20, 0.62);
+  --color-glass-edge: rgba(255, 255, 255, 0.13);
+  --color-glass-hover: rgba(255, 255, 255, 0.13);
+}

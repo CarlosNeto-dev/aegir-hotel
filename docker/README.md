@@ -10,14 +10,13 @@
 
 Container definitions for the project — **front-end only** for now.
 
-> Quick start, port table and GPU summary live in the root
+> Quick start, port table live in the root
 > [`README.md`](../README.md). This page is the container internals only.
 
 | File | Role |
 |------|------|
 | `Dockerfile.frontend` | multi-stage image: `base → debugger → build → production` |
 | `docker-compose.yml` | services `website` + `tests` |
-| `docker-compose.override.yml` | opt-in NVIDIA GPU passthrough (auto-merged) |
 | `.env` / `.env.example` | the only place to change ports and versions |
 
 Build **context is the repo root** (`context: ..` in Compose), so the single
@@ -35,17 +34,18 @@ docker build -f docker/Dockerfile.frontend --target production -t aegir-web:prod
 
 | Stage | From | Contains | Shipped? |
 |-------|------|----------|----------|
-| `base` | `node:24-bookworm-slim` | **only** the Node runtime + `WORKDIR /app` — one place the Node version is set | no |
+| `base` | `node:24-bookworm-slim` | the Node runtime + Corepack-enabled `pnpm` + `WORKDIR /app` — one place the Node version is set | no |
 | `debugger` | `base` | `base` + `git`, `curl`, `procps`, `serve`, `source-map-explorer` | dev / CI |
-| `build` | `base` | `npm ci` + `npm run build` → `/app/dist` | no |
+| `build` | `base` | `pnpm install` + `pnpm run build` → `/app/dist` | no |
 | `production` | `nginx:1.27-alpine` | **only** the built static site + SPA fallback + asset caching | ✅ |
 
 - `debugger` is what Compose and the dev-container use.
-- `build` / `production` need `app/package.json` (+ lock). On a bare scaffold,
-  only `debugger` builds — which is all Compose needs.
-- **npm is not upgraded** — the version bundled with the Node image is kept. It
-  blocks package install-scripts by default (fine for React / Vite / Sass /
-  Vitest / GSAP). Approve a genuine need with `npm install-scripts approve <pkg>`.
+- `build` / `production` need `front-end/package.json`. On a bare scaffold, only
+  `debugger` builds — which is all Compose needs.
+- **pnpm via Corepack** — the version is pinned by `"packageManager"` in
+  `front-end/package.json` (not in the image). pnpm 12 refuses to finish an install while a
+  dependency has an undecided build script, so each one is listed in
+  `front-end/pnpm-workspace.yaml` (`allowBuilds`). Change with `pnpm approve-builds <pkg>`.
 
 ---
 
@@ -56,42 +56,27 @@ Shared config is defined once as YAML anchors (`x-frontend-build`,
 
 | | `website` | `tests` |
 |-|-----------|---------|
-| command | `npm install && vite` | `npm install && vitest --ui …` |
-| volume | `../app → /app` **only** | same |
+| command | `pnpm install && next dev …` | `pnpm install && vitest --ui …` |
+| runs as | `node` (uid 1000) | same |
+| volume | `../front-end → /app` **only** | same |
 | ports | `5173`, `4173`, `9229` | `51204` |
 | healthcheck | `node -e "process.exit(0)"` (liveness) | same |
 | restart | `unless-stopped` | `on-failure` |
 | depends_on | — | `website` |
 
-- **`npm install` in the command:** no lock file is vendored into the image yet,
-  so deps install into the bind-mounted `app/` on every start. Once
-  `app/package-lock.json` is committed, bake `npm ci` into the image and drop the
-  install step.
+- **`pnpm install` in the command:** deps install into the bind-mounted `front-end/` on
+  every start. No lock file is committed (`front-end/pnpm-lock.yaml` is
+  git-ignored) — pnpm resolves from `package.json` and writes the lock into the
+  bind mount each run.
+- **`user: "node"`** — the shared anchor pins both services to the image's
+  unprivileged user, the same identity the dev-container uses (`remoteUser:
+  node`). Without it `docker compose up` writes a **root-owned** `node_modules`
+  that a later "Reopen in Container" (running as `node`) cannot modify —
+  `EACCES` on `node_modules`. If you already hit that, wipe
+  it once: `docker compose run --rm -u 0 website rm -rf node_modules`.
 - **`tests` exits with no test files** (Vitest behaviour, exit 0). `restart:
   on-failure` means that clean exit does not loop; the UI stays resident on
   `51204` once a `*.test.tsx` exists.
-
----
-
-## 🎮 GPU
-
-`docker-compose.override.yml` gives the `website` container NVIDIA GPU access —
-for future hardware-accelerated react-three-fiber / WebGL and headless Blender
-renders. Compose merges it automatically on a bare `docker compose up`.
-
-```
-Machine WITH NVIDIA GPU + Container Toolkit
-    docker compose up                        → base + override (GPU on)
-
-Machine WITHOUT GPU support
-    docker compose -f docker-compose.yml up   → base only, override ignored
-    (or delete / rename docker-compose.override.yml)
-```
-
-Requirements: NVIDIA driver on the host, the
-[NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/), and
-(Docker Desktop) GPU enabled with the WSL2 backend. Verify with `nvidia-smi`
-inside the container.
 
 ---
 
@@ -104,7 +89,7 @@ docker compose logs -f website        # wait for "VITE vX ready in …"
 
 | Edit | Result |
 |------|--------|
-| `app/src/**/*.tsx` | `[vite] (client) hmr update …`, module swapped, React state kept |
+| `front-end/app/**/*.tsx` | `[vite] (client) hmr update …`, module swapped, React state kept |
 | `.scss` / `.module.scss` | style re-injected, no reload, class hashes stable |
 | `app/vite.config.ts` | Vite restarts the dev server itself |
 | `*.test.tsx` (with `tests` up) | affected tests re-run, Vitest UI updates |
@@ -125,11 +110,10 @@ docker compose down          # or  down -v  to also drop volumes
 
 | Symptom | Cause / fix |
 |---------|-------------|
-| Edits don't hot-reload | `usePolling` missing in `vite.config.ts`, or you edited a file outside `app/` (only `app/` is mounted) |
-| `tests` container keeps stopping | expected with zero test files — add one under `src/` |
+| Edits don't hot-reload | (1) the editor never saved to disk — dev-container needs `files.autoSave` (set to `onFocusChange` in `.devcontainer/frontend/devcontainer.json`); (2) `usePolling` missing in `vite.config.ts`; (3) you edited a file outside `front-end/` (only `front-end/` is mounted); (4) an import whose casing differs from the file name — Vite serves it but drops HMR |
+| `tests` container keeps stopping | expected with zero test files — add one under `app/` |
 | Port already allocated | change the value in `docker/.env` and `docker compose up` again |
-| `could not select device driver "nvidia"` | no GPU runtime — use `docker compose -f docker-compose.yml up` |
-| `npm warn install-scripts … blocked` | intentional; `npm install-scripts approve <pkg>` if really needed |
+| `ERR_PNPM_IGNORED_BUILDS` | a dependency has an undecided build script — `pnpm approve-builds <pkg>` (or `!<pkg>` to deny) writes it to `front-end/pnpm-workspace.yaml` |
 | Stale `node_modules` after changing deps | `docker compose down -v` then `up` |
 
 ---
@@ -138,7 +122,7 @@ docker compose down          # or  down -v  to also drop volumes
 
 [🏠 Project overview](../README.md) ·
 [🤝 Contribution workflow](../.github/CONTRIBUTING.md) ·
-[🎨 app/](../app/README.md) ·
+[🎨 app/](../front-end/README.md) ·
 [🧩 .devcontainer/](../.devcontainer/README.md) ·
 [🤖 CLAUDE.md](CLAUDE.md)
 &nbsp;&nbsp;|&nbsp;&nbsp; 🇧🇷 [Português](README.pt-BR.md)

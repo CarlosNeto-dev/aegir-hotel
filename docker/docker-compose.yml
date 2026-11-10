@@ -8,16 +8,16 @@
 #  Design
 #    · Every tunable value is an env var with a default → edit docker/.env only.
 #    · Shared config lives in YAML anchors (`x-*`) merged with `<<:` → DRY.
-#    · Both services bind-mount ONLY ../app and run `npm install` on startup
-#      before their long-running process (no package-lock is vendored yet).
-#    · GPU passthrough is opt-in via docker-compose.override.yml (auto-merged
-#      by `docker compose up`). Machines without an NVIDIA runtime run the
-#      base file explicitly:  docker compose -f docker-compose.yml up
+#    · Both services bind-mount ONLY ../front-end and run `pnpm install` on startup
+#      before their long-running process. No lock file is committed — pnpm
+#      resolves and writes front-end/pnpm-lock.yaml into the bind mount each run.
+#    · Services run as the unprivileged `node` user — the SAME identity the
+#      dev-container uses (remoteUser: node) — so node_modules written here and
+#      by "Reopen in Container" never collide on ownership.
 #
 #  Run from this folder (docker/) so ../ paths and .env resolve:
 #    cd docker
-#    docker compose up                       # website + tests (+ GPU override)
-#    docker compose -f docker-compose.yml up  # website + tests, no GPU
+#    docker compose up                       # website + tests
 #    docker compose up website               # just the site
 # =============================================================================
 
@@ -42,9 +42,12 @@ x-frontend-build: &frontend-build
 x-frontend-service: &frontend-service
   build: *frontend-build
   working_dir: ${APP_DIR:-/app}
+  # Run as the image's unprivileged user (uid 1000), matching the dev-container's
+  # remoteUser. Keeps node_modules ownership consistent across both entry points.
+  user: "node"
   # Volume: ONLY the application folder. Path is relative to THIS file (docker/).
   volumes:
-    - ../app:${APP_DIR:-/app}
+    - ../front-end:${APP_DIR:-/app}
   restart: unless-stopped
 
 x-frontend-healthcheck: &frontend-healthcheck
@@ -67,8 +70,10 @@ services:
     container_name: aegir-website
     environment:
       NODE_ENV: development
+      # Next.js file watching needs polling on Docker bind mounts (Windows/WSL2/macOS).
+      WATCHPACK_POLLING: "true"
     # Install deps into the mounted volume, then start the dev server.
-    command: sh -c "npm install && npm run dev -- --host 0.0.0.0 --port ${WEB_DEV_PORT:-5173}"
+    command: sh -c "pnpm install && pnpm run dev -H 0.0.0.0 -p ${WEB_DEV_PORT:-5173}"
     ports:
       # website — Vite dev server (hot reload)
       - "${WEB_DEV_PORT:-5173}:${WEB_DEV_PORT:-5173}"
@@ -93,7 +98,7 @@ services:
     restart: on-failure
     environment:
       NODE_ENV: test
-    command: sh -c "npm install && npm run test:ui -- --open=false --api.host 0.0.0.0 --api.port ${TEST_UI_PORT:-51204} --passWithNoTests"
+    command: sh -c "pnpm install && pnpm run test:ui -- --open=false --api.host 0.0.0.0 --api.port ${TEST_UI_PORT:-51204} --passWithNoTests"
     depends_on:
       website:
         condition: service_started

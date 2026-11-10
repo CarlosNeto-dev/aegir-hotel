@@ -11,8 +11,19 @@ Agent notes for the dev-container. Root guidance: [`../CLAUDE.md`](../CLAUDE.md)
 - `forwardPorts` / `portsAttributes` must mirror `docker/.env`
   (`5173 / 4173 / 51204 / 9229`). No Python/backend ports — front-end only.
 - Extensions list is deliberate; `glenn2223.live-sass` + its
-  `liveSassCompile.settings.*` are the SCSS-standalone path (output is
-  git-ignored).
+  `liveSassCompile.settings.*` are the SCSS-standalone path. `savePath` is
+  `/app/_styles/css` (workspace-relative; one dedicated folder, not siblings);
+  `excludeList` adds `**/*.module.scss` so only global styles get a standalone
+  build. Folder contents git-ignored, `.gitkeep` retained. The app itself does
+  not read this CSS — Vite compiles `.scss` on import.
+- `settings."files.autoSave": "onFocusChange"` is load-bearing, not cosmetic.
+  The editor default (`off`) leaves edits in the buffer; the bind-mounted file
+  never changes; Vite HMR (verified working, polling watcher) has nothing to
+  fire on until the tab is closed. Do not remove it. `formatOnSave` (Prettier)
+  runs on that same save.
+- `postCreateCommand: pnpm install` — `front-end/pnpm-lock.yaml` is git-ignored and
+  regenerated here (and by the compose service commands, the Docker `build`
+  stage and CI). There is no committed lock to reconcile against.
 - It's JSONC — comments are allowed; keep it parseable
   (`node -e "JSON.parse(stripComments(...))"`).
 

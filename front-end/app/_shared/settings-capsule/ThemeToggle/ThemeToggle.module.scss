@@ -1,0 +1,44 @@
+@use "tools/mixins" as *;
+
+.root {
+  display: flex;
+
+  .button {
+    @include capsule-button;
+  }
+
+  .icon {
+    display: grid;
+    flex: none;
+    width: 1.9rem;
+    height: 1.9rem;
+
+    svg {
+      grid-area: 1 / 1;
+      transition:
+        transform 0.55s var(--ease),
+        opacity 0.3s linear;
+
+      @media (prefers-reduced-motion: reduce) {
+        transition: none;
+      }
+    }
+
+    .sun {
+      opacity: 0;
+      transform: rotate(-120deg) scale(0.4);
+    }
+  }
+}
+
+:global(:root[data-theme="dark"]) .root .icon {
+  .moon {
+    opacity: 0;
+    transform: rotate(120deg) scale(0.4);
+  }
+
+  .sun {
+    opacity: 1;
+    transform: none;
+  }
+}

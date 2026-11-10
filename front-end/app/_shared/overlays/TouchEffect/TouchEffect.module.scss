@@ -1,0 +1,103 @@
+@use "tools/variables" as *;
+
+.root {
+  position: fixed;
+  inset: 0;
+  z-index: $z-cursor;
+  overflow: hidden;
+  color: var(--touch-color, var(--color-ink));
+  pointer-events: none;
+
+  .mark {
+    position: absolute;
+    translate: -50% -50%;
+    border-radius: 50%;
+  }
+
+  &[data-shape="wave"] .mark {
+    width: 6rem;
+    height: 6rem;
+    background: currentColor;
+    animation: wave 0.7s var(--ease) forwards;
+  }
+
+  &[data-shape="ring"] .mark {
+    width: 5.6rem;
+    height: 5.6rem;
+    border: 2px solid currentColor;
+    animation: ring 0.6s var(--ease) forwards;
+  }
+
+  &[data-shape="dot"] .mark {
+    width: 1.4rem;
+    height: 1.4rem;
+    background: currentColor;
+    animation: dot 0.5s var(--ease) forwards;
+  }
+
+  &[data-shape="spark"] .mark {
+    width: 4.4rem;
+    height: 4.4rem;
+    border-radius: 0;
+    background:
+      linear-gradient(currentColor, currentColor) center / 100% 2px no-repeat,
+      linear-gradient(currentColor, currentColor) center / 2px 100% no-repeat;
+    mask: radial-gradient(circle, transparent 0.6rem, #000 0.65rem);
+    animation: spark 0.6s var(--ease) forwards;
+  }
+}
+
+@keyframes wave {
+  from {
+    opacity: 0.35;
+    scale: 0.2;
+  }
+
+  to {
+    opacity: 0;
+    scale: 1.4;
+  }
+}
+
+@keyframes ring {
+  from {
+    opacity: 1;
+    scale: 0.3;
+  }
+
+  to {
+    opacity: 0;
+    scale: 1.2;
+  }
+}
+
+@keyframes dot {
+  0% {
+    opacity: 1;
+    scale: 0.4;
+  }
+
+  40% {
+    opacity: 1;
+    scale: 1.2;
+  }
+
+  100% {
+    opacity: 0;
+    scale: 1;
+  }
+}
+
+@keyframes spark {
+  from {
+    opacity: 1;
+    rotate: 0deg;
+    scale: 0.4;
+  }
+
+  to {
+    opacity: 0;
+    rotate: 45deg;
+    scale: 1.1;
+  }
+}
