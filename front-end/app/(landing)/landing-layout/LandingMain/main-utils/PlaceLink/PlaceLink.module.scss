@@ -1,0 +1,65 @@
+@use "tools/breakpoints" as *;
+@use "tools/mixins" as *;
+
+.root {
+  gap: 1rem;
+  cursor: default;
+  opacity: 0.62;
+  pointer-events: none;
+
+  svg {
+    flex: none;
+    width: 1.6rem;
+    height: 1.6rem;
+
+    @include from-tv {
+      width: 2.8rem;
+      height: 2.8rem;
+    }
+  }
+
+  &.solid {
+    @include pill-button;
+    width: auto;
+  }
+
+  &.outline {
+    @include pill-button(outline);
+    width: auto;
+  }
+
+  &.text {
+    @include text-button;
+    display: inline-flex;
+    align-items: center;
+    font-family: var(--font-mono);
+    font-size: 1.05rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+
+    svg {
+      width: 1.4rem;
+      height: 1.4rem;
+    }
+
+    @include from-tv {
+      font-size: 1.8rem;
+
+      svg {
+        width: 2.4rem;
+        height: 2.4rem;
+      }
+    }
+  }
+
+  .soon {
+    padding: 0.3rem 0.7rem;
+    border: 1px solid currentColor;
+    border-radius: 999px;
+    font-family: var(--font-mono);
+    font-size: 0.85em;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+}

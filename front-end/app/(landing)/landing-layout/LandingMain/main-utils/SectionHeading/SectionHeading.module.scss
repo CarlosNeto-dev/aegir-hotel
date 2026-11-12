@@ -1,0 +1,35 @@
+@use "tools/breakpoints" as *;
+@use "tools/mixins" as *;
+
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+
+  @include from-desktop {
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 6.4rem;
+  }
+
+  .text {
+    display: flex;
+    flex-direction: column;
+    gap: 1.8rem;
+  }
+
+  .kicker {
+    @include kicker;
+  }
+
+  .title {
+    max-width: 16ch;
+    @include display(3.4rem, 5.2rem, 9.2rem);
+  }
+
+  .note {
+    max-width: 36ch;
+    @include copy;
+  }
+}

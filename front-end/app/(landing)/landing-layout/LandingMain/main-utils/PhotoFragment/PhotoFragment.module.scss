@@ -1,0 +1,16 @@
+.root {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  background: var(--color-line);
+  clip-path: polygon(var(--shard));
+
+  .image {
+    object-fit: cover;
+  }
+}
+
+:global(:root[data-photo-cut="off"]) .root {
+  border-radius: 1.6rem;
+  clip-path: none;
+}

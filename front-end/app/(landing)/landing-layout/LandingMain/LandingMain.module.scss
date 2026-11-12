@@ -1,0 +1,9 @@
+.root {
+  position: relative;
+
+  .sections {
+    display: flex;
+    flex-direction: column;
+    overflow-x: clip;
+  }
+}

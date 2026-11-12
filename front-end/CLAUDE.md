@@ -37,7 +37,7 @@ layout.tsx                   root layout: fonts, <html lang="pt-BR">, <SiteHeade
   page.tsx page.module.scss loading.tsx
   landing-layout/
     LandingMain/               + sections/ (Opening Journey Suites Compare Day Models Numbers Booking + Section)
-                               + aside/ (MainAside/, account-panel/{AccountPanel/, account-views/, account-utils/})
+                               + aside/ (MainAside/)
     LandingFooter/
     overlays/             ProgressBar/ Cursor/
 ambientes-3d/                /ambientes-3d  ·  /ambientes-3d/[ambiente]
@@ -50,7 +50,7 @@ _shared/
                                header-hooks/{ActiveSectionProvider.tsx, useActiveSection.ts, useHeaderHidden.ts, scroll-to-section.ts}
                                header-utils/{header-items.ts, HeaderAccount/ HeaderBrand/ HeaderCta/ HeaderIcons/ HeaderNavList/ LequeHint/ SectionLink/}
   panels/                     PanelProvider/ (no .module.scss)  SidePanel/
-                               settings-panel/{SettingsPanel/ SettingsProvider/ settings-controls/ settings-sections/ settings-utils/}
+                               account-panel/{AccountPanel/ account-views/ account-utils/} + settings-panel/{SettingsPanel/ SettingsProvider/ settings-controls/ settings-sections/ settings-utils/}
   settings-capsule/          SettingsCapsule/ SettingsButton/ ThemeToggle/   (fixed Theme + Settings capsule)
   smooth-scroll/             SmoothScrollProvider/ (Lenis + ScrollTrigger; no .module.scss)
   auth/                      AuthProvider/ GuestAvatar/ auth-utils.ts

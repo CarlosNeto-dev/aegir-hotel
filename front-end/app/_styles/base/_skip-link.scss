@@ -1,0 +1,21 @@
+@use "../tools/mixins" as *;
+@use "../tools/variables" as *;
+
+.skip-link {
+  position: fixed;
+  top: 0.8rem;
+  left: 0.8rem;
+  z-index: $z-cursor;
+  padding: 0.8rem 1.4rem;
+  border-radius: $pill;
+  font-family: var(--font-body);
+  font-size: 1.4rem;
+  color: var(--color-ink);
+  translate: 0 -200%;
+  @include glass;
+
+  &:focus-visible {
+    translate: 0;
+    @include focus-ring;
+  }
+}

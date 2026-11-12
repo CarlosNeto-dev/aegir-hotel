@@ -1,0 +1,33 @@
+@use "tools/breakpoints" as *;
+@use "tools/mixins" as *;
+
+.root {
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid var(--color-line);
+
+  .row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1.6rem;
+    border-bottom: 1px solid var(--color-line);
+    @include fluid(padding-block, 0.8rem, 1rem, 1.8rem);
+  }
+
+  dt {
+    color: var(--color-grey);
+    font-family: var(--font-mono);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    @include fluid(font-size, 0.95rem, 1rem, 1.7rem);
+  }
+
+  dd {
+    color: var(--color-ink);
+    font-family: var(--font-body);
+    font-weight: 400;
+    text-align: right;
+    @include fluid(font-size, 1.25rem, 1.35rem, 2.3rem);
+  }
+}

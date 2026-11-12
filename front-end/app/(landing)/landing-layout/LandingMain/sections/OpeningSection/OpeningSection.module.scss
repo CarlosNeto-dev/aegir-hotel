@@ -1,0 +1,206 @@
+@use "tools/breakpoints" as *;
+@use "tools/variables" as *;
+@use "tools/mixins" as *;
+
+$compact: 699px;
+
+.root {
+  position: relative;
+  height: 100svh;
+
+  .stage {
+    position: relative;
+    height: 100svh;
+    padding: 0 var(--gutter);
+    overflow: hidden;
+
+    &:not([data-ready]) .fragment {
+      visibility: hidden;
+    }
+  }
+
+  .hero {
+    position: absolute;
+    top: 50%;
+    left: var(--gutter);
+    z-index: 30;
+    display: flex;
+    flex-direction: column;
+    gap: 2.4rem;
+    width: 42%;
+    max-width: 62rem;
+    translate: 0 -46%;
+
+    @media (max-width: $compact) {
+      top: 9.6rem;
+      right: var(--gutter);
+      gap: 1.6rem;
+      width: auto;
+      max-width: none;
+      translate: none;
+    }
+
+    @include from-tv {
+      gap: 4rem;
+      max-width: 110rem;
+    }
+  }
+
+  .kicker {
+    @include kicker;
+  }
+
+  .title {
+    max-width: 11ch;
+    @include display(4.2rem, 7.2rem, 12.8rem);
+  }
+
+  .heroSlot {
+    display: none;
+
+    @media (max-width: $compact) {
+      display: block;
+      margin-block: -1.6rem;
+    }
+  }
+
+  .lead {
+    max-width: 40ch;
+    @include copy;
+
+    @media (max-width: $compact) and (max-height: 640px) {
+      display: none;
+    }
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+
+    @include from-tv {
+      gap: 2rem;
+    }
+
+    > * {
+      @media (max-width: 479px) {
+        padding-inline: 1.6rem;
+        letter-spacing: 0.12em;
+      }
+    }
+  }
+
+  .discover {
+    @include pill-button(outline);
+    width: auto;
+  }
+
+  .facts {
+    max-width: 44ch;
+    color: var(--color-grey);
+    font-family: var(--font-body);
+    line-height: 1.5;
+    @include fluid(font-size, 1.15rem, 1.2rem, 2rem);
+
+  }
+
+  .hero[data-tight] .facts,
+  .hero[data-tight="lead"] .lead,
+  .hero[data-tight="discover"] .lead,
+  .hero[data-tight="discover"] .discover {
+    @media (max-width: $compact) {
+      display: none;
+    }
+  }
+
+  .ring {
+    position: absolute;
+    inset: 0;
+    z-index: 20;
+    pointer-events: none;
+  }
+
+  .fragment {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: block;
+    pointer-events: auto;
+    visibility: hidden;
+
+    &:focus-visible {
+      @include focus-ring;
+    }
+  }
+
+  .photo {
+    width: 100%;
+    height: 100%;
+  }
+
+  .messages {
+    position: absolute;
+    inset: 0;
+    z-index: 25;
+    display: grid;
+    place-items: center;
+    padding: 0 var(--gutter);
+    pointer-events: none;
+
+    @media (max-width: $compact) {
+      inset: 9.6rem 0 auto;
+      place-items: start center;
+    }
+  }
+
+  .message {
+    grid-area: 1 / 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.4rem;
+    width: min(var(--message-width, 36rem), 64vw);
+    text-align: center;
+    visibility: hidden;
+
+    @media (max-width: $compact) {
+      width: min(32rem, 100%);
+    }
+
+    @include from-tv {
+      gap: 3rem;
+    }
+  }
+
+  .messageKicker {
+    color: var(--color-grey);
+    font-family: var(--font-mono);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    @include fluid(font-size, 0.95rem, 1.05rem, 1.8rem);
+  }
+
+  .messageText {
+    @include display(2.4rem, 3.2rem, 5.6rem);
+  }
+
+  .hint {
+    position: absolute;
+    bottom: 2.4rem;
+    left: var(--gutter);
+    z-index: 30;
+    color: var(--color-grey);
+    font-family: var(--font-mono);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    @include fluid(font-size, 0.95rem, 1rem, 1.7rem);
+
+    @media (max-width: $compact) {
+      display: none;
+    }
+
+    @include from-tv {
+      bottom: 5.6rem;
+    }
+  }
+}

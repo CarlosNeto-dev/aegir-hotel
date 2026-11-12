@@ -5,6 +5,7 @@ import AuthProvider from "./_shared/auth/AuthProvider/AuthProvider";
 import CustomCursor from "./_shared/overlays/CustomCursor/CustomCursor";
 import SectionCurtain from "./_shared/overlays/SectionCurtain/SectionCurtain";
 import TouchEffect from "./_shared/overlays/TouchEffect/TouchEffect";
+import AccountPanel from "./_shared/panels/account-panel/AccountPanel/AccountPanel";
 import PanelProvider from "./_shared/panels/PanelProvider/PanelProvider";
 import SettingsPanel from "./_shared/panels/settings-panel/SettingsPanel/SettingsPanel";
 import SettingsProvider from "./_shared/panels/settings-panel/SettingsProvider/SettingsProvider";
@@ -58,6 +59,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <script dangerouslySetInnerHTML={{ __html: settingsScript }} />
       </head>
       <body>
+        <a href="#conteudo" className="skip-link">
+          Pular para o conteúdo
+        </a>
         <SettingsProvider>
           <AuthProvider>
             <PanelProvider>
@@ -67,6 +71,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                   {children}
                   <SettingsCapsule />
                   <SettingsPanel />
+                  <AccountPanel />
                   <SectionCurtain />
                   <CustomCursor />
                   <TouchEffect />

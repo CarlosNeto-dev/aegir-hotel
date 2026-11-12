@@ -41,7 +41,7 @@ front-end/
     ├── (landing)/                        # landing  →  /
     │   ├── page.tsx · page.module.scss · loading.tsx
     │   └── landing-layout/
-    │       ├── LandingMain/             #   sections/ (8 × XxxSection) · aside/ (MainAside, account-panel/)
+    │       ├── LandingMain/             #   sections/ (8 × XxxSection) · aside/ (MainAside)
     │       ├── LandingFooter/
     │       └── overlays/           #   ProgressBar/ Cursor/
     ├── ambientes-3d/                    # /ambientes-3d · /ambientes-3d/[ambiente]
@@ -51,7 +51,7 @@ front-end/
     ├── redefinir-senha/                 # /redefinir-senha (sem loading.tsx)
     ├── _shared/                  # compartilhado por todas as rotas
     │   ├── site-header/              #   SiteHeaderLayout/ Mobile/ Desktop/ TV/ · header-hooks/ · header-utils/
-    │   ├── panels/                     #   PanelProvider/ · SidePanel/ · settings-panel/
+    │   ├── panels/                     #   PanelProvider/ · SidePanel/ · account-panel/ · settings-panel/
     │   ├── settings-capsule/           #   cápsula fixa de Tema + Ajustes
     │   ├── smooth-scroll/              #   SmoothScrollProvider (Lenis + ScrollTrigger)
     │   ├── auth/                       #   AuthProvider/ · GuestAvatar/

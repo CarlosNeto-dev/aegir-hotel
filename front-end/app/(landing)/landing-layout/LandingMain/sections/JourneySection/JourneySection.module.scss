@@ -1,0 +1,91 @@
+@use "tools/breakpoints" as *;
+@use "tools/mixins" as *;
+
+$compact: 899px;
+
+.root {
+  position: absolute;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+
+  .place {
+    position: absolute;
+    top: var(--text-top, 12rem);
+    bottom: var(--text-bottom, 4.8rem);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: var(--text-width, 46rem);
+    visibility: hidden;
+    pointer-events: auto;
+
+    &[data-photo="left"] {
+      right: var(--text-far, var(--gutter));
+    }
+
+    &[data-photo="right"] {
+      left: var(--text-near, var(--gutter));
+    }
+
+    @media (max-width: $compact) {
+      &[data-photo] {
+        right: var(--text-far, var(--gutter));
+        left: var(--text-near, var(--gutter));
+        width: auto;
+        justify-content: flex-start;
+      }
+    }
+  }
+
+  .content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.6rem;
+
+    @include from-tablet {
+      gap: 2rem;
+    }
+
+    @include from-tv {
+      gap: 3.6rem;
+    }
+  }
+
+  .kicker {
+    @include kicker;
+  }
+
+  .title {
+    @include display(3rem, 5.2rem, 9.2rem);
+  }
+
+  .summary,
+  .description {
+    @include copy;
+  }
+
+  .description {
+    display: none;
+  }
+
+  [data-fit="long"] {
+    .summary {
+      display: none;
+    }
+
+    .description {
+      display: block;
+    }
+  }
+
+  [data-fit="tight"] .facts,
+  [data-fit="tiny"] .facts,
+  [data-fit="tiny"] .summary {
+    display: none;
+  }
+
+  .actions {
+    display: flex;
+  }
+}
