@@ -50,9 +50,12 @@ front-end/
     ├── redefinir-senha/                 # /redefinir-senha (no loading.tsx)
     ├── _shared/                  # shared by every route
     │   ├── site-header/              #   SiteHeaderLayout/ Mobile/ Desktop/ TV/ · header-hooks/ · header-utils/
-    │   ├── panels/                     #   PanelProvider/ · settings-panel/SettingsPanel/
-    │   ├── overlays/               #   SiteLoader/
-    │   └── lib/                  #   api/{core, endpoints}/ · data/
+    │   ├── panels/                     #   PanelProvider/ · SidePanel/ · settings-panel/
+    │   ├── settings-capsule/           #   fixed Theme + Settings capsule
+    │   ├── smooth-scroll/              #   SmoothScrollProvider (Lenis + ScrollTrigger)
+    │   ├── auth/                       #   AuthProvider/ · GuestAvatar/
+    │   ├── overlays/               #   SiteLoader/ · SectionCurtain/ · CustomCursor/ · TouchEffect/
+    │   └── lib/                  #   gsap.ts · section-nav.ts · motion.ts · api/{core, endpoints}/ · data/
     └── _styles/                        # GLOBAL SCSS ONLY: main.scss · base/ · tools/
 ```
 
@@ -134,11 +137,16 @@ Checked on 2026-11-02 in a clean copy on Windows (`pnpm install`, `tsc`, `next b
 | `pnpm build` | ✅ 6 routes (`/`, `/ambientes-3d`, `/ambientes-3d/[ambiente]`, `/pagamentos`, `/redefinir-senha`, `/_not-found`) |
 | `pnpm lint` | ❌ ESLint not installed |
 | `docker compose` → `website` | ✅ `pnpm install` + `next dev -H 0.0.0.0 -p 5173` reach *Ready* (verified on 2026-10-26; the paths were then `app/`, now `front-end/`) |
-| `docker compose` → `tests` | ❌ runs `pnpm run test:ui`, script removed |
-| Docker `build` / `production` target | ❌ expects a static `dist/` + nginx; Next emits `.next/` |
+| Docker `production` target | ✅ **fixed 2026-11-13** — `next.config.ts` has `output: "standalone"`, the Dockerfile stage runs `node server.js` (no nginx) |
+| `pnpm run build` (production build) | ❌ **regression since 2026-11-02** — fails with `Error: <Html> should not be imported outside of pages/_document` while generating the static `/404`/`/_error` pages. Reproduced with and without `output: "standalone"`, so unrelated to the Docker fix above; likely something in `app/layout.tsx`'s provider tree |
 | Hot reload in Docker | ✅ `WATCHPACK_POLLING=true` set in compose; SCSS edits show up in ~4-20s |
 
-Not installed (add when needed, ask first): GSAP, react-three-fiber / three /
+A `tests` compose service used to be wired here for Vitest; removed
+2026-11-13 because `vitest` was never actually installed, so it did nothing.
+
+Installed for animation: GSAP 3.15 + @gsap/react 2.1 (ScrollTrigger) and Lenis 1.3.
+
+Not installed (add when needed, ask first): react-three-fiber / three /
 drei, Vitest + Testing Library, ESLint, Prettier, Stylelint.
 
 ---

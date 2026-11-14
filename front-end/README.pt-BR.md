@@ -51,9 +51,12 @@ front-end/
     ├── redefinir-senha/                 # /redefinir-senha (sem loading.tsx)
     ├── _shared/                  # compartilhado por todas as rotas
     │   ├── site-header/              #   SiteHeaderLayout/ Mobile/ Desktop/ TV/ · header-hooks/ · header-utils/
-    │   ├── panels/                     #   PanelProvider/ · settings-panel/SettingsPanel/
-    │   ├── overlays/               #   SiteLoader/
-    │   └── lib/                  #   api/{core, endpoints}/ · data/
+    │   ├── panels/                     #   PanelProvider/ · SidePanel/ · settings-panel/
+    │   ├── settings-capsule/           #   cápsula fixa de Tema + Ajustes
+    │   ├── smooth-scroll/              #   SmoothScrollProvider (Lenis + ScrollTrigger)
+    │   ├── auth/                       #   AuthProvider/ · GuestAvatar/
+    │   ├── overlays/               #   SiteLoader/ · SectionCurtain/ · CustomCursor/ · TouchEffect/
+    │   └── lib/                  #   gsap.ts · section-nav.ts · motion.ts · api/{core, endpoints}/ · data/
     └── _styles/                        # SOMENTE SCSS GLOBAL: main.scss · base/ · tools/
 ```
 
@@ -136,11 +139,16 @@ Verificado em 2026-11-02 numa cópia limpa no Windows (`pnpm install`, `tsc`, `n
 | `pnpm build` | ✅ 6 rotas (`/`, `/ambientes-3d`, `/ambientes-3d/[ambiente]`, `/pagamentos`, `/redefinir-senha`, `/_not-found`) |
 | `pnpm lint` | ❌ ESLint não instalado |
 | `docker compose` → `website` | ✅ `pnpm install` + `next dev -H 0.0.0.0 -p 5173` chegam a *Ready* (verificado em 2026-10-26; os caminhos eram `app/`, agora `front-end/`) |
-| `docker compose` → `tests` | ❌ roda `pnpm run test:ui`, script removido |
-| Alvo Docker `build` / `production` | ❌ espera um `dist/` estático + nginx; o Next gera `.next/` |
+| Alvo Docker `production` | ✅ **corrigido em 2026-11-13** — `next.config.ts` tem `output: "standalone"`, o estágio do Dockerfile roda `node server.js` (sem nginx) |
+| `pnpm run build` (build de produção) | ❌ **regressão desde 2026-11-02** — falha com `Error: <Html> should not be imported outside of pages/_document` ao gerar as páginas estáticas `/404`/`/_error`. Reproduzido com e sem `output: "standalone"`, então não tem relação com a correção do Docker acima; provavelmente algo na árvore de Providers do `app/layout.tsx` |
 | Hot reload no Docker | ✅ `WATCHPACK_POLLING=true` definido no compose; edições de SCSS aparecem em ~4-20s |
 
-Não instalados (adicione quando precisar, pergunte antes): GSAP, react-three-fiber /
+Havia um serviço `tests` no compose, montado pro Vitest; removido em
+2026-11-13 porque o `vitest` nunca chegou a ser instalado, então não fazia nada.
+
+Instalados para animação: GSAP 3.15 + @gsap/react 2.1 (ScrollTrigger) e Lenis 1.3.
+
+Não instalados (adicione quando precisar, pergunte antes): react-three-fiber /
 three / drei, Vitest + Testing Library, ESLint, Prettier, Stylelint.
 
 ---
