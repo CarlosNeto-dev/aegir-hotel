@@ -4,23 +4,23 @@ Guidance for Claude Code when working in this repository.
 
 ## What this is
 
-Aegir Hotel — a **front-end only** web project: React 19 + TypeScript + SCSS +
-GSAP, bundled by Vite 6, run entirely through Docker. Future (not present yet):
-react-three-fiber / three.js, Blender assets, a database, and **Python** pipeline
-tooling. Python is *documented* as future in the stack list but is **not** in the
-containers — do not add a backend/Python service unless asked.
+Aegir Hotel — a **front-end only** web project: **Next.js 15 (App Router)** +
+React 19 + TypeScript + SCSS Modules, managed with **pnpm**, run entirely through
+Docker. Future (not present yet): GSAP, react-three-fiber / three.js, Blender
+assets, a database, and **Python** pipeline tooling. Python is *documented* as
+future in the stack list but is **not** in the containers — do not add a
+backend/Python service unless asked.
 
-The repo is a **scaffold**: container setup is complete and verified; `app/`
-holds the folder skeleton only.
+The repo is a **scaffold**: `front-end/` holds the Next.js skeleton (most files are
+still empty placeholders) — `front-end/CLAUDE.md` is the source of truth for it.
 
 ## Layout
 
 | Path | What |
 |------|------|
-| `app/` | the web client; bind-mounted to `/app` in the container. Only this folder is mounted. |
-| `app/index.html` | Vite entry — keep it at `app/` root, never in `src/`. |
-| `app/src/` | feature-first: `Foo.tsx` + `Foo.module.scss` + `Foo.test.tsx` co-located. `src/styles/` is **global SCSS only**. |
-| `docker/` | `Dockerfile.frontend` (multi-stage), `docker-compose.yml`, `docker-compose.override.yml` (GPU), `.env`. |
+| `front-end/` | the web client; bind-mounted to `/app` in the container. Only this folder is mounted. |
+| `front-end/app/` | routes (App Router) + `_shared/` (shared header, panels, overlays, `lib/` api + data) + `_styles/` (global SCSS). Every component is its own folder: `Foo/Foo.tsx` + `Foo/Foo.module.scss`. Only route folders (URL segments) are Portuguese; everything else is English. Details in `front-end/CLAUDE.md`. |
+| `docker/` | `Dockerfile.frontend` (multi-stage), `docker-compose.yml`, `.env`. |
 | `.devcontainer/frontend/` | VS Code dev-container, reuses the compose file. |
 | `.github/` | `CODEOWNERS`, issue/PR templates, `workflows/release.yml` (CI **only** on `v*.*.*` tags), and `CONTRIBUTING.md` (+ `.pt-BR`) = the workflow guide. No `README.md` here — it would replace the root README as the repo home page. |
 | `.dockerignore` | at repo root because compose build `context: ..`. |
@@ -60,44 +60,50 @@ triggers `release.yml` which publishes the GitHub Release.
 ```bash
 cd docker
 cp .env.example .env
-docker compose -f docker-compose.yml up --build   # no GPU
-docker compose up                                 # with GPU (merges override)
+docker compose up --build
 docker compose down [-v]
 ```
 
-Ports (from `docker/.env`): `5173` dev server, `4173` preview, `51204` Vitest UI,
-`9229` Node inspector.
+Ports (from `docker/.env`): `5173` Next dev server, `9229` Node inspector. `4173`
+(preview) is defined but **currently unused** — no `next start` service runs
+there yet.
 
 ## Conventions
 
 - Components: `PascalCase` folder + files, default export.
 - Hooks: `useThing.ts`, one per file.
-- Import alias: `@/` → `src/`.
-- Tests: `*.test.tsx` next to the component, `@testing-library/react` + Vitest.
-- Styles: `*.module.scss` beside the component; globals only in `src/styles/`.
-  Vite compiles SCSS (modern Dart Sass API); `glenn2223.live-sass` is an optional
-  extra that emits git-ignored `.css` siblings.
+- Import alias: `@/` → the `front-end/` root (e.g. `@/app/_shared/…`).
+- Styles: `Foo.module.scss` beside `Foo.tsx`; globals only in `app/_styles/`.
+  The global sheet is `app/_styles/main.scss`, imported once in
+  `app/layout.tsx` (`./_styles/main.scss`). Next compiles SCSS natively (`sass` package), and
+  `next.config.ts` sets `sassOptions.includePaths` to `app/_styles` so any module
+  can `@use "tools/variables" as *;`.
 
 ## Gotchas
 
-- **HMR needs polling.** `app/vite.config.ts` must set
-  `server.watch.usePolling: true` — Docker bind mounts on Windows/WSL2/macOS emit
-  no fs events otherwise.
-- **npm blocks install-scripts by default** (current npm, bundled with the Node
-  image — not upgraded on purpose). Fine for this stack. Approve real needs with
-  `npm install-scripts approve <pkg>`.
-- **`tests` service exits with no test files** (Vitest behaviour). `restart:
-  on-failure` stops it looping. It stays resident once a `*.test.tsx` exists.
-- **`build` / `production` image targets need `app/package.json` + lock file.**
-  Only `debugger` builds on a bare scaffold.
-- **GPU** lives in `docker-compose.override.yml`; non-GPU machines must pass
-  `-f docker-compose.yml` explicitly.
+- **HMR needs polling.** Docker bind mounts on Windows/WSL2/macOS emit no fs
+  events, so the compose `website` service sets `WATCHPACK_POLLING=true`.
+- **Next's dev flags are `-H` / `-p`**, not `--host` / `--port`
+  (`next dev -H 0.0.0.0 -p 5173`).
+- **Package manager is pnpm** (via Corepack; version pinned in
+  `front-end/package.json` `"packageManager"`). pnpm 12 **fails `pnpm install`**
+  (`ERR_PNPM_IGNORED_BUILDS`) on any dependency build script nobody decided on;
+  decisions live in `front-end/pnpm-workspace.yaml` (`allowBuilds`). Add one with
+  `pnpm approve-builds <pkg>` (or `'!<pkg>'` to deny). Never use `npm install`
+  in `front-end/` — it would create a competing `package-lock.json`.
+- **No test runner is installed.** There used to be a compose `tests` service
+  wired for Vitest; it was removed 2026-11-13 because it ran a script
+  (`pnpm run test:ui`) that never existed, so it did nothing. Add a runner
+  (and a service for it) only when asked.
+- **`build` / `production` image targets** ship the Next.js **standalone**
+  server (`front-end/next.config.ts` has `output: "standalone"`) — no nginx,
+  no static `dist/`. See `docker/CLAUDE.md`.
 
 ## Verification
 
-- **Containers / Vite config:** `docker compose -f docker-compose.yml config -q`,
-  build the `debugger` target, `up -d`, confirm `VITE ... ready`, edit a `.tsx`
-  and a `.scss` and check `[vite] hmr update` in the logs, then `down`.
+- **Containers / Next config:** `docker compose -f docker-compose.yml config -q`,
+  build the `debugger` target, `up -d website`, confirm `Ready in …` in the logs,
+  edit a `.tsx` and a `.scss` and check the page updates, then `down`.
 - **Docs:** run `bash scripts/check-docs.sh` — it parses every Mermaid block and
   checks local links. Do this whenever you touch a `.md`.
 - **`.github` YAML:** `release.yml` and the issue forms must stay valid YAML.

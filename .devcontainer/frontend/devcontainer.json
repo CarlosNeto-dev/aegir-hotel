@@ -4,9 +4,10 @@
 //  Reuses docker/docker-compose.yml so the editor attaches to the very same
 //  container the project runs day to day. On "Reopen in Container" the tool:
 //    1. builds the `website` service (frontend `debugger` stage),
-//    2. starts it (plus `tests` via depends_on),
-//    3. opens a shell in /app,
-//    4. runs `npm install` after creation.
+//    2. starts it running its normal Compose command
+//       (`pnpm install && pnpm run dev -H 0.0.0.0 -p ...`) - the dev server
+//       comes up on its own, nothing to type.
+//    3. opens an integrated terminal in /app for anything else you need.
 //
 //  Ports mirror docker/docker-compose.yml and docker/.env.
 // =============================================================================
@@ -17,22 +18,22 @@
   "service": "website",
   "workspaceFolder": "/app",
 
-  // The compose command runs the dev server; override it so the editor's
-  // container stays a plain long-lived shell instead.
-  "overrideCommand": true,
-  "runServices": ["website", "tests"],
+  // false (the default) lets the compose `command:` run as-is - the dev
+  // server starts by itself. VS Code still gets you an integrated terminal
+  // by exec-ing into the same running container; it doesn't need the main
+  // process idle for that.
+  "overrideCommand": false,
+  "runServices": ["website"],
   "shutdownAction": "stopCompose",
 
   // Keep in sync with docker/docker-compose.yml + docker/.env.
-  "forwardPorts": [5173, 4173, 51204, 9229],
+  "forwardPorts": [5173, 4173, 9229],
   "portsAttributes": {
-    "5173":  { "label": "website · Vite dev",     "onAutoForward": "notify" },
-    "4173":  { "label": "website · Vite preview" },
-    "51204": { "label": "tests · Vitest UI" },
+    "5173":  { "label": "website · Next dev",     "onAutoForward": "notify" },
+    "4173":  { "label": "website · preview (unused)" },
     "9229":  { "label": "debug · Node inspector" }
   },
 
-  "postCreateCommand": "npm install",
   "remoteUser": "node",
 
   "customizations": {
@@ -43,15 +44,32 @@
         "glenn2223.live-sass",
         "stylelint.vscode-stylelint",
         "ms-azuretools.vscode-docker",
-        "vitest.explorer",
         "slevesque.shader"
       ],
       "settings": {
+        // Write the buffer to disk on focus change (switch to browser / terminal
+        // / another file). Without this the editor default is "off": edits stay
+        // in the buffer, the file on the bind mount never changes, and Next's
+        // Fast Refresh has nothing to react to until the tab is closed.
+        "files.autoSave": "onFocusChange",
         "editor.formatOnSave": true,
         "editor.defaultFormatter": "esbenp.prettier-vscode",
-        // Live Sass Compiler — emit a CSS (+ map) sibling next to each .scss.
+        // Live Sass Compiler — standalone build of the GLOBAL stylesheet only.
+        // Output goes to one dedicated folder (savePath is workspace-relative,
+        // workspaceFolder is /app), NOT next to each .scss. The app itself never
+        // reads this CSS — Next compiles .scss on import. app/_styles/css/ is
+        // git-ignored. *.module.scss is excluded: those are Next-only.
         "liveSassCompile.settings.formats": [
-          { "format": "expanded", "extensionName": ".css", "savePath": "~/" }
+          {
+            "format": "expanded",
+            "extensionName": ".css",
+            "savePath": "/app/_styles/css"
+          }
+        ],
+        "liveSassCompile.settings.excludeList": [
+          "**/node_modules/**",
+          ".vscode/**",
+          "**/*.module.scss"
         ],
         "liveSassCompile.settings.generateMap": true,
         "liveSassCompile.settings.autoprefix": ["defaults"]

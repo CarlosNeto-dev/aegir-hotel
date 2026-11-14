@@ -1,57 +1,53 @@
 # 🏨 Aegir Hotel
 
 <p>
-  <img alt="Next.js" src="https://img.shields.io/badge/Next.js-black?logo=nextdotjs&logoColor=white">
+  <img alt="Node" src="https://img.shields.io/badge/Node-24.x-339933?logo=node.js&logoColor=white">
   <img alt="React" src="https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black">
-  <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white">
-  <img alt="Sass" src="https://img.shields.io/badge/SCSS-CC6699?logo=sass&logoColor=white">
+  <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-5.7-3178C6?logo=typescript&logoColor=white">
+  <img alt="Next.js" src="https://img.shields.io/badge/Next.js-15-000000?logo=next.js&logoColor=white">
+  <img alt="Sass" src="https://img.shields.io/badge/SCSS-1.83-CC6699?logo=sass&logoColor=white">
   <img alt="GSAP" src="https://img.shields.io/badge/GSAP-3-88CE02?logo=greensock&logoColor=black">
-  <img alt="Three.js" src="https://img.shields.io/badge/Three.js-000000?logo=threedotjs&logoColor=white">
   <img alt="Docker" src="https://img.shields.io/badge/Docker-Compose%20v2-2496ED?logo=docker&logoColor=white">
-  <img alt="Licença" src="https://img.shields.io/badge/Licen%C3%A7a-MIT-yellow.svg">
-  <img alt="Status" src="https://img.shields.io/badge/status-em%20andamento-orange">
+  <img alt="License" src="https://img.shields.io/badge/Licen%C3%A7a-MIT-yellow.svg">
+  <img alt="Status" src="https://img.shields.io/badge/status-esqueleto-blue">
 </p>
 
 **🌐 Idioma:** [English](README.md) · **Português**
-
-> ⚠️ **Em andamento:** este projeto muda o tempo todo.
 
 ---
 
 ## 📖 Visão geral
 
-O **Aegir** é um hotel fictício de frente para o mar, no litoral da Bahia, em forma de U aberto para o mar. O site conta a história dele seção por seção, e **cada foto abre o lugar em 3D**.
+Aegir Hotel é um projeto web **front-end** feito com **Next.js (App Router) +
+React + TypeScript + SCSS Modules**, animado com **GSAP**, gerenciado com
+**pnpm**. Tudo roda dentro do Docker, então qualquer máquina obtém exatamente o
+mesmo ambiente com um único comando.
 
-É um projeto de equipe da faculdade, na **UNIESP**, desenvolvido por 5 pessoas.
+Previsto para depois — já considerado na stack e na configuração de containers:
+cenas 3D com **react-three-fiber / three.js**, *assets* exportados do
+**Blender**, um **banco de dados** e ferramentas em **Python** para o pipeline de
+assets/dados.
 
-- **Protótipo no ar:** [claude.ai/artifact/ExkmZoV4JgsG6WztkNgNVN](https://claude.ai/artifact/ExkmZoV4JgsG6WztkNgNVN)
-- **Versão final:** em desenvolvimento neste repositório, com **Next.js**, **React** e **TypeScript**.
-
----
-
-## ✨ O que o protótipo já faz
-
-- **Página animada pela rolagem** com GSAP e ScrollTrigger: tela de carregamento, uma abertura que se quebra em fragmentos de foto e uma seção para cada lugar do hotel.
-- **Visualizador 3D com Three.js:** 14 cenas carregadas sob demanda (quartos, planta do térreo, maquete em escala 1:100 e fachada), com controles de órbita e um painel de detalhes.
-- **Luz de dia e de pôr do sol:** duas iluminações prontas em cada cena, trocadas com um clique.
-- **Suítes:** um prisma 3D em CSS que gira e uma tabela de comparação.
-- **"Um dia no Aegir":** um relógio fixo que acompanha a rolagem por sete momentos do dia.
-- **Reserva:** datas, hóspedes e suíte com estimativa na hora, e uma etapa de login antes do pagamento.
-- **Painel de ajustes e tema escuro:** tema, cursor, efeitos e qualidade gráfica, com o tema escuro aplicado antes de a página aparecer.
-- **Celular:** o menu vira um leque de cartas que se arrasta para o lado, e cada seção se adapta a uma coluna.
+> ℹ️ O repositório é hoje um **esqueleto**: a configuração de containers está
+> completa e testada, `front-end/` contém a estrutura de pastas definida, e o código da
+> aplicação é adicionado seguindo o [`front-end/README.pt-BR.md`](front-end/README.pt-BR.md).
 
 ---
 
-## 🧱 Tecnologias
+## 🧱 Stack
 
-- **Framework:** Next.js com React 19 e TypeScript.
-- **Estilo:** SCSS.
-- **Animação:** GSAP e ScrollTrigger.
-- **3D:** Three.js (GLTFLoader, OrbitControls e iluminação pré-calculada).
-- **Testes:** Vitest.
-- **Contêineres:** Docker e Docker Compose v2, com imagem multi-stage e acesso opcional à GPU NVIDIA.
-- **Fluxo de trabalho:** Gitflow, GitHub Projects, revisão por CODEOWNERS e publicação de versões com GitHub Actions.
-- **Previsto:** modelos exportados do Blender, um banco de dados e ferramentas em Python para o pipeline de modelos e dados.
+| Área | Escolha | Observações |
+|------|---------|-------------|
+| Runtime | Node.js `24.x` | fixado em `docker/.env` (`NODE_VERSION`) |
+| UI | React `19` + TypeScript `5.7` | |
+| Estilo | SCSS Modules (`sass`) | o Next compila nativamente; `glenn2223.live-sass` é opcional |
+| Animação | GSAP `3` | |
+| Framework | Next.js `15` (App Router) | servidor de dev + Fast Refresh |
+| Gerenciador de pacotes | pnpm | via Corepack; versão fixada em `front-end/package.json` |
+| Containers | Docker + Compose v2 | imagem multi-stage |
+| 3D *(futuro)* | react-three-fiber, three.js, assets do Blender | |
+| Pipeline *(futuro)* | Python (ferramentas de asset/dados), um banco de dados | ainda não nos containers |
+| Testes *(futuro)* | ainda não instalado | nenhum runner configurado; adicionar quando precisar |
 
 ---
 
@@ -59,51 +55,123 @@ O **Aegir** é um hotel fictício de frente para o mar, no litoral da Bahia, em 
 
 ```
 aegir-hotel/
-├── .github/          # guia de contribuição, CODEOWNERS, modelos de issue e PR, workflow de release
-├── .devcontainer/    # dev container do VS Code / Codespaces
-├── app/              # o site (Next.js)
-├── docker/           # Dockerfile, arquivos do Compose e o .env com portas e versões
-├── docs/images/      # imagens usadas neste README
-├── scripts/          # check-docs.sh: valida diagramas Mermaid e links locais
-├── LICENSE
-└── README.md · README.pt-BR.md
+├── .github/
+│   ├── CONTRIBUTING.md · CONTRIBUTING.pt-BR.md   # 📘 O guia de fluxo (branches · issues · PRs · release)
+│   ├── CLAUDE.md                      # notas do agente para CI / templates
+│   ├── CODEOWNERS                     # revisores obrigatórios por path (roster de 5)
+│   ├── ISSUE_TEMPLATE/                # formulários bug / feature / task (GitHub Projects)
+│   ├── PULL_REQUEST_TEMPLATE.md
+│   └── workflows/release.yml          # CI — roda SOMENTE numa tag v*.*.*
+├── .devcontainer/
+│   ├── frontend/devcontainer.json     # dev-container VS Code / Codespaces (reusa o compose)
+│   └── README.md · README.pt-BR.md · CLAUDE.md
+├── front-end/                         # o cliente web — montado como volume no container
+│   ├── public/                        # arquivos estáticos servidos como estão
+│   ├── next.config.ts · tsconfig.json · package.json · pnpm-workspace.yaml
+│   ├── app/                           # rotas + _shared/ (compartilhado) + _styles/ (SCSS global)
+│   │                                  # uma pasta por componente: Foo/Foo.tsx + Foo/Foo.module.scss
+│   └── README.md · README.pt-BR.md · CLAUDE.md
+├── docker/
+│   ├── Dockerfile.frontend            # multi-stage: base → debugger → build → production
+│   ├── docker-compose.yml             # serviços: website + tests
+│   ├── .env / .env.example            # todas as portas e versões
+│   └── README.md · README.pt-BR.md · CLAUDE.md
+├── scripts/check-docs.sh              # valida todo diagrama Mermaid + links locais
+├── LICENSE                            # MIT
+├── .dockerignore · .gitignore
+├── README.md · README.pt-BR.md
+└── CLAUDE.md                          # notas para o agente Claude Code
 ```
 
-Cada pasta tem um `README.md` em inglês e um `README.pt-BR.md` em português.
+Cada pasta traz um `README.md` em inglês **e** um `README.pt-BR.md`, além de um
+`CLAUDE.md` com notas voltadas ao agente.
 
 ---
 
-## 🚀 Como rodar
+## 🚀 Início rápido
 
-**Requisitos:** Docker Desktop (ou Docker Engine com Compose v2). Nada mais precisa ser instalado no seu computador, nem mesmo o Node.
+**Requisitos:** Docker Desktop (ou Docker Engine + Compose v2). Nada mais — nem o
+Node — precisa estar instalado na máquina.
 
 ```bash
-git clone https://github.com/CarlosNeto-dev/aegir-hotel.git
+git clone <este-repo> aegir-hotel
 cd aegir-hotel/docker
 cp .env.example .env
 
-docker compose -f docker-compose.yml up      # sem GPU NVIDIA
-docker compose up                            # com GPU NVIDIA e o Container Toolkit
+docker compose up
 ```
 
-Depois, abra o endereço que aparece no terminal. Todas as portas e versões ficam definidas em um só lugar: `docker/.env`.
-
-Para parar:
+| URL | O quê |
+|-----|-------|
+| <http://localhost:5173> | o site (servidor de dev do Next.js, Fast Refresh) |
+| <http://localhost:4173> | reservado para um preview parecido com produção *(sem uso hoje)* |
+| `localhost:9229` | inspetor do Node.js |
 
 ```bash
-docker compose down          # para os contêineres
-docker compose down -v       # para e apaga os volumes
+docker compose down          # parar
+docker compose down -v        # parar + remover volumes
 ```
 
-Detalhes dos contêineres, da GPU e do recarregamento automático estão em [`docker/README.pt-BR.md`](docker/README.pt-BR.md).
+Detalhes dos containers, o build multi-stage e o passo a passo de
+hot-reload estão em [`docker/README.pt-BR.md`](docker/README.pt-BR.md).
 
 ---
 
-## 🤝 Como contribuir
+## 💻 Desenvolvimento local sem Docker (opcional)
 
-Todo o fluxo de trabalho (ambiente, branches, issues, pull requests, versões e releases) está em [`.github/CONTRIBUTING.pt-BR.md`](.github/CONTRIBUTING.pt-BR.md) · [English](.github/CONTRIBUTING.md).
+Precisa de Node `24.x` na máquina e da aplicação já inicializada
+([`front-end/README.pt-BR.md`](front-end/README.pt-BR.md)).
 
-Resumindo: trabalhe num fork, crie a branch a partir da `develop`, abra um pull request e aguarde a revisão do [CODEOWNERS](.github/CODEOWNERS). Uma tag `v*.*.*` na `main` dispara [o workflow de release](.github/workflows/release.yml), que publica uma GitHub Release.
+```bash
+cd front-end && pnpm install && pnpm dev
+```
+
+O caminho com Docker é o oficialmente suportado.
+
+---
+
+## 🔌 Portas
+
+Definidas uma única vez em `docker/.env`, reutilizadas pelo Dockerfile, pelo
+Compose e pelo dev-container.
+
+| Variável | Padrão | Finalidade |
+|----------|--------|------------|
+| `WEB_DEV_PORT` | `5173` | servidor de dev do Next.js |
+| `WEB_PREVIEW_PORT` | `4173` | reservado para um preview parecido com produção *(sem uso hoje)* |
+| `NODE_DEBUG_PORT` | `9229` | inspetor do Node.js |
+
+---
+
+
+## 🤝 Contribuindo
+
+**Todo o fluxo de contribuição** — ambiente de dev, modelo de branches, issues &
+GitHub Projects, pull requests, versionamento e o pipeline de release — está num
+único lugar:
+
+### → [`.github/CONTRIBUTING.pt-BR.md`](.github/CONTRIBUTING.pt-BR.md) · [English](.github/CONTRIBUTING.md)
+
+Resumindo: trabalhe num fork, saia de `develop`, abra um PR, receba uma revisão
+de [CODEOWNERS](.github/CODEOWNERS) do Neto, e uma tag `v*.*.*` na `main` dispara
+[o workflow de release](.github/workflows/release.yml) que publica um GitHub
+Release.
+
+---
+
+## 📚 Mapa da documentação
+
+| Arquivo | Conteúdo |
+|---------|----------|
+| [`README.md`](README.md) · `README.pt-BR.md` | visão geral do projeto (esta página) |
+| [`.github/CONTRIBUTING.pt-BR.md`](.github/CONTRIBUTING.pt-BR.md) · [en](.github/CONTRIBUTING.md) | **o guia de fluxo**: ambiente, branches, issues, PRs, releases |
+| [`front-end/README.pt-BR.md`](front-end/README.pt-BR.md) · [en](front-end/README.md) | estrutura de pastas + guia passo a passo da aplicação |
+| [`docker/README.pt-BR.md`](docker/README.pt-BR.md) · [en](docker/README.md) | imagens, Compose, fluxo de hot-reload, solução de problemas |
+| [`.devcontainer/README.pt-BR.md`](.devcontainer/README.pt-BR.md) · [en](.devcontainer/README.md) | o dev-container do VS Code |
+| [`CLAUDE.md`](CLAUDE.md) | convenções para o agente Claude Code |
+
+Cada link local — e qualquer diagrama Mermaid — é validado por
+[`scripts/check-docs.sh`](scripts/check-docs.sh).
 
 ---
 
