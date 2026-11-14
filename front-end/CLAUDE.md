@@ -113,13 +113,14 @@ in the devcontainer and the matching `.gitignore` entries are dead config.
 |-------|--------|
 | `pnpm install` | ok (needs `allowBuilds` decisions). `next@15.0.3` flagged deprecated — CVE-2025-66478, bump to a patched 15.x |
 | `tsc --noEmit` | passes |
-| `pnpm build` | **passes** — 6 routes (`/`, `/ambientes-3d`, `/ambientes-3d/[ambiente]`, `/pagamentos`, `/redefinir-senha`, `/_not-found`) |
+| `pnpm build` | passed on 2026-11-02 — 6 routes (`/`, `/ambientes-3d`, `/ambientes-3d/[ambiente]`, `/pagamentos`, `/redefinir-senha`, `/_not-found`). **Regressed by 2026-11-13** — see the `pnpm run build` row below |
 | `next dev` | `/`, `/ambientes-3d`, `/ambientes-3d/teste`, `/pagamentos`, `/redefinir-senha` all 200, header rendered |
 | `pnpm lint` | **cannot run** — `next lint` needs `eslint` + `eslint-config-next` (not installed) |
 | `next dev --host 0.0.0.0` | **fails** — Next uses `-H/--hostname` and `-p/--port` |
-| `docker/docker-compose.yml` `tests` | runs `pnpm run test:ui` — script no longer exists |
-| `Dockerfile.frontend` `build`/`production` | expects `/app/dist` + nginx SPA; Next emits `.next/` (needs `output: "export"` and `generateStaticParams` for the dynamic routes) |
-| HMR in Docker | `WATCHPACK_POLLING=true` is set in compose (needed on Docker bind mounts) |
+| `docker/docker-compose.yml` `tests` service | **removed 2026-11-13** — ran `pnpm run test:ui`, a script that never existed (no test runner installed), so it did nothing |
+| `Dockerfile.frontend` `build`/`production` | **fixed 2026-11-13**: `next.config.ts` has `output: "standalone"`; `production` runs `node server.js` (no nginx, no pnpm) — chosen over `output: "export"` because the dynamic route `/ambientes-3d/[ambiente]` doesn't need `generateStaticParams` this way |
+| `pnpm run build` (production build) | **fails**, with or without `output: "standalone"` (isolated by testing both) — `Error: <Html> should not be imported outside of pages/_document` while statically generating `/404`/`/_error`. Not a Docker/network issue (reproduced twice, no font-fetch errors on the second run). Likely something in `app/layout.tsx`'s provider tree throwing for a route with no page-specific data — not investigated further, out of scope for the Dockerfile fix |
+| HMR in Docker | `WATCHPACK_POLLING=true` is set in compose (needed on Docker bind mounts) — **verified 2026-11-13**: editing a `.tsx` or `.module.scss` triggers `✓ Compiled …` and the page updates; editing `next.config.ts` logs `⚠ Found a change in next.config.ts. Restarting the server…` and Next restarts itself |
 | `release.yml` `quality` | would fail on tag: no `format:check`/`typecheck`/`test` scripts (`--if-present` skips them) |
 | `@types/react`/`@types/react-dom` `^18` vs React 19 RC | mismatch — align when upgrading |
 | Windows host | `node_modules` created by the Linux container is not usable from the host (pnpm symlinks); install inside the container or in a copy |
