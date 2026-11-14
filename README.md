@@ -4,7 +4,7 @@
   <img alt="Node" src="https://img.shields.io/badge/Node-24.x-339933?logo=node.js&logoColor=white">
   <img alt="React" src="https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black">
   <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-5.7-3178C6?logo=typescript&logoColor=white">
-  <img alt="Vite" src="https://img.shields.io/badge/Vite-6-646CFF?logo=vite&logoColor=white">
+  <img alt="Next.js" src="https://img.shields.io/badge/Next.js-15-000000?logo=next.js&logoColor=white">
   <img alt="Sass" src="https://img.shields.io/badge/SCSS-1.83-CC6699?logo=sass&logoColor=white">
   <img alt="GSAP" src="https://img.shields.io/badge/GSAP-3-88CE02?logo=greensock&logoColor=black">
   <img alt="Docker" src="https://img.shields.io/badge/Docker-Compose%20v2-2496ED?logo=docker&logoColor=white">
@@ -18,9 +18,10 @@
 
 ## 📖 Overview
 
-Aegir Hotel is a **front-end** web project built with **React + TypeScript +
-SCSS**, animated with **GSAP** and bundled by **Vite**. Everything runs inside
-Docker, so any machine gets the exact same toolchain with a single command.
+Aegir Hotel is a **front-end** web project built with **Next.js (App Router) +
+React + TypeScript + SCSS Modules**, animated with **GSAP**, managed with
+**pnpm**. Everything runs inside Docker, so any machine gets the exact same
+toolchain with a single command.
 
 Planned for later — already accounted for in the stack and the container setup:
 **react-three-fiber / three.js** 3D scenes, **Blender**-exported assets, a
@@ -38,13 +39,14 @@ Planned for later — already accounted for in the stack and the container setup
 |------|--------|-------|
 | Runtime | Node.js `24.x` | pinned in `docker/.env` (`NODE_VERSION`) |
 | UI | React `19` + TypeScript `5.7` | |
-| Styling | SCSS (`sass` `1.83`) | Vite compiles it natively; `glenn2223.live-sass` optional |
+| Styling | SCSS Modules (`sass`) | Next compiles it natively; `glenn2223.live-sass` optional |
 | Animation | GSAP `3` | |
-| Build tool | Vite `6` | dev server + HMR + `vite preview` |
-| Tests | Vitest `2` + `@vitest/ui` | runs in its own container |
+| Framework | Next.js `15` (App Router) | dev server + Fast Refresh |
+| Package manager | pnpm | via Corepack; version pinned in `front-end/package.json` |
 | Containers | Docker + Compose v2 | multi-stage image |
 | 3D *(future)* | react-three-fiber, three.js, Blender assets | |
 | Pipeline *(future)* | Python (asset/data tooling), a database | not yet in the containers |
+| Tests *(future)* | not installed yet | no runner is wired in; add one when needed |
 
 ---
 
@@ -100,9 +102,8 @@ docker compose up
 
 | URL | What |
 |-----|------|
-| <http://localhost:5173> | the website (Vite dev server, hot reload) |
-| <http://localhost:51204/__vitest__/> | the Vitest UI *(after the first test file exists)* |
-| <http://localhost:4173> | `vite preview` (production-like) |
+| <http://localhost:5173> | the website (Next.js dev server, Fast Refresh) |
+| <http://localhost:4173> | reserved for a production-like preview *(unused today)* |
 | `localhost:9229` | Node.js inspector |
 
 ```bash
@@ -121,7 +122,7 @@ Needs Node `24.x` on the host and the app already bootstrapped
 ([`front-end/README.md`](front-end/README.md)).
 
 ```bash
-cd app && pnpm install && pnpm dev
+cd front-end && pnpm install && pnpm dev
 ```
 
 The Docker path is the supported one.
@@ -135,9 +136,8 @@ dev-container.
 
 | Var | Default | Purpose |
 |-----|---------|---------|
-| `WEB_DEV_PORT` | `5173` | Vite dev server |
-| `WEB_PREVIEW_PORT` | `4173` | `vite preview` |
-| `TEST_UI_PORT` | `51204` | Vitest UI |
+| `WEB_DEV_PORT` | `5173` | Next.js dev server |
+| `WEB_PREVIEW_PORT` | `4173` | reserved for a production-like preview *(unused today)* |
 | `NODE_DEBUG_PORT` | `9229` | Node.js inspector |
 
 ---
