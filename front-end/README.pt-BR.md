@@ -13,10 +13,11 @@ Esta pasta é todo o front-end. Ela é **montada como volume em `/app`** dentro 
 container (veja [`../docker/README.pt-BR.md`](../docker/README.pt-BR.md)), então
 tudo que você faz aqui é o que roda.
 
-> 🎯 **Branch de arquitetura.** A `frontend-architecture-organization` carrega apenas
-> esta estrutura de pastas e arquivos. Todo arquivo `.ts` / `.tsx` / `.scss` abaixo é
-> **vazio de propósito** (cada pasta que os contém mantém um `.gitkeep`), então o
-> esqueleto ainda não compila — veja o [Status desta branch](#-status-desta-branch).
+> ⚠️ **Em andamento.** A árvore de rotas, as pastas e os parciais de SCSS
+> existem, mas a maioria dos arquivos `.ts` / `.tsx` / `.scss` ainda é
+> **placeholder vazio** (o header do site, o `layout.tsx` e o `page.tsx` da landing
+> já têm código). Veja o [Status atual](#-status-atual) para saber o que compila e
+> o que não.
 
 ---
 
@@ -50,9 +51,12 @@ front-end/
     ├── redefinir-senha/                 # /redefinir-senha (sem loading.tsx)
     ├── _shared/                  # compartilhado por todas as rotas
     │   ├── site-header/              #   SiteHeaderLayout/ Mobile/ Desktop/ TV/ · header-hooks/ · header-utils/
-    │   ├── panels/                     #   PanelProvider/ · settings-panel/SettingsPanel/
-    │   ├── overlays/               #   SiteLoader/
-    │   └── lib/                  #   api/{core, endpoints}/ · data/
+    │   ├── panels/                     #   PanelProvider/ · SidePanel/ · settings-panel/
+    │   ├── settings-capsule/           #   cápsula fixa de Tema + Ajustes
+    │   ├── smooth-scroll/              #   SmoothScrollProvider (Lenis + ScrollTrigger)
+    │   ├── auth/                       #   AuthProvider/ · GuestAvatar/
+    │   ├── overlays/               #   SiteLoader/ · SectionCurtain/ · CustomCursor/ · TouchEffect/
+    │   └── lib/                  #   gsap.ts · section-nav.ts · motion.ts · api/{core, endpoints}/ · data/
     └── _styles/                        # SOMENTE SCSS GLOBAL: main.scss · base/ · tools/
 ```
 
@@ -83,7 +87,7 @@ Toda pasta que contém placeholders `.ts` / `.tsx` vazios tem um `.gitkeep`.
 8. **Server components por padrão.** Use `"use client"` só onde precisar de
    estado, efeitos ou APIs do navegador (Cursor, painéis, canvas da cena, animação).
 9. **Nada de `page.tsx` / `layout.tsx` / `loading.tsx` vazio** — arquivo vazio *não é
-   módulo* e quebra o `next build`. Os params dinâmicos são uma `Promise` no Next 15. Este esqueleto quebra a regra de propósito até as páginas serem escritas. Este esqueleto quebra a regra de propósito até as páginas serem escritas.
+   módulo* e quebra o `next build`. Os params dinâmicos são uma `Promise` no Next 15.
 
 ---
 
@@ -106,19 +110,46 @@ O Next.js compila SCSS nativamente quando o pacote `sass` está instalado.
 
 ---
 
-## 🩺 Status desta branch
+## 🚀 Executando
 
-| Item | Estado |
-|------|--------|
-| Pastas e arquivos de `app/` | ✅ todos presentes, conforme a estrutura combinada |
-| Arquivos de código (`.ts` / `.tsx` / `.scss`) | ⚪ **vazios de propósito**, com um `.gitkeep` em cada pasta que os contém |
-| `package.json`, `next.config.ts`, `tsconfig.json`, `pnpm-workspace.yaml` | ✅ conteúdo real (pnpm, alias `@/*`, `includePaths` do SCSS) |
-| `pnpm build` | ❌ esperado — `page.tsx` / `layout.tsx` vazios *não são módulos* |
-| Docker, dev-container, CI | ⚪ fora do escopo — só os caminhos do host apontam para `front-end/`; os comandos deles ainda descrevem a configuração anterior com Vite + npm |
+```bash
+cd ../docker
+docker compose -f docker-compose.yml up --build
+```
 
-Preencher os arquivos é feito em branches de funcionalidade, em cima deste
-esqueleto. Ainda não instalados (adicione quando precisar, pergunte antes): ESLint,
-Prettier, Stylelint, Vitest, GSAP, react-three-fiber / three / drei.
+Scripts (`package.json`):
+
+| Script | Comando | Obs. |
+|--------|---------|------|
+| `pnpm dev` | `next dev` | o Next escuta `0.0.0.0` por padrão; as flags são `-p/--port`, `-H/--hostname` — **não** `--host` |
+| `pnpm build` | `next build` | exige que todo arquivo de rota exporte um componente |
+| `pnpm start` | `next start` | serve o build de `.next/` |
+| `pnpm lint` | `next lint` | precisa de `eslint` + `eslint-config-next` (ainda não instalados) |
+
+---
+
+## 🩺 Status atual
+
+Verificado em 2026-11-02 numa cópia limpa no Windows (`pnpm install`, `tsc`, `next build`):
+
+| Verificação | Resultado |
+|-------------|-----------|
+| `pnpm install` | ✅ 46 pacotes — mas o `next@15.0.3` está sinalizado (CVE-2025-66478); atualize para um 15.x corrigido |
+| `tsc --noEmit` | ✅ |
+| `pnpm build` | ✅ 6 rotas (`/`, `/ambientes-3d`, `/ambientes-3d/[ambiente]`, `/pagamentos`, `/redefinir-senha`, `/_not-found`) |
+| `pnpm lint` | ❌ ESLint não instalado |
+| `docker compose` → `website` | ✅ `pnpm install` + `next dev -H 0.0.0.0 -p 5173` chegam a *Ready* (verificado em 2026-10-26; os caminhos eram `app/`, agora `front-end/`) |
+| Alvo Docker `production` | ✅ **corrigido em 2026-11-13** — `next.config.ts` tem `output: "standalone"`, o estágio do Dockerfile roda `node server.js` (sem nginx) |
+| `pnpm run build` (build de produção) | ❌ **regressão desde 2026-11-02** — falha com `Error: <Html> should not be imported outside of pages/_document` ao gerar as páginas estáticas `/404`/`/_error`. Reproduzido com e sem `output: "standalone"`, então não tem relação com a correção do Docker acima; provavelmente algo na árvore de Providers do `app/layout.tsx` |
+| Hot reload no Docker | ✅ `WATCHPACK_POLLING=true` definido no compose; edições de SCSS aparecem em ~4-20s |
+
+Havia um serviço `tests` no compose, montado pro Vitest; removido em
+2026-11-13 porque o `vitest` nunca chegou a ser instalado, então não fazia nada.
+
+Instalados para animação: GSAP 3.15 + @gsap/react 2.1 (ScrollTrigger) e Lenis 1.3.
+
+Não instalados (adicione quando precisar, pergunte antes): react-three-fiber /
+three / drei, Vitest + Testing Library, ESLint, Prettier, Stylelint.
 
 ---
 

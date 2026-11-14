@@ -13,10 +13,10 @@ This folder is the entire front-end. It is **bind-mounted into `/app`** inside t
 container (see [`../docker/README.md`](../docker/README.md)), so anything you do
 here is what runs.
 
-> 🎯 **Architecture branch.** `frontend-architecture-organization` carries only this
-> folder and file structure. Every `.ts` / `.tsx` / `.scss` file below is **empty on
-> purpose** (each folder that holds them keeps a `.gitkeep`), so the skeleton does
-> not build yet — see [Status of this branch](#-status-of-this-branch).
+> ⚠️ **Work in progress.** The route tree, folders and SCSS partials exist, but
+> most `.ts` / `.tsx` / `.scss` files are still **empty placeholders** (the site
+> header, `layout.tsx` and the landing `page.tsx` already have code). See
+> [Current status](#-current-status) for what builds and what doesn't.
 
 ---
 
@@ -50,9 +50,12 @@ front-end/
     ├── redefinir-senha/                 # /redefinir-senha (no loading.tsx)
     ├── _shared/                  # shared by every route
     │   ├── site-header/              #   SiteHeaderLayout/ Mobile/ Desktop/ TV/ · header-hooks/ · header-utils/
-    │   ├── panels/                     #   PanelProvider/ · settings-panel/SettingsPanel/
-    │   ├── overlays/               #   SiteLoader/
-    │   └── lib/                  #   api/{core, endpoints}/ · data/
+    │   ├── panels/                     #   PanelProvider/ · SidePanel/ · settings-panel/
+    │   ├── settings-capsule/           #   fixed Theme + Settings capsule
+    │   ├── smooth-scroll/              #   SmoothScrollProvider (Lenis + ScrollTrigger)
+    │   ├── auth/                       #   AuthProvider/ · GuestAvatar/
+    │   ├── overlays/               #   SiteLoader/ · SectionCurtain/ · CustomCursor/ · TouchEffect/
+    │   └── lib/                  #   gsap.ts · section-nav.ts · motion.ts · api/{core, endpoints}/ · data/
     └── _styles/                        # GLOBAL SCSS ONLY: main.scss · base/ · tools/
 ```
 
@@ -83,7 +86,7 @@ Every folder that holds empty `.ts` / `.tsx` placeholders contains a `.gitkeep`.
 8. **Server components by default.** Add `"use client"` only where you need
    state, effects or browser APIs (Cursor, panels, the scene canvas, animation).
 9. **No empty `page.tsx` / `layout.tsx` / `loading.tsx`** — an empty file is *not a
-   module* and breaks `next build`. Dynamic params are a `Promise` in Next 15. This skeleton breaks the rule on purpose until the pages are written. This skeleton breaks the rule on purpose until the pages are written.
+   module* and breaks `next build`. Dynamic params are a `Promise` in Next 15.
 
 ---
 
@@ -105,19 +108,46 @@ Next.js compiles SCSS natively once the `sass` package is installed.
 
 ---
 
-## 🩺 Status of this branch
+## 🚀 Running
 
-| Item | State |
-|------|-------|
-| Folders and files of `app/` | ✅ all present, matching the agreed structure |
-| Source files (`.ts` / `.tsx` / `.scss`) | ⚪ **empty on purpose**, with a `.gitkeep` in each folder that holds them |
-| `package.json`, `next.config.ts`, `tsconfig.json`, `pnpm-workspace.yaml` | ✅ real content (pnpm, `@/*` alias, SCSS `includePaths`) |
-| `pnpm build` | ❌ expected — empty `page.tsx` / `layout.tsx` are *not modules* |
-| Docker, dev-container, CI | ⚪ out of scope — only the host paths point to `front-end/`; their commands still describe the earlier Vite + npm setup |
+```bash
+cd ../docker
+docker compose -f docker-compose.yml up --build
+```
 
-Filling the files is done in feature branches, on top of this skeleton. Not
-installed yet (add when needed, ask first): ESLint, Prettier, Stylelint, Vitest,
-GSAP, react-three-fiber / three / drei.
+Scripts (`package.json`):
+
+| Script | Command | Note |
+|--------|---------|------|
+| `pnpm dev` | `next dev` | Next binds `0.0.0.0` by default; flags are `-p/--port`, `-H/--hostname` — **not** `--host` |
+| `pnpm build` | `next build` | needs every route file to export a component |
+| `pnpm start` | `next start` | serves the `.next/` build |
+| `pnpm lint` | `next lint` | needs `eslint` + `eslint-config-next` (not installed yet) |
+
+---
+
+## 🩺 Current status
+
+Checked on 2026-11-02 in a clean copy on Windows (`pnpm install`, `tsc`, `next build`):
+
+| Check | Result |
+|-------|--------|
+| `pnpm install` | ✅ 46 packages — but `next@15.0.3` is flagged (CVE-2025-66478); upgrade to a patched 15.x |
+| `tsc --noEmit` | ✅ |
+| `pnpm build` | ✅ 6 routes (`/`, `/ambientes-3d`, `/ambientes-3d/[ambiente]`, `/pagamentos`, `/redefinir-senha`, `/_not-found`) |
+| `pnpm lint` | ❌ ESLint not installed |
+| `docker compose` → `website` | ✅ `pnpm install` + `next dev -H 0.0.0.0 -p 5173` reach *Ready* (verified on 2026-10-26; the paths were then `app/`, now `front-end/`) |
+| Docker `production` target | ✅ **fixed 2026-11-13** — `next.config.ts` has `output: "standalone"`, the Dockerfile stage runs `node server.js` (no nginx) |
+| `pnpm run build` (production build) | ❌ **regression since 2026-11-02** — fails with `Error: <Html> should not be imported outside of pages/_document` while generating the static `/404`/`/_error` pages. Reproduced with and without `output: "standalone"`, so unrelated to the Docker fix above; likely something in `app/layout.tsx`'s provider tree |
+| Hot reload in Docker | ✅ `WATCHPACK_POLLING=true` set in compose; SCSS edits show up in ~4-20s |
+
+A `tests` compose service used to be wired here for Vitest; removed
+2026-11-13 because `vitest` was never actually installed, so it did nothing.
+
+Installed for animation: GSAP 3.15 + @gsap/react 2.1 (ScrollTrigger) and Lenis 1.3.
+
+Not installed (add when needed, ask first): react-three-fiber / three /
+drei, Vitest + Testing Library, ESLint, Prettier, Stylelint.
 
 ---
 

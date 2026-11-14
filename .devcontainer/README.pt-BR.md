@@ -26,17 +26,14 @@ ao serviço **`website`** (o estágio `debugger` do `docker/Dockerfile.frontend`
 
 Ao usar **Reopen in Container**:
 
-1. `website` + `tests` são construídos e iniciados via Compose.
-2. O editor abre um shell em `/app`.
-3. `postCreateCommand` roda `npm install` — isso resolve e grava o
-   `front-end/package-lock.json` (que está no `.gitignore`) do zero; não há lock
-   versionado pra sincronizar.
-4. `overrideCommand: true` mantém o container como um shell simples de longa
-   duração em vez de rodar o comando de dev-server do Compose — você mesmo inicia
-   `npm run dev` pelo terminal integrado.
+1. `website` é construído e iniciado via Compose — o comando normal dele
+   (`pnpm install && pnpm run dev …`) roda do jeito que está, então o servidor
+   de dev sobe **sozinho**, sem precisar digitar nada.
+2. O editor abre um terminal integrado em `/app` pra qualquer outra coisa que
+   você precisar (git, lint, scripts avulsos).
 
-Portas encaminhadas: `5173` (Vite), `4173` (preview), `51204` (UI do Vitest),
-`9229` (inspetor do Node) — iguais às do `docker/.env`.
+Portas encaminhadas: `5173` (Next dev), `4173` (preview, hoje sem uso), `9229`
+(inspetor do Node) — iguais às do `docker/.env`.
 
 ---
 
@@ -49,24 +46,23 @@ Portas encaminhadas: `5173` (Vite), `4173` (preview), `51204` (UI do Vitest),
 | `glenn2223.live-sass` | compilação opcional de SCSS → CSS isolado |
 | `stylelint.vscode-stylelint` | lint de SCSS |
 | `ms-azuretools.vscode-docker` | ferramentas Docker / Compose |
-| `vitest.explorer` | rodar testes pelo editor |
 | `slevesque.shader` | sintaxe GLSL (shaders r3f no futuro) |
 
 As configurações do Live Sass Compiler (`liveSassCompile.settings.*`) geram um
 `.css` `expanded` + source map em **uma pasta dedicada**,
 [`front-end/app/_styles/css/`](../front-end/app/_styles) (o `savePath` é relativo ao workspace,
 e o `workspaceFolder` é `/app`) — não ao lado de cada `.scss`. O `*.module.scss`
-está na `excludeList`: os estilos de componente são compilados só pelo Vite. O
+está na `excludeList`: os estilos de componente são compilados só pelo Next. O
 conteúdo da pasta é ignorado pelo git (a pasta em si é mantida por `.gitkeep`) —
 veja [`../.gitignore`](../.gitignore).
 
-Esse CSS é para inspeção / uso isolado; **o app nunca importa ele**. O Vite
-compila `.scss` no import (`src/main.tsx` → `import "./styles/main.scss"`).
+Esse CSS é para inspeção / uso isolado; **o app nunca importa ele**. O Next
+compila `.scss` no import (`app/layout.tsx` → `import "./_styles/main.scss"`).
 
 ### `files.autoSave: onFocusChange`
 
 Definido de propósito. O padrão do editor é `off` — um buffer não salvo nunca
-chega no arquivo do bind mount, então o HMR do Vite não tem o que reagir até
+chega no arquivo do bind mount, então o Fast Refresh do Next não tem o que reagir até
 você fechar a aba. `onFocusChange` grava o arquivo assim que você troca pro
 navegador ou pro terminal, que é exatamente quando você quer o HMR disparando.
 Recarregue a janela depois de mudar isso (não precisa `Rebuild` — é config de
@@ -87,7 +83,7 @@ seletor no "Reopen in Container".
 
 [🏠 Visão geral](../README.pt-BR.md) ·
 [🤝 Fluxo de contribuição](../.github/CONTRIBUTING.pt-BR.md) ·
-[🎨 front-end/](../front-end/README.pt-BR.md) ·
+[🎨 app/](../front-end/README.pt-BR.md) ·
 [🐳 docker/](../docker/README.pt-BR.md) ·
 [🤖 CLAUDE.md](CLAUDE.md)
 &nbsp;&nbsp;|&nbsp;&nbsp; 🇬🇧 [English](README.md)

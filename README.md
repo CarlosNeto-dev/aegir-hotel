@@ -4,7 +4,7 @@
   <img alt="Node" src="https://img.shields.io/badge/Node-24.x-339933?logo=node.js&logoColor=white">
   <img alt="React" src="https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black">
   <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-5.7-3178C6?logo=typescript&logoColor=white">
-  <img alt="Vite" src="https://img.shields.io/badge/Vite-6-646CFF?logo=vite&logoColor=white">
+  <img alt="Next.js" src="https://img.shields.io/badge/Next.js-15-000000?logo=next.js&logoColor=white">
   <img alt="Sass" src="https://img.shields.io/badge/SCSS-1.83-CC6699?logo=sass&logoColor=white">
   <img alt="GSAP" src="https://img.shields.io/badge/GSAP-3-88CE02?logo=greensock&logoColor=black">
   <img alt="Docker" src="https://img.shields.io/badge/Docker-Compose%20v2-2496ED?logo=docker&logoColor=white">
@@ -18,41 +18,18 @@
 
 ## 📖 Overview
 
-Aegir Hotel is a **front-end** web project built with **React + TypeScript +
-SCSS**, animated with **GSAP** and bundled by **Vite**. Everything runs inside
-Docker, so any machine gets the exact same toolchain with a single command.
+Aegir Hotel is a **front-end** web project built with **Next.js (App Router) +
+React + TypeScript + SCSS Modules**, animated with **GSAP**, managed with
+**pnpm**. Everything runs inside Docker, so any machine gets the exact same
+toolchain with a single command.
 
 Planned for later — already accounted for in the stack and the container setup:
 **react-three-fiber / three.js** 3D scenes, **Blender**-exported assets, a
-**database**, and **Python** tooling for the asset/data pipeline. GPU passthrough
-is already wired (opt-in) for that work.
+**database**, and **Python** tooling for the asset/data pipeline.
 
-> ℹ️ The repo is currently a **scaffold**. On **this branch** the web client is only
-> a **folder and file skeleton** — see
-> [Purpose of this branch](#-purpose-of-this-branch).
-
----
-
-## 🎯 Purpose of this branch
-
-`frontend-architecture-organization` exists for one thing: **organizing the
-front-end architecture**. It carries only the **folder and file structure** of the
-web client (`front-end/`), so the whole team can see, review and agree on where
-every piece lives before any code is written.
-
-- **Structure only.** Every `.ts` / `.tsx` / `.scss` file under `front-end/app/` is
-  **empty on purpose**; each folder that holds them keeps a `.gitkeep`.
-- **Four real files** record the decisions: `package.json` (pnpm),
-  `next.config.ts` (SCSS `includePaths`), `tsconfig.json` (the `@/*` alias) and
-  `pnpm-workspace.yaml`.
-- **It does not build, and that is expected** — an empty `page.tsx` is not a module.
-  The code is written in feature branches, on top of this skeleton.
-- **Out of scope:** Docker, dev-container and CI were not redesigned here; only
-  their host paths now point to `front-end/`. Their commands and the tech-stack
-  table below still describe the earlier Vite + npm setup.
-- **The rules of the structure** (routes in Portuguese, everything else in
-  English, one folder per component…) live in
-  [`front-end/README.md`](front-end/README.md).
+> ℹ️ The repo is currently a **scaffold**: the container setup is complete and
+> verified, `front-end/` holds the agreed folder structure, and the application code is
+> added by following [`front-end/README.md`](front-end/README.md).
 
 ---
 
@@ -62,13 +39,14 @@ every piece lives before any code is written.
 |------|--------|-------|
 | Runtime | Node.js `24.x` | pinned in `docker/.env` (`NODE_VERSION`) |
 | UI | React `19` + TypeScript `5.7` | |
-| Styling | SCSS (`sass` `1.83`) | Vite compiles it natively; `glenn2223.live-sass` optional |
+| Styling | SCSS Modules (`sass`) | Next compiles it natively; `glenn2223.live-sass` optional |
 | Animation | GSAP `3` | |
-| Build tool | Vite `6` | dev server + HMR + `vite preview` |
-| Tests | Vitest `2` + `@vitest/ui` | runs in its own container |
-| Containers | Docker + Compose v2 | multi-stage image, GPU override |
+| Framework | Next.js `15` (App Router) | dev server + Fast Refresh |
+| Package manager | pnpm | via Corepack; version pinned in `front-end/package.json` |
+| Containers | Docker + Compose v2 | multi-stage image |
 | 3D *(future)* | react-three-fiber, three.js, Blender assets | |
 | Pipeline *(future)* | Python (asset/data tooling), a database | not yet in the containers |
+| Tests *(future)* | not installed yet | no runner is wired in; add one when needed |
 
 ---
 
@@ -86,16 +64,15 @@ aegir-hotel/
 ├── .devcontainer/
 │   ├── frontend/devcontainer.json     # VS Code / Codespaces dev-container (reuses compose)
 │   └── README.md · README.pt-BR.md · CLAUDE.md
-├── front-end/                         # the web client skeleton — bind-mounted into the container
+├── front-end/                         # the web client — bind-mounted into the container
 │   ├── public/                        # static assets served as-is
 │   ├── next.config.ts · tsconfig.json · package.json · pnpm-workspace.yaml
 │   ├── app/                           # routes + _shared/ (shared) + _styles/ (global SCSS)
-│   │                                  # files empty on purpose: Foo/Foo.tsx + Foo/Foo.module.scss
+│   │                                  # one folder per component: Foo/Foo.tsx + Foo/Foo.module.scss
 │   └── README.md · README.pt-BR.md · CLAUDE.md
 ├── docker/
 │   ├── Dockerfile.frontend            # multi-stage: base → debugger → build → production
 │   ├── docker-compose.yml             # services: website + tests
-│   ├── docker-compose.override.yml    # opt-in NVIDIA GPU passthrough
 │   ├── .env / .env.example            # every port & version knob
 │   └── README.md · README.pt-BR.md · CLAUDE.md
 ├── scripts/check-docs.sh              # validates every Mermaid diagram + local links
@@ -120,15 +97,13 @@ git clone <this-repo> aegir-hotel
 cd aegir-hotel/docker
 cp .env.example .env
 
-docker compose -f docker-compose.yml up      # no NVIDIA GPU
-docker compose up                            # with NVIDIA GPU + Container Toolkit
+docker compose up
 ```
 
 | URL | What |
 |-----|------|
-| <http://localhost:5173> | the website (Vite dev server, hot reload) |
-| <http://localhost:51204/__vitest__/> | the Vitest UI *(after the first test file exists)* |
-| <http://localhost:4173> | `vite preview` (production-like) |
+| <http://localhost:5173> | the website (Next.js dev server, Fast Refresh) |
+| <http://localhost:4173> | reserved for a production-like preview *(unused today)* |
 | `localhost:9229` | Node.js inspector |
 
 ```bash
@@ -136,7 +111,7 @@ docker compose down          # stop
 docker compose down -v        # stop + drop volumes
 ```
 
-Container internals, GPU notes, the multi-stage build and the hot-reload
+Container internals, the multi-stage build and the hot-reload
 walkthrough live in [`docker/README.md`](docker/README.md).
 
 ---
@@ -147,7 +122,7 @@ Needs Node `24.x` on the host and the app already bootstrapped
 ([`front-end/README.md`](front-end/README.md)).
 
 ```bash
-cd front-end && npm install && npm run dev
+cd front-end && pnpm install && pnpm dev
 ```
 
 The Docker path is the supported one.
@@ -161,21 +136,12 @@ dev-container.
 
 | Var | Default | Purpose |
 |-----|---------|---------|
-| `WEB_DEV_PORT` | `5173` | Vite dev server |
-| `WEB_PREVIEW_PORT` | `4173` | `vite preview` |
-| `TEST_UI_PORT` | `51204` | Vitest UI |
+| `WEB_DEV_PORT` | `5173` | Next.js dev server |
+| `WEB_PREVIEW_PORT` | `4173` | reserved for a production-like preview *(unused today)* |
 | `NODE_DEBUG_PORT` | `9229` | Node.js inspector |
 
 ---
 
-## 🎮 GPU
-
-`docker/docker-compose.override.yml` adds NVIDIA GPU access to the `website`
-container and is **merged automatically** by a bare `docker compose up`. Machines
-without a GPU runtime run `docker compose -f docker-compose.yml up` (or delete the
-override file). Detail in [`docker/README.md`](docker/README.md#-gpu).
-
----
 
 ## 🤝 Contributing
 
@@ -198,8 +164,8 @@ GitHub Release.
 |------|----------|
 | `README.md` · [`README.pt-BR.md`](README.pt-BR.md) | project overview (this page) |
 | [`.github/CONTRIBUTING.md`](.github/CONTRIBUTING.md) · [pt-BR](.github/CONTRIBUTING.pt-BR.md) | **the workflow guide**: environment, branches, issues, PRs, releases |
-| [`front-end/README.md`](front-end/README.md) · [pt-BR](front-end/README.pt-BR.md) | the architecture: folder structure and rules of the web client |
-| [`docker/README.md`](docker/README.md) · [pt-BR](docker/README.pt-BR.md) | images, Compose, GPU, hot-reload workflow, troubleshooting |
+| [`front-end/README.md`](front-end/README.md) · [pt-BR](front-end/README.pt-BR.md) | folder structure + step-by-step app bootstrap guide |
+| [`docker/README.md`](docker/README.md) · [pt-BR](docker/README.pt-BR.md) | images, Compose, hot-reload workflow, troubleshooting |
 | [`.devcontainer/README.md`](.devcontainer/README.md) · [pt-BR](.devcontainer/README.pt-BR.md) | the VS Code dev-container |
 | [`CLAUDE.md`](CLAUDE.md) | conventions for the Claude Code agent |
 

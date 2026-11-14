@@ -2,27 +2,22 @@
 #  docker-compose.yml · Aegir Hotel — local orchestration (frontend only)
 # -----------------------------------------------------------------------------
 #  Services
-#    website  → the React app (Vite dev server, hot reload)
-#    tests    → the Vitest runner + UI; starts after `website`
+#    website  → the Next.js app (dev server, Fast Refresh)
 #
 #  Design
 #    · Every tunable value is an env var with a default → edit docker/.env only.
 #    · Shared config lives in YAML anchors (`x-*`) merged with `<<:` → DRY.
-#    · Both services bind-mount ONLY ../front-end and run `npm install` on startup
-#      before their long-running process. No lock file is committed — npm
-#      resolves and writes front-end/package-lock.json into the bind mount each run.
-#    · Services run as the unprivileged `node` user — the SAME identity the
+#    · The service bind-mounts ONLY ../front-end and runs `pnpm install` on
+#      startup before its long-running process. No lock file is committed —
+#      pnpm resolves and writes front-end/pnpm-lock.yaml into the bind mount
+#      each run.
+#    · Runs as the unprivileged `node` user — the SAME identity the
 #      dev-container uses (remoteUser: node) — so node_modules written here and
 #      by "Reopen in Container" never collide on ownership.
-#    · GPU passthrough is opt-in via docker-compose.override.yml (auto-merged
-#      by `docker compose up`). Machines without an NVIDIA runtime run the
-#      base file explicitly:  docker compose -f docker-compose.yml up
 #
 #  Run from this folder (docker/) so ../ paths and .env resolve:
 #    cd docker
-#    docker compose up                       # website + tests (+ GPU override)
-#    docker compose -f docker-compose.yml up  # website + tests, no GPU
-#    docker compose up website               # just the site
+#    docker compose up                       # website
 # =============================================================================
 
 name: aegir-hotel
@@ -40,7 +35,6 @@ x-frontend-build: &frontend-build
     APP_DIR: ${APP_DIR:-/app}
     WEB_DEV_PORT: ${WEB_DEV_PORT:-5173}
     WEB_PREVIEW_PORT: ${WEB_PREVIEW_PORT:-4173}
-    TEST_UI_PORT: ${TEST_UI_PORT:-51204}
     NODE_DEBUG_PORT: ${NODE_DEBUG_PORT:-9229}
 
 x-frontend-service: &frontend-service
@@ -68,44 +62,22 @@ x-frontend-healthcheck: &frontend-healthcheck
 
 services:
 
-  # website — the React application (Vite dev server)
+  # website — the Next.js application (dev server)
   website:
     <<: *frontend-service
     container_name: aegir-website
     environment:
       NODE_ENV: development
+      # Next.js file watching needs polling on Docker bind mounts (Windows/WSL2/macOS).
+      WATCHPACK_POLLING: "true"
     # Install deps into the mounted volume, then start the dev server.
-    command: sh -c "npm install && npm run dev -- --host 0.0.0.0 --port ${WEB_DEV_PORT:-5173}"
+    command: sh -c "pnpm install && pnpm run dev -H 0.0.0.0 -p ${WEB_DEV_PORT:-5173}"
     ports:
-      # website — Vite dev server (hot reload)
+      # website — Next.js dev server (Fast Refresh)
       - "${WEB_DEV_PORT:-5173}:${WEB_DEV_PORT:-5173}"
-      # website — `vite preview` production-like preview
+      # website — reserved for a production-like preview (unused today)
       - "${WEB_PREVIEW_PORT:-4173}:${WEB_PREVIEW_PORT:-4173}"
       # debug — Node.js inspector
       - "${NODE_DEBUG_PORT:-9229}:${NODE_DEBUG_PORT:-9229}"
-    healthcheck:
-      <<: *frontend-healthcheck
-
-  # tests — Vitest UI; waits for `website` before starting.
-  #
-  # Vitest exits (cleanly, code 0) when the project has ZERO test files, so on a
-  # fresh checkout this container starts, prints "No test files found" and stops.
-  # As soon as you add the first `*.test.tsx`, the same command keeps the UI
-  # resident on TEST_UI_PORT. `restart: on-failure` (overriding the shared
-  # `unless-stopped`) means the clean empty-project exit does NOT loop, but a
-  # real crash still recovers.
-  tests:
-    <<: *frontend-service
-    container_name: aegir-tests
-    restart: on-failure
-    environment:
-      NODE_ENV: test
-    command: sh -c "npm install && npm run test:ui -- --open=false --api.host 0.0.0.0 --api.port ${TEST_UI_PORT:-51204} --passWithNoTests"
-    depends_on:
-      website:
-        condition: service_started
-    ports:
-      # tests — Vitest UI dashboard
-      - "${TEST_UI_PORT:-51204}:${TEST_UI_PORT:-51204}"
     healthcheck:
       <<: *frontend-healthcheck
