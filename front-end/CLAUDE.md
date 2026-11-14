@@ -1,0 +1,137 @@
+# CLAUDE.md — `front-end/`
+
+Agent notes for the web client. Root guidance: [`../CLAUDE.md`](../CLAUDE.md).
+
+> The stack is **Next.js (App Router) + pnpm**. This file is the source of truth
+> for `front-end/`. Docs elsewhere (`docker/`, `.devcontainer/`, `.github/`) may still
+> describe an older stack; where they disagree, `front-end/` wins — see *Known breakages*.
+
+## State
+
+**Next.js 15 (App Router) skeleton.** Most `.ts` / `.tsx` / `.scss` files in `app/`
+are **empty placeholders**: the route tree, folders and SCSS partials exist; the
+site header, `layout.tsx` and the landing `page.tsx` already have the user's code.
+Each folder holding empty `.ts`/`.tsx` files carries a `.gitkeep`.
+
+Present: `package.json` (`"packageManager": "pnpm@12.15.0"`; `next 15.0.3`, `react`/`react-dom` 19 RC, `sass`,
+`typescript`, `@types/*`, `gsap 3.15` + `@gsap/react 2.1` (ScrollTrigger), `lenis 1.3` for smooth scroll), `next.config.ts` (`sassOptions`), `tsconfig.json`
+(Next default + `@/*` → `./*`), `pnpm-workspace.yaml` (`allowBuilds` — required, see
+`../docker/CLAUDE.md`), `public/photos/`, `public/scenes/`, `app/`. Use **pnpm**, never npm.
+The folder is bind-mounted to `/app` in the container; the host folder is `front-end/`.
+
+**Not installed** (add only when needed, ask first): ESLint, Prettier, Stylelint,
+Vitest + Testing Library, three / react-three-fiber / drei.
+
+## Layout (`app/`)
+
+Everything lives in `app/`. Folders starting with `_` are **private** (never
+routes); `(name)` is a **route group** (not in the URL). **Only folders that become a
+URL segment are in Portuguese** (lowercase, hyphens, no accents): the site is pt-BR and
+Next.js builds the URL from the folder name. Everything that is not a route is
+**English**: component folders (`PascalCase`, each with `Name.tsx` + `Name.module.scss`),
+files, functions, props, SCSS classes and route groups such as `(landing)`.
+
+```
+layout.tsx                   root layout: fonts, <html lang="pt-BR">, <SiteHeaderLayout />, global SCSS
+(landing)/                    landing  ->  /
+  page.tsx page.module.scss loading.tsx
+  landing-layout/
+    LandingMain/               + sections/ (Opening Journey Suites Compare Day Models Numbers Booking + Section)
+                               + aside/ (MainAside/, account-panel/{AccountPanel/, account-views/, account-utils/})
+    LandingFooter/
+    overlays/             ProgressBar/ Cursor/
+ambientes-3d/                /ambientes-3d  ·  /ambientes-3d/[ambiente]
+  _r3f/SceneCanvas/            (no .module.scss)
+  ambients-layout/AmbientsMain/   + SceneLayout/ SceneTopBar/ SceneInfo/ SceneControls/
+pagamentos/                  /pagamentos            (payments-layout/PaymentsMain/)
+redefinir-senha/             /redefinir-senha       (reset-password-layout/ResetPasswordMain/; no loading.tsx)
+_shared/
+  site-header/              SiteHeaderLayout/ SiteHeaderMobile/ SiteHeaderDesktop/ SiteHeaderTV/
+                               header-hooks/{ActiveSectionProvider.tsx, useActiveSection.ts, useHeaderHidden.ts, scroll-to-section.ts}
+                               header-utils/{header-items.ts, HeaderAccount/ HeaderBrand/ HeaderCta/ HeaderIcons/ HeaderNavList/ LequeHint/ SectionLink/}
+  panels/                     PanelProvider/ (no .module.scss)  SidePanel/
+                               settings-panel/{SettingsPanel/ SettingsProvider/ settings-controls/ settings-sections/ settings-utils/}
+  settings-capsule/          SettingsCapsule/ SettingsButton/ ThemeToggle/   (fixed Theme + Settings capsule)
+  smooth-scroll/             SmoothScrollProvider/ (Lenis + ScrollTrigger; no .module.scss)
+  auth/                      AuthProvider/ GuestAvatar/ auth-utils.ts
+  overlays/               SiteLoader/ SectionCurtain/ CustomCursor/ TouchEffect/
+  lib/                  gsap.ts section-nav.ts motion.ts header-bottom.ts scroll-frame.ts
+                               api/{core/{client,types}.ts, endpoints/{auth,bookings,payments,chat}.ts}  data/{places,photos,day-moments}.ts
+_styles/                    GLOBAL SCSS only (see below)
+```
+
+Import with the alias, full path to the component file, e.g.
+`@/app/_shared/site-header/SiteHeaderLayout/SiteHeaderLayout`.
+`public/photos/` and `public/scenes/` = verbatim assets (images, `.glb`).
+
+## Styles (`app/_styles/`)
+
+**Component styles are CSS Modules, not global SCSS.** Every component `.tsx` has a
+same-name `.module.scss` beside it (`SiteHeaderDesktop.module.scss`,
+`page.module.scss`) — **except** `layout.tsx`, `PanelProvider.tsx` and `SceneCanvas.tsx`.
+Non-component `.ts` (`header-items.ts`, `social-items.ts`, `lib/`) get none.
+Classes are camelCase (`styles.headerButton`). New or changed SCSS uses nesting
+(`&` for states/modifiers), `$` variables and mixins with arguments; each module
+`@use`s only what it needs.
+
+`_styles/` is deliberately small — **global only**:
+
+```
+main.scss                      single entry, imported ONCE from layout.tsx (./_styles/main.scss)
+base/         _index _reset _root _typography _scroll
+tools/  _variables _mixins _breakpoints
+```
+
+Next compiles SCSS natively via the `sass` package. Any module can
+`@use "tools/variables" as *;` because `next.config.ts` sets
+`sassOptions.includePaths: [app/_styles]`. Inside `tools/` the partials
+`@use` each other without a prefix (`@use "breakpoints" as *;`). Do not recreate
+per-feature mirror folders under `_styles/`.
+
+The old Live Sass Compiler output is gone; the `glenn2223.live-sass` `savePath`
+in the devcontainer and the matching `.gitignore` entries are dead config.
+
+## Conventions
+
+- Components: `PascalCase` folder + `PascalCase.tsx`, default export. Non-component
+  modules (`header-items.ts`, `social-items.ts`, `photos.ts`): `kebab-case.ts` / lowercase.
+- `page.tsx` / `layout.tsx` are **server components by default**. Add
+  `"use client"` only where state/effects/browser APIs are needed (Cursor,
+  panels, scene canvas, anything GSAP/three).
+- Routes are the folders of `app/` that hold `page.tsx`; their UI sits in the
+  sibling `*-layout` folder and is imported into the page. Keep `page.tsx` thin.
+- Dynamic route params are a `Promise` in Next 15:
+  `params: Promise<{ ambiente: string }>` then `await params`.
+- Import alias `@/` → the `front-end/` root (e.g. `@/app/_shared/…`).
+- Hooks: `useThing.ts`, one per file (`header-hooks/` exists for the header).
+- An **empty `.ts`/`.tsx` is invalid** when imported under Next (`is not a module`);
+  `page.tsx` / `layout.tsx` / `loading.tsx` must never be empty.
+
+## Known breakages (verified 2026-11-02 in a clean copy on Windows: install, tsc, build, dev)
+
+| Check | Result |
+|-------|--------|
+| `pnpm install` | ok (needs `allowBuilds` decisions). `next@15.0.3` flagged deprecated — CVE-2025-66478, bump to a patched 15.x |
+| `tsc --noEmit` | passes |
+| `pnpm build` | passed on 2026-11-02 — 6 routes (`/`, `/ambientes-3d`, `/ambientes-3d/[ambiente]`, `/pagamentos`, `/redefinir-senha`, `/_not-found`). **Regressed by 2026-11-13** — see the `pnpm run build` row below |
+| `next dev` | `/`, `/ambientes-3d`, `/ambientes-3d/teste`, `/pagamentos`, `/redefinir-senha` all 200, header rendered |
+| `pnpm lint` | **cannot run** — `next lint` needs `eslint` + `eslint-config-next` (not installed) |
+| `next dev --host 0.0.0.0` | **fails** — Next uses `-H/--hostname` and `-p/--port` |
+| `docker/docker-compose.yml` `tests` service | **removed 2026-11-13** — ran `pnpm run test:ui`, a script that never existed (no test runner installed), so it did nothing |
+| `Dockerfile.frontend` `build`/`production` | **fixed 2026-11-13**: `next.config.ts` has `output: "standalone"`; `production` runs `node server.js` (no nginx, no pnpm) — chosen over `output: "export"` because the dynamic route `/ambientes-3d/[ambiente]` doesn't need `generateStaticParams` this way |
+| `pnpm run build` (production build) | **fails**, with or without `output: "standalone"` (isolated by testing both) — `Error: <Html> should not be imported outside of pages/_document` while statically generating `/404`/`/_error`. Not a Docker/network issue (reproduced twice, no font-fetch errors on the second run). Likely something in `app/layout.tsx`'s provider tree throwing for a route with no page-specific data — not investigated further, out of scope for the Dockerfile fix |
+| HMR in Docker | `WATCHPACK_POLLING=true` is set in compose (needed on Docker bind mounts) — **verified 2026-11-13**: editing a `.tsx` or `.module.scss` triggers `✓ Compiled …` and the page updates; editing `next.config.ts` logs `⚠ Found a change in next.config.ts. Restarting the server…` and Next restarts itself |
+| `release.yml` `quality` | would fail on tag: no `format:check`/`typecheck`/`test` scripts (`--if-present` skips them) |
+| `@types/react`/`@types/react-dom` `^18` vs React 19 RC | mismatch — align when upgrading |
+| Windows host | `node_modules` created by the Linux container is not usable from the host (pnpm symlinks); install inside the container or in a copy |
+
+Do not "fix" `docker/`, `.devcontainer/`, `.github/` or root docs as a side
+effect of a `front-end/` task — report and ask; they are separate decisions.
+
+## When editing
+
+- Changing a port/version → also update `docker/.env(.example)`, compose,
+  `Dockerfile.frontend`, devcontainer, and the docker READMEs.
+- Folder/route changes → update the tree in `README.md` **and** `README.pt-BR.md`
+  and the *Layout* section here.
+- Keep `README.md` and `README.pt-BR.md` in sync.
