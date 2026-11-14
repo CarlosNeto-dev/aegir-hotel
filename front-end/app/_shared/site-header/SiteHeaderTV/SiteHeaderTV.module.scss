@@ -3,7 +3,6 @@
 @use "tools/mixins" as *;
 
 $face-height: 10.4rem;
-$side-height: 8rem;
 $marker-height: 3.2rem;
 
 .root {
@@ -11,6 +10,7 @@ $marker-height: 3.2rem;
 
   @include from-tv {
     display: grid;
+    grid-template-areas: "account face crown";
     grid-template-columns: 1fr auto 1fr;
     align-items: center;
     column-gap: 2rem;
@@ -18,40 +18,19 @@ $marker-height: 3.2rem;
   }
 
   .account {
+    grid-area: account;
     justify-self: end;
 
     @include motion-ok {
       animation: sideInLeft 0.9s 0.25s var(--ease) both;
     }
-
-    .accountButton {
-      @include glass;
-      height: $side-height;
-      padding: 0 4rem;
-      border-radius: $pill;
-      cursor: pointer;
-      font-family: var(--font-body), system-ui, sans-serif;
-      font-size: 1.7rem;
-      font-weight: 500;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-      color: var(--color-ink);
-      transition: background 0.25s;
-
-      &:hover,
-      &:focus-visible {
-        background: var(--color-glass-hover);
-      }
-
-      &:focus-visible {
-        @include focus-ring;
-      }
-    }
   }
 
   .face {
     @include glass;
+    grid-area: face;
     display: grid;
+    grid-template-areas: "nav-left brand nav-right";
     grid-template-columns: 1fr auto 1fr;
     align-items: center;
     width: clamp(150rem, 66vw, 220rem);
@@ -63,6 +42,14 @@ $marker-height: 3.2rem;
       animation: faceIn 1s var(--ease) both;
     }
 
+    .navLeft {
+      grid-area: nav-left;
+    }
+
+    .navRight {
+      grid-area: nav-right;
+    }
+
     .navLeft,
     .navRight {
       nav {
@@ -72,6 +59,7 @@ $marker-height: 3.2rem;
 
     .brand {
       @include row-center;
+      grid-area: brand;
       gap: 4.8rem;
       padding-inline: 4.8rem;
 
@@ -87,6 +75,7 @@ $marker-height: 3.2rem;
   }
 
   .crown {
+    grid-area: crown;
     justify-self: start;
 
     @include motion-ok {

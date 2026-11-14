@@ -1,0 +1,21 @@
+@use "tools/breakpoints" as *;
+
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  min-width: 0;
+
+  @include from-tv {
+    gap: 3.2rem;
+  }
+
+  .switches {
+    display: flex;
+    flex-direction: column;
+
+    > * + * {
+      border-top: 1px solid var(--color-line);
+    }
+  }
+}

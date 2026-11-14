@@ -8,6 +8,7 @@ type Theme = "light" | "dark";
 function IconMoon() {
   return (
     <svg
+      className={styles.moon}
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
@@ -22,6 +23,7 @@ function IconMoon() {
 function IconSun() {
   return (
     <svg
+      className={styles.sun}
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
@@ -34,7 +36,7 @@ function IconSun() {
   );
 }
 
-export function ThemeToggle() {
+export default function ThemeToggle() {
   const [theme, setTheme] = useState<Theme>("light");
 
   useEffect(() => {
@@ -50,15 +52,21 @@ export function ThemeToggle() {
     setTheme(next);
   }
 
+  const label = theme === "dark" ? "Tema claro" : "Tema escuro";
+
   return (
     <div className={styles.root}>
       <button
         type="button"
         className={styles.button}
-        aria-label={theme === "dark" ? "Usar tema claro" : "Usar tema escuro"}
+        aria-label={label}
         onClick={toggleTheme}
       >
-        {theme === "dark" ? <IconSun /> : <IconMoon />}
+        <span className={styles.icon}>
+          <IconMoon />
+          <IconSun />
+        </span>
+        <span className={styles.text}>Tema</span>
       </button>
     </div>
   );
