@@ -139,9 +139,12 @@ Verificado em 2026-11-02 numa cópia limpa no Windows (`pnpm install`, `tsc`, `n
 | `pnpm build` | ✅ 6 rotas (`/`, `/ambientes-3d`, `/ambientes-3d/[ambiente]`, `/pagamentos`, `/redefinir-senha`, `/_not-found`) |
 | `pnpm lint` | ❌ ESLint não instalado |
 | `docker compose` → `website` | ✅ `pnpm install` + `next dev -H 0.0.0.0 -p 5173` chegam a *Ready* (verificado em 2026-10-26; os caminhos eram `app/`, agora `front-end/`) |
-| `docker compose` → `tests` | ❌ roda `pnpm run test:ui`, script removido |
-| Alvo Docker `build` / `production` | ❌ espera um `dist/` estático + nginx; o Next gera `.next/` |
+| Alvo Docker `production` | ✅ **corrigido em 2026-11-13** — `next.config.ts` tem `output: "standalone"`, o estágio do Dockerfile roda `node server.js` (sem nginx) |
+| `pnpm run build` (build de produção) | ❌ **regressão desde 2026-11-02** — falha com `Error: <Html> should not be imported outside of pages/_document` ao gerar as páginas estáticas `/404`/`/_error`. Reproduzido com e sem `output: "standalone"`, então não tem relação com a correção do Docker acima; provavelmente algo na árvore de Providers do `app/layout.tsx` |
 | Hot reload no Docker | ✅ `WATCHPACK_POLLING=true` definido no compose; edições de SCSS aparecem em ~4-20s |
+
+Havia um serviço `tests` no compose, montado pro Vitest; removido em
+2026-11-13 porque o `vitest` nunca chegou a ser instalado, então não fazia nada.
 
 Instalados para animação: GSAP 3.15 + @gsap/react 2.1 (ScrollTrigger) e Lenis 1.3.
 

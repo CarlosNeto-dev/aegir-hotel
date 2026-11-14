@@ -11,12 +11,21 @@ Agent notes for the container setup. Root guidance: [`../CLAUDE.md`](../CLAUDE.m
   there.
 - `Dockerfile.frontend` stages: `base → debugger → build → production`. `base` is
   the single place `NODE_VERSION` resolves. Re-declare `ARG` after each `FROM`.
+- `production` ships the Next.js **standalone** server (`front-end/next.config.ts`
+  has `output: "standalone"`), not a static site — there is no nginx stage
+  anymore. `build` must NOT set `NODE_ENV=production` before `pnpm install`:
+  `sass` and `typescript` are devDependencies the build needs, and production
+  mode skips devDependencies. `production` copies `.next/standalone`,
+  `.next/static` and `public/` separately (standalone bundles neither) and runs
+  `node server.js` as the `node` user on `PORT`/`HOSTNAME` env vars.
 - Ports flow from `.env` → compose `args` → Dockerfile `ARG`/`EXPOSE`. Change a
   port in **all** of: `.env`, `.env.example`, `docker-compose.yml`,
   `Dockerfile.frontend`, `.devcontainer/frontend/devcontainer.json`, and both
   root + docker READMEs.
-- `tests` uses `restart: on-failure` (overrides the anchor's `unless-stopped`)
-  because Vitest exits 0 on an empty project.
+- There is only one service, `website` — a `tests` service existed before but
+  was removed 2026-11-13: it ran `pnpm run test:ui`, a script that never
+  existed (no test runner is installed), so it did nothing. Add it back (with
+  a real test runner) only when asked.
 - The `x-frontend-service` anchor pins `user: "node"` (uid 1000) so the
   bind-mounted `node_modules` written by `docker compose up` and by the
   dev-container (`remoteUser: node`) share one owner. Removing it reintroduces
@@ -41,8 +50,8 @@ cd docker
 docker compose config -q                          # compose file valid
 docker build -f Dockerfile.frontend --check ..    # Dockerfile lint
 ```
-Then `up -d`, confirm `VITE … ready`, edit a `.tsx` + a `.scss`, check
-`[vite] hmr update` in logs, `down`.
+Then `up -d website`, confirm the Next.js dev server reports ready in the logs,
+edit a `.tsx` + a `.scss`, check the page updates (Fast Refresh), `down`.
 
 ## Docs
 

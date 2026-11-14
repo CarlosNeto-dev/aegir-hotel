@@ -65,8 +65,8 @@ docker compose down [-v]
 ```
 
 Ports (from `docker/.env`): `5173` Next dev server, `9229` Node inspector. `4173`
-(preview) and `51204` (test UI) are defined but **currently unused** — there is no
-test runner installed.
+(preview) is defined but **currently unused** — no `next start` service runs
+there yet.
 
 ## Conventions
 
@@ -91,11 +91,13 @@ test runner installed.
   decisions live in `front-end/pnpm-workspace.yaml` (`allowBuilds`). Add one with
   `pnpm approve-builds <pkg>` (or `'!<pkg>'` to deny). Never use `npm install`
   in `front-end/` — it would create a competing `package-lock.json`.
-- **`tests` service is currently broken** — it runs `pnpm run test:ui`, a script
-  that no longer exists (no test runner is installed). Fix or remove it only when
-  asked.
-- **`build` / `production` image targets** still assume a static `dist/` + nginx;
-  Next emits `.next/`. Only `debugger` is usable today.
+- **No test runner is installed.** There used to be a compose `tests` service
+  wired for Vitest; it was removed 2026-11-13 because it ran a script
+  (`pnpm run test:ui`) that never existed, so it did nothing. Add a runner
+  (and a service for it) only when asked.
+- **`build` / `production` image targets** ship the Next.js **standalone**
+  server (`front-end/next.config.ts` has `output: "standalone"`) — no nginx,
+  no static `dist/`. See `docker/CLAUDE.md`.
 
 ## Verification
 
