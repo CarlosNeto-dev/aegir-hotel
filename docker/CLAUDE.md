@@ -15,7 +15,10 @@ Agent notes for the container setup. Root guidance: [`../CLAUDE.md`](../CLAUDE.m
   has `output: "standalone"`), not a static site — there is no nginx stage
   anymore. `build` must NOT set `NODE_ENV=production` before `pnpm install`:
   `sass` and `typescript` are devDependencies the build needs, and production
-  mode skips devDependencies. `production` copies `.next/standalone`,
+  mode skips devDependencies. The build command itself, however, MUST run as
+  `NODE_ENV=production pnpm run build`: under the inherited "development",
+  `next build` fails prerendering /404 ("<Html> should not be imported outside
+  of pages/_document"). `production` copies `.next/standalone`,
   `.next/static` and `public/` separately (standalone bundles neither) and runs
   `node server.js` as the `node` user on `PORT`/`HOSTNAME` env vars.
 - Ports flow from `.env` → compose `args` → Dockerfile `ARG`/`EXPOSE`. Change a
