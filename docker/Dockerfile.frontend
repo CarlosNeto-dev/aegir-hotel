@@ -136,10 +136,12 @@ FROM base AS build
 COPY front-end/package.json front-end/pnpm-workspace.yaml ./
 RUN pnpm install
 
-# Then the sources, and compile. `next build` sets its own production mode
-# internally - no need to export NODE_ENV here either.
+# Then the sources, and compile. NODE_ENV=production only for this command:
+# the stage inherits "development" from `base`, and `next build` under
+# "development" breaks while prerendering /404 and /500 ("<Html> should not be
+# imported outside of pages/_document"). The install above keeps "development".
 COPY front-end/ ./
-RUN pnpm run build
+RUN NODE_ENV=production pnpm run build
 
 
 # =============================================================================
