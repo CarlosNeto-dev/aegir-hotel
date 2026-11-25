@@ -48,8 +48,9 @@ desktop.ini
 npm-debug.log*
 pnpm-debug.log*
 
-# ---- Claude Code: personal settings (each machine keeps its own) -----
-.claude/settings.local.json
+# ---- Claude Code: personal agents, settings and session reports ------
+#  Each machine keeps its own (user scope: ~/.claude). Nothing here is shared.
+.claude/
 
 # ---- 3D source files (ship exported .glb/.gltf only) -----------------
 *.blend
