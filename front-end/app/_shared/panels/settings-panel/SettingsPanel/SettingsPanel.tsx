@@ -16,6 +16,7 @@ import {
   getSectionText,
 } from "../settings-utils/settings-routes";
 import { usePointerKind } from "../settings-utils/usePointerKind";
+import { useTvMode } from "../../../lib/tv-mode";
 import styles from "./SettingsPanel.module.scss";
 
 function pad(value: number) {
@@ -26,8 +27,11 @@ export default function SettingsPanel() {
   const baseId = useId();
   const { layer } = usePanels();
   const pathname = usePathname();
-  const route = getRouteSettings(pathname);
   const pointer = usePointerKind();
+  const tv = useTvMode();
+  // Na landing da TV não há rolagem, cursor nem rodapé: ficam só os ajustes
+  // que mudam alguma coisa lá (fonte, formato das fotos e acessibilidade).
+  const route = getRouteSettings(pathname, tv);
   const [hasOpened, setHasOpened] = useState(false);
 
   useEffect(() => {
@@ -44,7 +48,7 @@ export default function SettingsPanel() {
     >
       <div className={styles.root}>
         {route.sections.map((id, index) => {
-          const text = getSectionText(id, pointer);
+          const text = getSectionText(id, pointer, tv);
           const headingId = `${baseId}-${id}`;
 
           return (
@@ -63,10 +67,12 @@ export default function SettingsPanel() {
                 {id === "pointer" && (
                   <PointerSection pointer={pointer} showVideos={hasOpened} />
                 )}
-                {id === "letters" && <LettersSection showVideos={hasOpened} />}
-                {id === "graphics" && <GraphicsSection pointer={pointer} />}
+                {id === "letters" && <LettersSection showVideos={hasOpened} tv={tv} />}
+                {id === "graphics" && (
+                  <GraphicsSection pointer={pointer} showVideos={hasOpened} tv={tv} />
+                )}
                 {id === "speed" && <SpeedSection />}
-                {id === "accessibility" && <AccessibilitySection />}
+                {id === "accessibility" && <AccessibilitySection tv={tv} />}
               </div>
             </section>
           );

@@ -1,0 +1,31 @@
+// O formato das fotos vem dos Ajustes: o script do <head> escreve
+// data-photo-shape no <html> antes da primeira pintura. Sem ele (sem
+// JavaScript), vale o formato padrão: cantos redondos.
+.root {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  border-radius: 1.6rem;
+  background: var(--color-line);
+
+  .image {
+    object-fit: cover;
+  }
+}
+
+// Retas: sem arredondar nada.
+:global(:root[data-photo-shape="square"]) .root {
+  border-radius: 0;
+}
+
+// Arco: o topo vira uma curva larga (como uma janela em arco) e a base fica
+// com cantos pequenos. Os valores depois da barra são a altura da curva.
+:global(:root[data-photo-shape="arch"]) .root {
+  border-radius: 50% 50% 1.2rem 1.2rem / 38% 38% 1.2rem 1.2rem;
+}
+
+// Fragmentos: cada foto é recortada pelo seu polígono (--shard, vindo do TSX).
+:global(:root[data-photo-shape="fragment"]) .root {
+  border-radius: 0;
+  clip-path: polygon(var(--shard));
+}

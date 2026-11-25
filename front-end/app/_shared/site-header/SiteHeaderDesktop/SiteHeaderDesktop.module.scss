@@ -12,6 +12,13 @@
     @include row-center;
   }
 
+  @media (min-width: $tablet) and (max-width: 1023px) {
+    :global(:root[data-text-size="large"]) &,
+    :global(:root[data-text-size="larger"]) & {
+      display: none;
+    }
+  }
+
   @include from-tv {
     display: none;
   }

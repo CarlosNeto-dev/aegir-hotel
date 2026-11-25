@@ -1,3 +1,5 @@
+import { thumbSrc } from "@/app/_shared/lib/data/places";
+
 export type NavItem = {
   id: string;
   label: string;
@@ -11,42 +13,42 @@ export const NAV_ITEMS = [
     id: "abertura",
     label: "Abertura",
     summary: "O hotel inteiro, de cima",
-    photo: "/photos/thumbs/aerial-sunset.webp",
+    photo: thumbSrc("aerial-sunset"),
     href: "#abertura",
   },
   {
     id: "percurso",
     label: "Percurso",
     summary: "Seis lugares, um de cada vez",
-    photo: "/photos/thumbs/pool-courtyard.webp",
+    photo: thumbSrc("pool-courtyard"),
     href: "#percurso",
   },
   {
     id: "suites",
     label: "Onde dormir",
     summary: "Três suítes de frente para o mar",
-    photo: "/photos/thumbs/suite-dune.webp",
+    photo: thumbSrc("suite-dune"),
     href: "#suites",
   },
   {
     id: "dia",
     label: "Sol a sol",
     summary: "Um dia no hotel, das 8h às 20h",
-    photo: "/photos/thumbs/beach-restaurant.webp",
+    photo: thumbSrc("beach-restaurant"),
     href: "#dia",
   },
   {
-    id: "maquetes",
-    label: "Maquetes",
-    summary: "Dezesseis fotos que abrem em 3D",
-    photo: "/photos/thumbs/white-model.webp",
-    href: "#maquetes",
+    id: "galeria",
+    label: "Galeria",
+    summary: "O hotel em dezesseis fotos",
+    photo: thumbSrc("white-model"),
+    href: "#galeria",
   },
   {
     id: "reserva",
     label: "Sua estadia",
     summary: "Datas, suíte e o valor",
-    photo: "/photos/thumbs/suite-terrace.webp",
+    photo: thumbSrc("suite-terrace"),
     href: "#reserva",
   },
 ] as const satisfies readonly NavItem[];

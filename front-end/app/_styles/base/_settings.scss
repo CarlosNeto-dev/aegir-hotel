@@ -16,6 +16,21 @@
     }
   }
 
+  &[data-font="elegant"] {
+    --font-title: var(--font-elegant-title), Georgia, serif;
+    --font-body: var(--font-elegant-body), system-ui, sans-serif;
+  }
+
+  &[data-font="modern"] {
+    --font-title: var(--font-modern-title), Georgia, serif;
+    --font-body: var(--font-modern-body), system-ui, sans-serif;
+  }
+
+  &[data-font="easy"] {
+    --font-title: var(--font-easy), system-ui, sans-serif;
+    --font-body: var(--font-easy), system-ui, sans-serif;
+  }
+
   &[data-text-size="large"] {
     font-size: 68.75%;
   }
@@ -61,7 +76,9 @@
     *:not([data-keep-motion], [data-keep-motion] *)::after {
       animation-duration: 0.01ms !important;
       animation-iteration-count: 1 !important;
-      transition-duration: 0.01ms !important;
+      /* 0s, não 0.01ms: com duração > 0 todo estilo vira transição (transition-property: all)
+         e medidas feitas logo após mudar um estilo leem o valor antigo. */
+      transition-duration: 0s !important;
       transition-delay: 0s !important;
       scroll-behavior: auto !important;
     }

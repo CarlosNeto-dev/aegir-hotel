@@ -1,0 +1,30 @@
+// As mesmas regras do PhotoFragment, em miniatura, para comparar lado a lado.
+.root {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  place-items: center;
+  padding: 1rem 1.6rem;
+  background: var(--color-paper);
+
+  .photo {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: 0.8rem;
+    background: center / cover no-repeat;
+
+    &[data-shape="square"] {
+      border-radius: 0;
+    }
+
+    &[data-shape="arch"] {
+      border-radius: 50% 50% 0.6rem 0.6rem / 38% 38% 0.6rem 0.6rem;
+    }
+
+    &[data-shape="fragment"] {
+      border-radius: 0;
+      clip-path: polygon(4% 8%, 58% 0%, 96% 10%, 100% 88%, 44% 100%, 0% 84%);
+    }
+  }
+}

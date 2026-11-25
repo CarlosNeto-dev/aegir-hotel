@@ -16,8 +16,8 @@ const SECTIONS: Record<Exclude<SettingsSectionId, "pointer">, SectionText> = {
     summary: "Leve, Médio ou Pesado: uma escolha ajusta tudo de uma vez.",
   },
   letters: {
-    label: "Efeito das letras",
-    summary: "As letras dos títulos entram e somem uma a uma durante a rolagem.",
+    label: "Letras",
+    summary: "A fonte do site e o efeito das letras que entram e somem na rolagem.",
   },
   graphics: {
     label: "Gráficos",
@@ -48,6 +48,18 @@ const POINTER_SECTION: Record<PointerKind, SectionText> = {
   },
 };
 
+// Na TV, só o que muda alguma coisa na landing da TV.
+const TV_SECTIONS: Partial<Record<SettingsSectionId, SectionText>> = {
+  letters: { label: "Fonte", summary: "A fonte dos títulos e dos textos." },
+  graphics: { label: "Fotos", summary: "O formato das fotos e dos cartões." },
+  accessibility: { label: "Acessibilidade", summary: "Tamanho do texto, contraste e movimento." },
+};
+
+const TV_ROUTE = {
+  label: "Página inicial · TV",
+  sections: ["letters", "graphics", "accessibility"],
+} as const satisfies { label: string; sections: readonly SettingsSectionId[] };
+
 const ROUTES = [
   {
     match: (pathname: string) => pathname === "/",
@@ -70,13 +82,16 @@ const ROUTES = [
   sections: readonly SettingsSectionId[];
 }[];
 
-export function getRouteSettings(pathname: string) {
-  return ROUTES.find((route) => route.match(pathname)) ?? ROUTES[0];
+export function getRouteSettings(pathname: string, tv = false) {
+  const route = ROUTES.find((item) => item.match(pathname)) ?? ROUTES[0];
+  return tv && route === ROUTES[0] ? TV_ROUTE : route;
 }
 
 export function getSectionText(
   id: SettingsSectionId,
   pointer: PointerKind,
+  tv = false,
 ): SectionText {
+  if (tv && TV_SECTIONS[id]) return TV_SECTIONS[id];
   return id === "pointer" ? POINTER_SECTION[pointer] : SECTIONS[id];
 }

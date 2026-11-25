@@ -1,0 +1,118 @@
+@use "tools/variables" as *;
+@use "tools/mixins" as *;
+
+$ink-on-photo: #fbf9f5;
+$shadow-on-photo:
+  0 0.2rem 2.4rem rgba(0, 0, 0, 0.55),
+  0 0 0.3rem rgba(0, 0, 0, 0.45);
+
+@keyframes bail {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+.root {
+  position: fixed;
+  inset: 0;
+  z-index: $z-loader;
+  overflow: hidden;
+  background: var(--color-paper);
+  animation: bail 0.4s ease 6s forwards;
+
+  .status {
+    @include visually-hidden;
+  }
+
+  .slices {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .slice {
+    position: relative;
+    flex: 1 1 0;
+    overflow: hidden;
+    transform: translateX(-105%);
+
+    &:nth-child(even) {
+      transform: translateX(105%);
+    }
+  }
+
+  .photo {
+    object-fit: cover;
+  }
+
+  .hotel {
+    position: absolute;
+    top: calc(var(--slice) * -100%);
+    left: 0;
+    width: 100%;
+    height: calc(var(--slices) * 100%);
+    opacity: 0;
+  }
+
+  .fly {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    visibility: hidden;
+    opacity: 0;
+  }
+
+  .count,
+  .caption {
+    position: absolute;
+    left: var(--gutter);
+    z-index: 1;
+    color: var(--color-ink);
+    pointer-events: none;
+    transition:
+      color 0.3s ease,
+      text-shadow 0.3s ease;
+
+    &[data-on-photo] {
+      color: $ink-on-photo;
+      text-shadow: $shadow-on-photo;
+    }
+  }
+
+  .count {
+    top: 50%;
+    translate: 0 -50%;
+    font-family: var(--font-mono);
+    font-weight: 400;
+    line-height: 0.8;
+    letter-spacing: -0.06em;
+    font-variant-numeric: tabular-nums;
+    @include fluid(font-size, 11rem, 22rem, 32rem);
+  }
+
+  .caption {
+    bottom: clamp(3rem, 7vh, 7rem);
+    @include kicker;
+  }
+}
+
+:global(:root[data-site-loader="done"]) .root {
+  display: none;
+}
+
+:global(:root[data-reduce-motion]) .root .slice,
+:global(:root[data-reduce-motion]) .root .slice:nth-child(even) {
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .root .slice,
+  .root .slice:nth-child(even) {
+    transform: none;
+  }
+}

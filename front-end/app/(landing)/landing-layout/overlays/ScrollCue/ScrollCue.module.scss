@@ -1,0 +1,266 @@
+@use "tools/breakpoints" as *;
+@use "tools/variables" as *;
+@use "tools/mixins" as *;
+
+$compact: 699px;
+// Largura aproximada da cápsula Tema/Ajustes no celular (canto de baixo à direita).
+$capsule-room-x: 23rem;
+
+// Celular: um brilho que escorre de cima para baixo dentro da linha.
+@keyframes flow {
+  from {
+    transform: translateY(-100%);
+  }
+
+  to {
+    transform: translateY(230%);
+  }
+}
+
+// Computador: a rodinha do mouse desce e some.
+@keyframes wheel {
+  0% {
+    opacity: 0;
+    transform: translateY(-0.2rem);
+  }
+
+  30% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateY(1.2rem);
+  }
+}
+
+// TV: o segmento de baixo do direcional "afunda" e acende, como um botão
+// apertado, e depois volta.
+@keyframes press {
+  0%,
+  45%,
+  100% {
+    transform: translateY(0);
+  }
+
+  15%,
+  30% {
+    transform: translateY(0.5px);
+  }
+}
+
+@keyframes light {
+  0%,
+  45%,
+  100% {
+    opacity: 0;
+  }
+
+  15%,
+  30% {
+    opacity: 0.85;
+  }
+}
+
+.root {
+  position: fixed;
+  bottom: calc(2rem + env(safe-area-inset-bottom, 0px));
+  left: 50%;
+  z-index: $z-floating;
+  padding: 0.8rem 1.2rem;
+  border: 0;
+  background: none;
+  color: var(--color-ink);
+  // Sem fundo: um brilho em volta, na cor do papel, deixa o ícone e o texto
+  // legíveis por cima de qualquer foto.
+  text-shadow:
+    0 0 0.4rem var(--color-paper),
+    0 0 1.4rem var(--color-paper);
+  cursor: pointer;
+  opacity: 0;
+  visibility: hidden;
+  translate: -50% 0.8rem;
+  transition:
+    opacity 0.3s ease,
+    translate 0.4s ease,
+    scale 0.15s ease,
+    visibility 0s linear 0.4s;
+
+  &[data-shown] {
+    opacity: 1;
+    visibility: visible;
+    translate: -50% 0;
+    transition:
+      opacity 0.3s ease,
+      translate 0.4s ease,
+      scale 0.15s ease,
+      visibility 0s;
+  }
+
+  .touch,
+  .mouse,
+  .remote {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.2rem;
+  }
+
+  // Um ícone por aparelho. Quem decide é o usePointerKind (JavaScript), que
+  // escreve data-kind no botão: o CSS sozinho confundia alguns celulares.
+  &[data-kind="mouse"] .mouse,
+  &[data-kind="touch"] .touch,
+  &[data-kind="remote"] .remote {
+    display: flex;
+  }
+
+  // O rótulo: as letras pequenas e espaçadas dos kickers do site, na cor do texto.
+  .label {
+    padding-left: 0.28em;
+    font: 600 1.1rem/1 var(--font-mono);
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+  }
+
+  // --- toque (celular e tablet) ---
+  .touch {
+    gap: 1rem;
+
+    .label {
+      letter-spacing: 0.32em;
+    }
+  }
+
+  .line {
+    position: relative;
+    width: 1px;
+    height: 4.8rem;
+    overflow: hidden;
+    background: color-mix(in srgb, var(--color-ink) 18%, transparent);
+
+    &::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 1px;
+      height: 45%;
+      background: var(--color-ink);
+    }
+  }
+
+  // --- mouse (computador) ---
+  // Medidas em pixels inteiros (26px de largura, borda de 2px, rodinha de 2px):
+  // sobram 22px por dentro e a rodinha fica exatamente no meio, sem meio pixel
+  // borrado puxando para um lado.
+  .mouseBody {
+    position: relative;
+    width: 2.6rem;
+    height: 4rem;
+    border: 2px solid currentColor;
+    border-radius: 1.3rem;
+    box-shadow: 0 0 1.2rem var(--color-paper);
+
+    &::after {
+      content: "";
+      position: absolute;
+      top: 0.7rem;
+      right: 0;
+      left: 0;
+      width: 2px;
+      height: 0.8rem;
+      margin-inline: auto;
+      border-radius: 1px;
+      background: currentColor;
+    }
+  }
+
+  // --- controle remoto (TV) ---
+  .remoteIcon {
+    width: 2.4rem;
+    height: 6.8rem;
+    overflow: visible;
+    filter: drop-shadow(0 0 0.6rem var(--color-paper));
+  }
+
+  .press {
+    transform-box: fill-box;
+  }
+
+  .pressFill {
+    opacity: 0;
+  }
+
+  // As animações só rodam enquanto o botão está visível.
+  &[data-shown] {
+    .line::after {
+      animation: flow 1.6s linear infinite;
+    }
+
+    .mouseBody::after {
+      animation: wheel 1.4s ease-in-out infinite;
+    }
+
+    .press {
+      animation: press 1.4s linear infinite;
+    }
+
+    .pressFill {
+      animation: light 1.4s linear infinite;
+    }
+  }
+
+  // Sem cor nova no hover nem no clique: só encolhe, e no clique encolhe mais.
+  @media (hover: hover) {
+    &:hover {
+      scale: 0.94;
+    }
+  }
+
+  &:active {
+    scale: 0.86;
+  }
+
+  &:focus-visible {
+    outline: 0.2rem solid currentColor;
+    outline-offset: 0.4rem;
+    border-radius: 0.4rem;
+  }
+
+  // No celular a cápsula Tema/Ajustes ocupa o canto de baixo à direita. O botão
+  // fica no meio do espaço livre à esquerda dela, na mesma altura, para não
+  // cobrir o texto da Abertura.
+  @media (max-width: $compact) {
+    bottom: calc(1.2rem + env(safe-area-inset-bottom, 0px));
+    left: calc((100vw - #{$capsule-room-x}) / 2);
+
+    .line {
+      height: 3.6rem;
+    }
+  }
+
+  @include from-tv {
+    bottom: 4.8rem;
+    zoom: 1.5;
+  }
+}
+
+:global(:root[data-reduce-motion]) .root[data-shown] {
+  .line::after,
+  .mouseBody::after,
+  .press,
+  .pressFill {
+    animation: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .root[data-shown] {
+    .line::after,
+    .mouseBody::after,
+    .press,
+    .pressFill {
+      animation: none;
+    }
+  }
+}

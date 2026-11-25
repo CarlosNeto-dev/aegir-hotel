@@ -1,11 +1,12 @@
 "use client";
 
 import Lenis from "lenis";
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { gsap, ScrollTrigger } from "../../lib/gsap";
 import { setLenis } from "../../lib/section-nav";
 import { usePanels } from "../../panels/PanelProvider/PanelProvider";
 import { useSettings } from "../../panels/settings-panel/SettingsProvider/SettingsProvider";
+import { startKeyboardScroll } from "../keyboard-scroll";
 
 const NO_SMOOTH_QUERY = "(prefers-reduced-motion: reduce), (hover: none)";
 
@@ -45,6 +46,25 @@ export default function SmoothScrollProvider({
     if (layer) lenis.stop();
     else lenis.start();
   }, [lenis, layer]);
+
+  // As setas do teclado rolam de forma contínua, com ou sem a rolagem suave.
+  // Os refs deixam o ouvinte ler sempre o valor atual sem ser recriado.
+  const lenisRef = useRef(lenis);
+  const layerRef = useRef(layer);
+
+  useEffect(() => {
+    lenisRef.current = lenis;
+    layerRef.current = layer;
+  }, [lenis, layer]);
+
+  useEffect(
+    () =>
+      startKeyboardScroll(
+        () => lenisRef.current,
+        () => Boolean(layerRef.current),
+      ),
+    [],
+  );
 
   return children;
 }

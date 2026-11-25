@@ -25,8 +25,8 @@ export default function SectionLink({
     onNavigate?.();
     if (pathname !== "/") return;
     if (event.metaKey || event.ctrlKey || event.shiftKey) return;
-    event.preventDefault();
-    scrollToSection(href.slice(1));
+    /* Só segura o clique se a seção existir na página; senão o link segue normal. */
+    if (scrollToSection(href.slice(1))) event.preventDefault();
   }
 
   return (

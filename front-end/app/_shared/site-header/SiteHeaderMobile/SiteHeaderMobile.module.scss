@@ -15,6 +15,14 @@ $narrow: 419px;
     display: none;
   }
 
+  /* Com texto Grande ou Maior, o header de computador não cabe em tablet estreito: fica o do celular. */
+  @media (min-width: $tablet) and (max-width: 1023px) {
+    :global(:root[data-text-size="large"]) &,
+    :global(:root[data-text-size="larger"]) & {
+      display: flex;
+    }
+  }
+
   .brand {
     flex: none;
     margin-right: clamp(0.2rem, 2.4vw, 1.2rem);
