@@ -2,136 +2,281 @@
 
 Agent notes for the web client. Root guidance: [`../CLAUDE.md`](../CLAUDE.md).
 
-> The stack is **Next.js (App Router) + pnpm**. This file is the source of truth
-> for `front-end/`. Docs elsewhere (`docker/`, `.devcontainer/`, `.github/`) may still
-> describe an older stack; where they disagree, `front-end/` wins — see *Known breakages*.
+> The stack is **Next.js 15 (App Router) + pnpm**. This file is the source of truth
+> for `front-end/`.
 
-## State
+## State (checked 2026-11-24: `tsc --noEmit` passes)
 
-**Next.js 15 (App Router) skeleton.** Most `.ts` / `.tsx` / `.scss` files in `app/`
-are **empty placeholders**: the route tree, folders and SCSS partials exist; the
-site header, `layout.tsx` and the landing `page.tsx` already have the user's code.
-Each folder holding empty `.ts`/`.tsx` files carries a `.gitkeep`.
+The last full check of `next build` and the standalone `node server.js` was on
+2026-11-14. Run them again before claiming the build is green.
 
-Present: `package.json` (`"packageManager": "pnpm@12.15.0"`; `next 15.0.3`, `react`/`react-dom` 19 RC, `sass`,
-`typescript`, `@types/*`, `gsap 3.15` + `@gsap/react 2.1` (ScrollTrigger), `lenis 1.3` for smooth scroll), `next.config.ts` (`sassOptions`), `tsconfig.json`
-(Next default + `@/*` → `./*`), `pnpm-workspace.yaml` (`allowBuilds` — required, see
-`../docker/CLAUDE.md`), `public/photos/`, `public/scenes/`, `app/`. Use **pnpm**, never npm.
-The folder is bind-mounted to `/app` in the container; the host folder is `front-end/`.
+- **Landing `/` is built.** It has:
+  - a header for mobile, desktop and TV;
+  - main: 7 sections, plus the aside and the progress bar;
+  - a footer, simple or "Fragmentos" (chosen in Settings);
+  - the Settings panel;
+  - the Account panel, which is visual only (the API arrives with issues #23-#29 / #41);
+  - the "Role para baixo" button (`ScrollCue`).
+- **TV landing.** `LandingScreen` swaps the long page for `TvLanding`, a curved
+  coverflow of the sections, when either is true:
+  - the device is a TV (`usePointerKind()` returns `"remote"`);
+  - the URL ends in `#tv`, which lets you preview it on any screen.
 
-**Not installed** (add only when needed, ask first): ESLint, Prettier, Stylelint,
-Vitest + Testing Library, three / react-three-fiber / drei.
+  The server always renders the normal landing; the swap happens under the
+  loading screen. See [TV mode](#tv-mode).
+- **`/pagamentos`, `/redefinir-senha`:** one-line placeholder pages (issues #30-#40).
+- **`/ambientes-3d`:** switched off. The folders exist but there is **no
+  `page.tsx`**, so Next answers 404. Re-add `page.tsx` when the 3D scenes exist.
+- **No 3D hints anywhere** (no "Ver em 3D" badge, no "em breve"): photos are plain
+  `PhotoFragment`s. Add a way into the 3D only when the 3D route really exists.
+- **Loading screen (`_shared/overlays/SiteLoader/`):** "Fatias · lugares".
+  - Eight place photos slide in as slices and turn into the aerial photo, which
+    then flies into the hero.
+  - Only `(landing)/page.tsx` renders it (and the 3D route will, later). It never
+    appears on `/pagamentos` or `/redefinir-senha`.
+  - It shows on **every visit and every reload (F5)**. Nothing is kept in
+    `sessionStorage`.
+  - When it finishes, it sets `html[data-site-loader="done"]` (`LOADER_DONE` in
+    `site-loader-script.ts`). `ScrollCue` waits for that mark. On an internal
+    navigation back to `/`, without a reload, the loader does not show again.
+  - It ends on real signals, with weights: fonts; hero photo decoded; Opening
+    `[data-ready]` (or `data-tv-landing` on the TV); the page `load` event.
+  - It lasts 1.8 s minimum and 4 s maximum.
+  - Under reduced motion it only fades.
+  - If no script runs, CSS hides it after 6 s. Under `<noscript>`, the
+    `loaderNoScript` style in `layout.tsx` hides it at once.
+  - There is **no `loading.tsx`**: a Suspense fallback never leaves without
+    JavaScript.
+- **Empty placeholders kept on purpose (future work):**
+  - `_shared/lib/api/**` (`core/client.ts`, `core/types.ts`,
+    `endpoints/{auth,bookings,chat,payments}.ts`);
+  - `account-utils/social-items.ts`;
+  - the `ambientes-3d` components and SCSS;
+  - the `PaymentsMain` and `ResetPasswordMain` components, and the `page.module.scss`
+    files of `pagamentos` and `redefinir-senha`.
+- **Leftover empty folders, not tracked by git, safe to delete:**
+  `_shared/settings-dock/`, `_shared/theme-toggle/`,
+  `_shared/panels/settings-panel/SettingsButton/`. The real `SettingsButton` and
+  `ThemeToggle` live in `_shared/settings-capsule/`.
+
+**Installed:** `next 15.5`, `react`/`react-dom` 19, `sass`, `typescript` 5,
+`@types/*`, `gsap 3` + `@gsap/react 2` (ScrollTrigger, `useGSAP`), `lenis 1`.
+
+**Not installed (ask first):** ESLint, Prettier, Stylelint, Vitest + Testing
+Library, three / react-three-fiber / drei.
+
+**Scripts:** `dev`, `build`, `start`, `typecheck` (`tsc --noEmit`). There is no
+`lint`, `format:check` or `test` script.
 
 ## Layout (`app/`)
 
-Everything lives in `app/`. Folders starting with `_` are **private** (never
-routes); `(name)` is a **route group** (not in the URL). **Only folders that become a
-URL segment are in Portuguese** (lowercase, hyphens, no accents): the site is pt-BR and
-Next.js builds the URL from the folder name. Everything that is not a route is
-**English**: component folders (`PascalCase`, each with `Name.tsx` + `Name.module.scss`),
-files, functions, props, SCSS classes and route groups such as `(landing)`.
+Folders starting with `_` are **private** (never routes). `(name)` is a **route
+group** (not in the URL). **Only folders that become a URL segment are
+Portuguese** (lowercase, hyphens, no accents). Everything else is **English**:
+component folders (`PascalCase`, each with `Name.tsx` + `Name.module.scss`), files,
+functions, props, SCSS classes, and route groups such as `(landing)`.
 
 ```
-layout.tsx                   root layout: fonts, <html lang="pt-BR">, <SiteHeaderLayout />, global SCSS
+layout.tsx                    root layout: fonts (next/font), <html lang="pt-BR">, two inline
+                              <head> scripts (theme + settings), a <noscript> style that hides
+                              the loader, every provider, global SCSS
 (landing)/                    landing  ->  /
-  page.tsx page.module.scss loading.tsx
+  page.tsx page.module.scss   SiteLoader + LandingScreen(tv=<TvLanding/>) around
+                              ProgressBar, LandingMain, LandingFooter, ScrollCue
   landing-layout/
-    LandingMain/               + sections/ (Opening Journey Suites Compare Day Models Numbers Booking + Section)
-                               + aside/ (MainAside/, account-panel/{AccountPanel/, account-views/, account-utils/})
-    LandingFooter/
-    overlays/             ProgressBar/ Cursor/
-ambientes-3d/                /ambientes-3d  ·  /ambientes-3d/[ambiente]
-  _r3f/SceneCanvas/            (no .module.scss)
-  ambients-layout/AmbientsMain/   + SceneLayout/ SceneTopBar/ SceneInfo/ SceneControls/
-pagamentos/                  /pagamentos            (payments-layout/PaymentsMain/)
-redefinir-senha/             /redefinir-senha       (reset-password-layout/ResetPasswordMain/; no loading.tsx)
+    LandingMain/              sections/ Opening (renders Journey inside it;
+                                        + story-layout.ts, opening-timeline.ts)
+                                        Suites Compare Day Gallery Numbers Booking
+                              main-utils/ PhotoFragment VanishText FactList
+                                          SectionHeading fit-text.ts
+                              main-hooks/ useHashScroll useInView
+                              aside/MainAside/
+    LandingFooter/            FooterFragments/ (+ closing-layout.ts: the DNA helix)
+                              footer-utils/ FooterContent/ FooterLegal/ credits.ts
+    overlays/                 ProgressBar/ ScrollCue/ ("Role para baixo")
+  landing-tv/                 LandingScreen/ (picks the TV or the normal landing)
+                              TvLanding/ TvArc/ TvSection/ tv-chapters.ts
+ambientes-3d/                 switched off (no page.tsx), scaffold for the 3D route:
+                              [ambiente]/ _r3f/SceneCanvas/ ambients-layout/AmbientsMain/
+                              (SceneControls SceneInfo SceneLayout SceneTopBar), all empty
+pagamentos/                   /pagamentos            (payments-layout/PaymentsMain/)
+redefinir-senha/              /redefinir-senha       (reset-password-layout/ResetPasswordMain/)
 _shared/
-  site-header/              SiteHeaderLayout/ SiteHeaderMobile/ SiteHeaderDesktop/ SiteHeaderTV/
-                               header-hooks/{ActiveSectionProvider.tsx, useActiveSection.ts, useHeaderHidden.ts, scroll-to-section.ts}
-                               header-utils/{header-items.ts, HeaderAccount/ HeaderBrand/ HeaderCta/ HeaderIcons/ HeaderNavList/ LequeHint/ SectionLink/}
-  panels/                     PanelProvider/ (no .module.scss)  SidePanel/
-                               settings-panel/{SettingsPanel/ SettingsProvider/ settings-controls/ settings-sections/ settings-utils/}
-  settings-capsule/          SettingsCapsule/ SettingsButton/ ThemeToggle/   (fixed Theme + Settings capsule)
-  smooth-scroll/             SmoothScrollProvider/ (Lenis + ScrollTrigger; no .module.scss)
-  auth/                      AuthProvider/ GuestAvatar/ auth-utils.ts
-  overlays/               SiteLoader/ SectionCurtain/ CustomCursor/ TouchEffect/
-  lib/                  gsap.ts section-nav.ts motion.ts header-bottom.ts scroll-frame.ts
-                               api/{core/{client,types}.ts, endpoints/{auth,bookings,payments,chat}.ts}  data/{places,photos,day-moments}.ts
-_styles/                    GLOBAL SCSS only (see below)
+  site-header/                SiteHeaderLayout/ SiteHeaderMobile/ SiteHeaderDesktop/ SiteHeaderTV/
+                              header-hooks/ ActiveSectionProvider useActiveSection
+                                            useHeaderHidden scroll-to-section
+                              header-utils/ header-items.ts HeaderAccount HeaderBrand HeaderCta
+                                            HeaderIcons HeaderNavList LequeHint SectionLink
+  panels/                     PanelProvider/ SidePanel/
+    settings-panel/           SettingsPanel/ SettingsProvider/
+                              settings-sections/ Presets Pointer Letters Graphics Speed Accessibility
+                              settings-controls/ ColorPicker DemoVideo FontPicker PhotoShapePreview
+                                                 PresetPicker SegmentedChoice SettingSwitch
+                                                 ShapePicker TextSizePicker
+                              settings-utils/ settings-options.ts settings-routes.ts
+                                              settings-script.ts usePointerKind.ts (re-export)
+    account-panel/            AccountPanel/ AccountField/ AccountShowcase/
+                              account-views/ SignIn SignUp ForgotPassword EmailSent SignedIn
+                              account-utils/ account-fields.ts account-views.ts social-items.ts (empty)
+  settings-capsule/           SettingsCapsule/ ThemeToggle/ SettingsButton/
+  smooth-scroll/              SmoothScrollProvider/ (Lenis + ScrollTrigger) keyboard-scroll.ts
+  auth/                       AuthProvider/ GuestAvatar/ auth-utils.ts (preview guest, no API yet)
+  overlays/                   SectionCurtain/ CustomCursor/ TouchEffect/
+                              SiteLoader/ (+ site-loader-script.ts)
+  lib/                        gsap.ts motion.ts scroll-frame.ts section-nav.ts header-bottom.ts
+                              pointer-kind.ts tv-mode.ts
+                              data/ places.ts photos.ts day-moments.ts hotel-info.ts
+                              api/ core/ endpoints/ (empty, issue #24 / #41)
+_styles/                      GLOBAL SCSS only (see below)
 ```
 
-Import with the alias, full path to the component file, e.g.
+Import with the alias and the full path to the component file, e.g.
 `@/app/_shared/site-header/SiteHeaderLayout/SiteHeaderLayout`.
-`public/photos/` and `public/scenes/` = verbatim assets (images, `.glb`).
+
+`public/` holds verbatim assets:
+
+- `photos/` (+ `thumbs/`): hotel photos in `.webp`;
+- `videos/settings/`: the Settings demos (`.webm` + `.mp4`);
+- `scenes/`: reserved for the 3D `.glb` files, empty for now.
+
+## Data flow worth knowing
+
+- **One source per fact.**
+  - Places, photos and prices: `lib/data/places.ts`.
+  - Gallery photos: `photos.ts`.
+  - "Sol a sol" moments: `day-moments.ts`.
+  - Address, contact, hours and policies: `hotel-info.ts`.
+  - Nav items: `site-header/header-utils/header-items.ts`.
+  - The TV chapters (`landing-tv/tv-chapters.ts`) read the same data; they never
+    copy it.
+  - Photo URLs always go through `photoSrc()` / `thumbSrc()`.
+- **Settings** live in `settings-options.ts` (options, defaults, presets).
+  - `settings-script.ts` applies them as `data-*` attributes on `<html>`: once
+    inline in `<head>` (no flash), and again by `SettingsProvider` on every change.
+  - They are saved in `localStorage["settings"]` (`SETTINGS_KEY`).
+  - The theme is separate: `localStorage["theme"]`, `light` by default, applied by
+    the inline theme script in `layout.tsx`.
+  - SCSS reacts through `:global(:root[data-…]) &` selectors and
+    `_styles/base/_settings.scss`.
+- **Section navigation** (`lib/section-nav.ts`): every link to a section goes
+  through `SectionLink` → `scrollToSection` → `goToSection`. That updates the hash
+  and, for far jumps, plays the `SectionCurtain` ("Indo para …").
+- **Scroll-driven scenes** use GSAP ScrollTrigger with `pin` + `scrub`. The math
+  lives in plain `.ts` files (`story-layout.ts`, `closing-layout.ts`), so the
+  components only read state and write styles.
+- **Keyboard scrolling** (`smooth-scroll/keyboard-scroll.ts`, wired in
+  `SmoothScrollProvider`): holding an arrow key gives a smooth, continuous
+  velocity instead of the OS key-repeat stutter. A TV remote sends the same keys.
+
+## TV mode
+
+- **Device kind.** `lib/pointer-kind.ts` (`usePointerKind`) returns `"mouse"`,
+  `"touch"` or `"remote"`.
+  - `"remote"` means `(min-width: 2560px)`.
+  - The guess is confirmed by the first real touch or mouse move. Samsung phones
+    with an S Pen report `pointer: fine`, so CSS alone gets them wrong.
+  - `settings-utils/usePointerKind.ts` only re-exports it.
+- **TV or not.** `lib/tv-mode.ts` (`useTvMode`) is true for `"remote"` or a `#tv`
+  hash.
+- **Swapping the landing.** `LandingScreen` toggles `data-tv-landing` on `<html>`.
+  `_styles/base/_tv.scss` then locks the page scroll and hides the header. It also
+  defines `--u`, the TV ruler: `min(1vw, 1.7778vh)`, so a 16:9 frame always fits.
+  The Settings text size multiplies TV text through `--tv-text`.
+- **`TvLanding`** handles the remote:
+  - the remote moves through the coverflow and opens a section page;
+  - "Back" arrives as `Escape` / `Backspace` / `BrowserBack` / `GoBack`, or as key
+    code `10009` (Samsung) / `461` (LG);
+  - focus can climb to the Theme/Settings capsule
+    (`[data-settings-capsule] button`).
+- On the TV, the Settings panel shows only the essentials.
+
+## 3D (planned, not in the code yet)
+
+- The 3D is built in Blender **outside this repo**. Only the exported `.glb`
+  comes in, into `public/scenes/`. `.blend` / `.fbx` are git-ignored.
+- The site will show the 3D **from inside only** (the lobby interior first).
+- The target GLB is a standard glTF:
+  - 1 draw call;
+  - baked light in the base colour (`KHR_materials_unlit`);
+  - Draco geometry and WebP textures.
+- The R3F side therefore needs a Draco decoder served by the site, and
+  `toneMapped = false`.
+- three / @react-three/fiber / drei are **not installed**. Ask before adding them,
+  and before re-adding `ambientes-3d/page.tsx`.
 
 ## Styles (`app/_styles/`)
 
-**Component styles are CSS Modules, not global SCSS.** Every component `.tsx` has a
-same-name `.module.scss` beside it (`SiteHeaderDesktop.module.scss`,
-`page.module.scss`) — **except** `layout.tsx`, `PanelProvider.tsx` and `SceneCanvas.tsx`.
-Non-component `.ts` (`header-items.ts`, `social-items.ts`, `lib/`) get none.
-Classes are camelCase (`styles.headerButton`). New or changed SCSS uses nesting
-(`&` for states/modifiers), `$` variables and mixins with arguments; each module
-`@use`s only what it needs.
+**Component styles are CSS Modules.** Every component `.tsx` has a same-name
+`.module.scss` beside it. These have none:
 
-`_styles/` is deliberately small — **global only**:
+- `layout.tsx`;
+- the providers (`PanelProvider`, `SettingsProvider`, `AuthProvider`,
+  `SmoothScrollProvider`, `ActiveSectionProvider`);
+- `LandingScreen`, `HeaderIcons`, `SectionLink` and `SceneCanvas`;
+- plain `.ts` modules.
+
+Classes are camelCase. SCSS uses nesting that follows the HTML, `&` for states, `$`
+variables and mixins with arguments. Each module `@use`s only what it needs.
 
 ```
-main.scss                      single entry, imported ONCE from layout.tsx (./_styles/main.scss)
-base/         _index _reset _root _typography _scroll
-tools/  _variables _mixins _breakpoints
+main.scss                     single entry, imported ONCE from layout.tsx
+base/    _index _root _reset _typography _scroll _settings _skip-link _tv
+tools/   _variables _mixins _breakpoints
 ```
 
-Next compiles SCSS natively via the `sass` package. Any module can
-`@use "tools/variables" as *;` because `next.config.ts` sets
-`sassOptions.includePaths: [app/_styles]`. Inside `tools/` the partials
-`@use` each other without a prefix (`@use "breakpoints" as *;`). Do not recreate
-per-feature mirror folders under `_styles/`.
+Any module can `@use "tools/mixins" as *;`, because `next.config.ts` sets
+`sassOptions.includePaths: [app/_styles]` (and silences the `legacy-js-api`
+deprecation).
 
-The old Live Sass Compiler output is gone; the `glenn2223.live-sass` `savePath`
-in the devcontainer and the matching `.gitignore` entries are dead config.
+Font stacks already carry their fallbacks (`--font-title`, `--font-body`,
+`--font-mono` in `_root.scss`), so write `font-family: var(--font-body);` with no
+extra fallbacks.
+
+- Default fonts: Playfair Display (title), Inter (body), JetBrains Mono (mono).
+- Settings can swap them for Cormorant Garamond, Karla, DM Serif Display, DM Sans
+  or Atkinson Hyperlegible. These load with `preload: false`.
+
+The optional Live Sass Compiler (dev-container) only builds the **global** sheet,
+into the git-ignored `app/_styles/css/`. The app never reads it.
 
 ## Conventions
 
-- Components: `PascalCase` folder + `PascalCase.tsx`, default export. Non-component
-  modules (`header-items.ts`, `social-items.ts`, `photos.ts`): `kebab-case.ts` / lowercase.
-- `page.tsx` / `layout.tsx` are **server components by default**. Add
-  `"use client"` only where state/effects/browser APIs are needed (Cursor,
-  panels, scene canvas, anything GSAP/three).
-- Routes are the folders of `app/` that hold `page.tsx`; their UI sits in the
-  sibling `*-layout` folder and is imported into the page. Keep `page.tsx` thin.
-- Dynamic route params are a `Promise` in Next 15:
-  `params: Promise<{ ambiente: string }>` then `await params`.
-- Import alias `@/` → the `front-end/` root (e.g. `@/app/_shared/…`).
-- Hooks: `useThing.ts`, one per file (`header-hooks/` exists for the header).
-- An **empty `.ts`/`.tsx` is invalid** when imported under Next (`is not a module`);
-  `page.tsx` / `layout.tsx` / `loading.tsx` must never be empty.
+- Components: `PascalCase` folder + `PascalCase.tsx`, **default export**. Plain
+  modules: `kebab-case.ts`. Hooks: `useThing.ts`, one per file, named export.
+- `page.tsx` / `layout.tsx` are server components. Add `"use client"` only for
+  state, effects or browser APIs.
+- Routes are the folders of `app/` that have a `page.tsx`. Their UI lives in the
+  sibling `*-layout/` folder. Keep `page.tsx` thin.
+- Dynamic params are a `Promise` in Next 15 (`await params`).
+- An empty `.ts`/`.tsx` is not a module. Never import one, and never leave
+  `page.tsx` / `layout.tsx` / `loading.tsx` empty.
+- `:hover` styles go inside `@media (hover: hover)`, so touch screens don't keep a
+  "stuck" hover.
+- Code comments in this folder are written in Portuguese, explaining the *why*.
+  Keep that style.
 
-## Known breakages (verified 2026-11-02 in a clean copy on Windows: install, tsc, build, dev)
+## Verification
 
-| Check | Result |
-|-------|--------|
-| `pnpm install` | ok (needs `allowBuilds` decisions). `next@15.0.3` flagged deprecated — CVE-2025-66478, bump to a patched 15.x |
-| `tsc --noEmit` | passes |
-| `pnpm build` | passed on 2026-11-02 — 6 routes (`/`, `/ambientes-3d`, `/ambientes-3d/[ambiente]`, `/pagamentos`, `/redefinir-senha`, `/_not-found`). **Regressed by 2026-11-13** — see the `pnpm run build` row below |
-| `next dev` | `/`, `/ambientes-3d`, `/ambientes-3d/teste`, `/pagamentos`, `/redefinir-senha` all 200, header rendered |
-| `pnpm lint` | **cannot run** — `next lint` needs `eslint` + `eslint-config-next` (not installed) |
-| `next dev --host 0.0.0.0` | **fails** — Next uses `-H/--hostname` and `-p/--port` |
-| `docker/docker-compose.yml` `tests` service | **removed 2026-11-13** — ran `pnpm run test:ui`, a script that never existed (no test runner installed), so it did nothing |
-| `Dockerfile.frontend` `build`/`production` | **fixed 2026-11-13**: `next.config.ts` has `output: "standalone"`; `production` runs `node server.js` (no nginx, no pnpm) — chosen over `output: "export"` because the dynamic route `/ambientes-3d/[ambiente]` doesn't need `generateStaticParams` this way |
-| `pnpm run build` (production build) | **fails**, with or without `output: "standalone"` (isolated by testing both) — `Error: <Html> should not be imported outside of pages/_document` while statically generating `/404`/`/_error`. Not a Docker/network issue (reproduced twice, no font-fetch errors on the second run). Likely something in `app/layout.tsx`'s provider tree throwing for a route with no page-specific data — not investigated further, out of scope for the Dockerfile fix |
-| HMR in Docker | `WATCHPACK_POLLING=true` is set in compose (needed on Docker bind mounts) — **verified 2026-11-13**: editing a `.tsx` or `.module.scss` triggers `✓ Compiled …` and the page updates; editing `next.config.ts` logs `⚠ Found a change in next.config.ts. Restarting the server…` and Next restarts itself |
-| `release.yml` `quality` | would fail on tag: no `format:check`/`typecheck`/`test` scripts (`--if-present` skips them) |
-| `@types/react`/`@types/react-dom` `^18` vs React 19 RC | mismatch — align when upgrading |
-| Windows host | `node_modules` created by the Linux container is not usable from the host (pnpm symlinks); install inside the container or in a copy |
+```bash
+pnpm typecheck
+pnpm build                     # must list /, /_not-found, /pagamentos, /redefinir-senha
+```
 
-Do not "fix" `docker/`, `.devcontainer/`, `.github/` or root docs as a side
-effect of a `front-end/` task — report and ask; they are separate decisions.
+To test the Docker `production` image (`output: "standalone"`):
+
+1. copy `.next/static` and `public/` next to `.next/standalone/server.js`;
+2. run `node server.js`.
+
+That is exactly what `docker/Dockerfile.frontend` does. Then check that `/` answers
+200 and `/ambientes-3d` answers 404.
+
+For UI changes, check phone, tablet, desktop and TV (`#tv`), in light and dark,
+with text size Normal / Large / Larger. The page must never scroll horizontally.
 
 ## When editing
 
-- Changing a port/version → also update `docker/.env(.example)`, compose,
-  `Dockerfile.frontend`, devcontainer, and the docker READMEs.
-- Folder/route changes → update the tree in `README.md` **and** `README.pt-BR.md`
-  and the *Layout* section here.
+- Changing a port or version → also update `docker/.env.example`, compose,
+  `Dockerfile.frontend`, the devcontainer, and the docker READMEs.
+- Folder or route changes → update the tree in `README.md` **and**
+  `README.pt-BR.md`, and the *Layout* section here.
 - Keep `README.md` and `README.pt-BR.md` in sync.
