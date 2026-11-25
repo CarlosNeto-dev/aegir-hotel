@@ -1,165 +1,197 @@
 # 🎨 `front-end/` — o cliente web
 
 <p>
-  <img alt="Next.js" src="https://img.shields.io/badge/Next.js-15-000000?logo=nextdotjs&logoColor=white">
+  <img alt="Next.js" src="https://img.shields.io/badge/Next.js-15.5-000000?logo=nextdotjs&logoColor=white">
   <img alt="React" src="https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black">
   <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white">
-  <img alt="Sass" src="https://img.shields.io/badge/SCSS-1.80-CC6699?logo=sass&logoColor=white">
+  <img alt="Sass" src="https://img.shields.io/badge/SCSS-1.80%2B-CC6699?logo=sass&logoColor=white">
+  <img alt="GSAP" src="https://img.shields.io/badge/GSAP-3-88CE02?logo=greensock&logoColor=black">
 </p>
 
 **🌐 Idioma:** [English](README.md) · **Português**
 
-Esta pasta é todo o front-end. Ela é **montada como volume em `/app`** dentro do
-container (veja [`../docker/README.pt-BR.md`](../docker/README.pt-BR.md)), então
-tudo que você faz aqui é o que roda.
+Esta pasta é o front-end inteiro. Ela é **montada em `/app`** dentro do container
+(veja [`../docker/README.pt-BR.md`](../docker/README.pt-BR.md)), então tudo o que
+você faz aqui é o que roda.
 
-> ⚠️ **Em andamento.** A árvore de rotas, as pastas e os parciais de SCSS
-> existem, mas a maioria dos arquivos `.ts` / `.tsx` / `.scss` ainda é
-> **placeholder vazio** (o header do site, o `layout.tsx` e o `page.tsx` da landing
-> já têm código). Veja o [Status atual](#-status-atual) para saber o que compila e
-> o que não.
+> ✅ **A landing (`/`) está pronta.** Ela tem:
+> - um header para celular, tablet/computador e TV;
+> - main: sete seções, um índice lateral e uma barra de progresso;
+> - um footer, Simples ou Fragmentos, escolhido nos Ajustes;
+> - os painéis de Ajustes e de Conta. A Conta é só visual; a API chega com as
+>   issues #23–#29 e #41.
+>
+> Na TV, ou com `#tv` no fim do endereço, a landing vira um coverflow curvo guiado
+> pelo controle. `/pagamentos` e `/redefinir-senha` são placeholders, e
+> `/ambientes-3d` está desligada até as cenas 3D existirem. Veja
+> [Estado atual](#-estado-atual).
 
 ---
 
 ## 🗂️ Estrutura de pastas
 
-Tudo fica em `app/`. O Next.js só exige `layout.tsx` / `page.tsx` ali; pastas
-que começam com `_` são **privadas** (nunca viram rota) e `(nome)` é um **grupo de
-rota** (não aparece na URL). **Só as pastas que viram um trecho da URL ficam em
-português** — o site é pt-BR e o Next.js monta a URL a partir do nome da pasta.
-Tudo que não é rota fica em **inglês**: pastas de componente (PascalCase, cada uma
-com `Nome.tsx` + `Nome.module.scss`), arquivos, funções e classes.
+Tudo fica em `app/`. Pastas que começam com `_` são **privadas** (nunca viram rota),
+e `(nome)` é um **grupo de rotas** (não entra na URL). **Só as pastas que viram um
+segmento de URL são em português**; todo o resto é em **inglês**.
 
 ```
 front-end/
 ├── package.json · pnpm-workspace.yaml · next.config.ts · tsconfig.json
 ├── public/
-│   ├── photos/                          # imagens
-│   └── scenes/                          # .glb / .gltf das cenas 3D
+│   ├── photos/ (+ thumbs/)              # fotos do hotel em .webp (e miniaturas do menu)
+│   ├── videos/settings/                 # vídeos de demonstração dos Ajustes (.webm + .mp4)
+│   └── scenes/                          # reservada para os .glb das cenas 3D (vazia por enquanto)
 └── app/
-    ├── layout.tsx                       # raiz: fontes, <html lang="pt-BR">, header, SCSS global
-    ├── (landing)/                        # landing  →  /
-    │   ├── page.tsx · page.module.scss · loading.tsx
-    │   └── landing-layout/
-    │       ├── LandingMain/             #   sections/ (8 × XxxSection) · aside/ (MainAside, account-panel/)
-    │       ├── LandingFooter/
-    │       └── overlays/           #   ProgressBar/ Cursor/
-    ├── ambientes-3d/                    # /ambientes-3d · /ambientes-3d/[ambiente]
-    │   ├── _r3f/SceneCanvas/            #   o canvas r3f (sem .module.scss)
-    │   └── ambients-layout/AmbientsMain/   # + SceneLayout/ SceneTopBar/ SceneInfo/ SceneControls/
-    ├── pagamentos/                      # /pagamentos
-    ├── redefinir-senha/                 # /redefinir-senha (sem loading.tsx)
-    ├── _shared/                  # compartilhado por todas as rotas
-    │   ├── site-header/              #   SiteHeaderLayout/ Mobile/ Desktop/ TV/ · header-hooks/ · header-utils/
-    │   ├── panels/                     #   PanelProvider/ · SidePanel/ · settings-panel/
-    │   ├── settings-capsule/           #   cápsula fixa de Tema + Ajustes
-    │   ├── smooth-scroll/              #   SmoothScrollProvider (Lenis + ScrollTrigger)
-    │   ├── auth/                       #   AuthProvider/ · GuestAvatar/
-    │   ├── overlays/               #   SiteLoader/ · SectionCurtain/ · CustomCursor/ · TouchEffect/
-    │   └── lib/                  #   gsap.ts · section-nav.ts · motion.ts · api/{core, endpoints}/ · data/
-    └── _styles/                        # SOMENTE SCSS GLOBAL: main.scss · base/ · tools/
+    ├── layout.tsx                       # raiz: fontes, <html lang="pt-BR">, scripts de tema + Ajustes, providers
+    ├── (landing)/                       # landing  →  /
+    │   ├── page.tsx · page.module.scss   # SiteLoader + LandingScreen (landing normal ou da TV)
+    │   ├── landing-layout/
+    │   │   ├── LandingMain/             #   sections/ (Opening + Journey, Suites, Compare, Day,
+    │   │   │                            #   Gallery, Numbers, Booking) · main-utils/ · main-hooks/ · aside/
+    │   │   ├── LandingFooter/           #   FooterFragments/ (hélice de DNA) · footer-utils/
+    │   │   └── overlays/                #   ProgressBar/ · ScrollCue/ ("Role para baixo")
+    │   └── landing-tv/                  # a landing da TV: LandingScreen/ · TvLanding/ · TvArc/ · TvSection/
+    ├── ambientes-3d/                    # desligada (sem page.tsx) — esqueleto da rota 3D
+    ├── pagamentos/                      # /pagamentos (placeholder)
+    ├── redefinir-senha/                 # /redefinir-senha (placeholder)
+    ├── _shared/                         # compartilhado por todas as rotas
+    │   ├── site-header/                 #   SiteHeaderLayout/ Mobile/ Desktop/ TV/ · header-hooks/ · header-utils/
+    │   ├── panels/                      #   PanelProvider/ · SidePanel/ · settings-panel/ · account-panel/
+    │   ├── settings-capsule/            #   cápsula fixa de Tema + Ajustes
+    │   ├── smooth-scroll/               #   SmoothScrollProvider (Lenis + ScrollTrigger) · keyboard-scroll
+    │   ├── auth/                        #   AuthProvider/ · GuestAvatar/ (hóspede de prévia, ainda sem API)
+    │   ├── overlays/                    #   SectionCurtain/ · CustomCursor/ · TouchEffect/ · SiteLoader/ (tela de carregamento)
+    │   └── lib/                         #   gsap · motion · scroll-frame · section-nav · header-bottom
+    │                                    #   pointer-kind · tv-mode
+    │                                    #   data/ (places, photos, day-moments, hotel-info) · api/ (vazia)
+    └── _styles/                         # SÓ SCSS GLOBAL: main.scss · base/ · tools/
 ```
 
-Toda pasta que contém placeholders `.ts` / `.tsx` vazios tem um `.gitkeep`.
+Alguns arquivos ainda estão vazios de propósito (trabalho futuro):
+`_shared/lib/api/**`, `account-utils/social-items.ts` e os componentes de
+`ambientes-3d`, `pagamentos` e `redefinir-senha`.
 
-### 📐 Regras da estrutura
+### 📐 Regras de estrutura
 
-1. **Rotas são as pastas de `app/` com um `page.tsx`.** Mantenha-o enxuto e
-   importe a UI da pasta `*-layout` vizinha (ex.: `landing-layout/LandingMain`).
-   UI compartilhada que não pertence a uma rota só vai em `_shared/`.
-2. **Idioma.** Só as pastas que viram um trecho da URL ficam em português
-   (minúsculas, com hífen, sem acento), porque o site é pt-BR e a URL espelha o nome
-   da pasta. Todo o resto — pastas, arquivos, funções, props, classes do SCSS — fica
-   em inglês, inclusive os grupos de rota, como `(landing)`. Texto que o usuário lê na
-   tela: português.
-3. **Uma pasta por componente**, com o nome dele, guardando `Nome.tsx` +
-   `Nome.module.scss`. Exceções sem `.module.scss`: `layout.tsx`,
-   `PanelProvider.tsx`, `SceneCanvas.tsx` e os `.ts` simples (`header-items.ts`,
-   `social-items.ts`, tudo em `lib/`).
-4. **`_shared/lib/api/` é o único lugar que fala com o backend**;
-   componentes nunca chamam `fetch` direto. `data/` guarda conteúdo estático.
-5. **`_styles/` é só global e pequena** — reset, variáveis `:root`, tipografia,
-   regras de scroll e `tools/` (variáveis, mixins, breakpoints).
-6. **`public/` vs `app/`** — `public/` é copiado literalmente (URLs estáveis:
-   fotos, modelos `.glb`); o que é importado no código é empacotado com hash.
-7. **Alias de path:** `@/` → a raiz de `front-end/`. Importe o arquivo do componente pelo caminho
-   completo, ex.: `@/app/_shared/site-header/SiteHeaderLayout/SiteHeaderLayout`.
-8. **Server components por padrão.** Use `"use client"` só onde precisar de
-   estado, efeitos ou APIs do navegador (Cursor, painéis, canvas da cena, animação).
-9. **Nada de `page.tsx` / `layout.tsx` / `loading.tsx` vazio** — arquivo vazio *não é
-   módulo* e quebra o `next build`. Os params dinâmicos são uma `Promise` no Next 15.
+1. **Rotas são as pastas de `app/` que têm um `page.tsx`.** Mantenha-o enxuto e
+   importe a interface da pasta irmã `*-layout` (ex.: `landing-layout/LandingMain`).
+   Interface compartilhada que não pertence a uma única rota vai em `_shared/`.
+2. **Idioma.** Só as pastas que viram segmento de URL são em português (minúsculas,
+   com hífen, sem acento). Todo o resto — pastas, arquivos, funções, props, classes
+   SCSS — é em inglês. O texto na tela e os comentários do código são em português.
+3. **Uma pasta por componente**, com `Nome.tsx` + `Nome.module.scss`. Estes não
+   têm `.module.scss`:
+   - `layout.tsx`;
+   - os providers (`PanelProvider`, `SettingsProvider`, `AuthProvider`,
+     `SmoothScrollProvider`, `ActiveSectionProvider`);
+   - `LandingScreen`, `HeaderIcons`, `SectionLink` e `SceneCanvas`;
+   - os módulos `.ts` simples.
+4. **Um lugar para cada fato.**
+   - Lugares, fotos e preços: `lib/data/places.ts`.
+   - Galeria: `photos.ts`.
+   - "Sol a sol": `day-moments.ts`.
+   - Endereço, contato, horários e políticas: `hotel-info.ts`.
+   - Itens do menu: `header-items.ts`.
+   - A landing da TV lê esses mesmos dados.
+5. **`_shared/lib/api/` será o único lugar que conversa com o backend** (issues #24
+   e #41). Componentes nunca chamam `fetch` direto.
+6. **`_styles/` é só global e pequena.** Ela guarda o reset, as variáveis do
+   `:root`, a tipografia, os Ajustes (`_settings.scss`), a landing da TV
+   (`_tv.scss`) e `tools/` (variáveis, mixins, breakpoints).
+7. **Alias de caminho:** `@/` → a raiz de `front-end/`.
+8. **Server components por padrão.** Use `"use client"` só onde precisar de estado,
+   efeitos ou APIs do navegador.
+9. **Nada de `page.tsx` / `layout.tsx` / `loading.tsx` vazio.** Um arquivo vazio
+   *não é um módulo* e quebra o `next build`.
+
+---
+
+## 📺 Landing da TV
+
+- **Quando aparece.** O `LandingScreen` decide qual landing mostrar. Na TV (tela com
+  pelo menos 2560 px de largura, detectada por `lib/pointer-kind.ts`), ou com `#tv`
+  no fim do endereço, a página comprida dá lugar ao `TvLanding`, um coverflow curvo
+  das seções.
+- **Sem troca visível.** O servidor sempre desenha a landing normal. A troca
+  acontece por baixo da tela de carregamento, então ninguém a vê.
+- **O que a página da TV faz.** Ela marca `<html data-tv-landing>`, e o `_tv.scss`
+  trava a rolagem da página e esconde o header.
+- **O controle.** As setas andam entre as seções, e o "Voltar" funciona com os
+  controles da Samsung e da LG.
 
 ---
 
 ## 💅 SCSS
 
-O Next.js compila SCSS nativamente quando o pacote `sass` está instalado.
-
-- **Global:** `app/_styles/main.scss`, importado **uma vez** em `app/layout.tsx`
-  (`import "./_styles/main.scss"`).
-- **Escopado:** `Coisa.module.scss` ao lado de `Coisa.tsx`, importado como CSS Module
+- **Global:** `app/_styles/main.scss`, importado **uma vez** em `app/layout.tsx`.
+- **Com escopo:** `Coisa.module.scss` ao lado de `Coisa.tsx`
   (`import styles from "./Coisa.module.scss"`, classes em camelCase). Use aninhamento
-  (`&` para estados e modificadores), variáveis `$` e mixins com argumentos.
-- **Ferramentas compartilhadas:** qualquer módulo pode escrever
-  `@use "tools/variables" as *;` porque o `next.config.ts` define
-  `sassOptions.includePaths: [app/_styles]`. Cada módulo faz `@use` só do que
-  usa (`tools/breakpoints`, `tools/variables`, `tools/mixins`).
-- A saída do Live Sass Compiler não existe mais; a configuração
-  `glenn2223.live-sass` do dev-container e as entradas correspondentes do
-  `.gitignore` são sobras sem uso.
+  que segue o HTML, `&` para estados, variáveis `$` e mixins com argumentos.
+- **Ferramentas:** qualquer módulo pode escrever `@use "tools/mixins" as *;`, porque
+  o `next.config.ts` define `sassOptions.includePaths: [app/_styles]`.
+- **Fontes:** `--font-title`, `--font-body` e `--font-mono` já trazem suas
+  alternativas; basta escrever `font-family: var(--font-body);`. Os Ajustes trocam
+  essas três variáveis (`data-font` em `_settings.scss`).
+- **Hover:** vai dentro de `@media (hover: hover)`, para telas de toque não ficarem
+  com um hover "preso".
+- **Live Sass Compiler:** o compilador do dev-container é **opcional**. Ele só gera
+  a folha global em `app/_styles/css/` (ignorada pelo git). A aplicação nunca a lê.
 
 ---
 
-## 🚀 Executando
+## 🚀 Rodando
 
 ```bash
 cd ../docker
-docker compose -f docker-compose.yml up --build
+docker compose up --build
 ```
 
 Scripts (`package.json`):
 
-| Script | Comando | Obs. |
-|--------|---------|------|
-| `pnpm dev` | `next dev` | o Next escuta `0.0.0.0` por padrão; as flags são `-p/--port`, `-H/--hostname` — **não** `--host` |
-| `pnpm build` | `next build` | exige que todo arquivo de rota exporte um componente |
-| `pnpm start` | `next start` | serve o build de `.next/` |
-| `pnpm lint` | `next lint` | precisa de `eslint` + `eslint-config-next` (ainda não instalados) |
+| Script | Comando | Observação |
+|--------|---------|------------|
+| `pnpm dev` | `next dev` | as flags são `-p/--port` e `-H/--hostname` — **não** `--host` |
+| `pnpm build` | `next build` | gera `.next/standalone` (`output: "standalone"`) |
+| `pnpm start` | `next start` | serve o build (com standalone, o Next recomenda `node .next/standalone/server.js`) |
+| `pnpm typecheck` | `tsc --noEmit` | confere os tipos sem gerar arquivos |
+
+Não há script de `lint` nem de `test`. O ESLint não está instalado, e o `next lint`
+está obsoleto no Next 15.5. Nenhum runner de testes está instalado.
 
 ---
 
-## 🩺 Status atual
+## 🩺 Estado atual
 
-Verificado em 2026-11-02 numa cópia limpa no Windows (`pnpm install`, `tsc`, `next build`):
+| Verificação | Última vez | Resultado |
+|-------------|------------|-----------|
+| `pnpm typecheck` | 2026-11-24 | ✅ |
+| `pnpm build` | 2026-11-14 | ✅ rotas `/`, `/_not-found`, `/pagamentos`, `/redefinir-senha` |
+| Servidor standalone (`node server.js`, igual ao estágio `production` do Docker) | 2026-11-14 | ✅ `/` 200 · `/ambientes-3d` 404 |
+| Hot reload no Docker | 2026-11-13 | ✅ `WATCHPACK_POLLING=true` no compose |
+| Tela de carregamento: sem erro de hidratação, movimento reduzido, sem JavaScript | 2026-11-15 | ✅ |
+| Landing no celular, tablet, computador e TV, claro/escuro, texto Normal/Grande/Maior | 2026-11-14 | ✅ sem rolagem horizontal da página (a comparação de suítes rola dentro de si no celular, de propósito) |
 
-| Verificação | Resultado |
-|-------------|-----------|
-| `pnpm install` | ✅ 46 pacotes — mas o `next@15.0.3` está sinalizado (CVE-2025-66478); atualize para um 15.x corrigido |
-| `tsc --noEmit` | ✅ |
-| `pnpm build` | ✅ 6 rotas (`/`, `/ambientes-3d`, `/ambientes-3d/[ambiente]`, `/pagamentos`, `/redefinir-senha`, `/_not-found`) |
-| `pnpm lint` | ❌ ESLint não instalado |
-| `docker compose` → `website` | ✅ `pnpm install` + `next dev -H 0.0.0.0 -p 5173` chegam a *Ready* (verificado em 2026-10-26; os caminhos eram `app/`, agora `front-end/`) |
-| Alvo Docker `production` | ✅ **corrigido em 2026-11-13** — `next.config.ts` tem `output: "standalone"`, o estágio do Dockerfile roda `node server.js` (sem nginx) |
-| `pnpm run build` (build de produção) | ❌ **regressão desde 2026-11-02** — falha com `Error: <Html> should not be imported outside of pages/_document` ao gerar as páginas estáticas `/404`/`/_error`. Reproduzido com e sem `output: "standalone"`, então não tem relação com a correção do Docker acima; provavelmente algo na árvore de Providers do `app/layout.tsx` |
-| Hot reload no Docker | ✅ `WATCHPACK_POLLING=true` definido no compose; edições de SCSS aparecem em ~4-20s |
+A tela de carregamento aparece em **toda visita e em toda atualização**. Ela não
+aparece de novo quando você volta para `/` por um link interno.
 
-Havia um serviço `tests` no compose, montado pro Vitest; removido em
-2026-11-13 porque o `vitest` nunca chegou a ser instalado, então não fazia nada.
+**Instalado:** Next 15.5, React 19, Sass, TypeScript 5, GSAP 3 + @gsap/react 2
+(ScrollTrigger) e Lenis 1.
 
-Instalados para animação: GSAP 3.15 + @gsap/react 2.1 (ScrollTrigger) e Lenis 1.3.
-
-Não instalados (adicione quando precisar, pergunte antes): react-three-fiber /
-three / drei, Vitest + Testing Library, ESLint, Prettier, Stylelint.
+**Não instalado** (adicionar quando precisar, perguntando antes):
+react-three-fiber / three / drei, Vitest + Testing Library, ESLint, Prettier,
+Stylelint.
 
 ---
 
 ## 🧭 Convenções
 
 - **Componentes:** `PascalCase.tsx`, export default. Módulos simples
-  (`header-items.ts`, `photos.ts`): minúsculo / `kebab-case.ts`.
+  (`header-items.ts`, `photos.ts`): `kebab-case.ts`.
 - **Hooks:** `useCoisa.ts`, um hook por arquivo.
 - **Estilos:** `Coisa.module.scss` ao lado do componente; globais só em `app/_styles/`.
-- **Imports:** use `@/…` para qualquer coisa a partir da raiz (`@/app/…`).
+- **Imports:** use `@/…` para qualquer coisa abaixo da raiz do projeto (`@/app/…`).
+- **Fotos:** sempre passam por `photoSrc()` / `thumbSrc()` de `places.ts`, nunca por
+  um caminho escrito à mão.
 
 ---
 
