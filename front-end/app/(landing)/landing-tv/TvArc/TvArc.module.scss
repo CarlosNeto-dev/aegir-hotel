@@ -1,0 +1,172 @@
+// As medidas do arco, em --u (1% do quadro 16:9 da TV; veja _tv.scss). São as do protótipo
+// "Curvo": cartões de 23u e raio de 80u, com um espaço entre eles. O arco é côncavo:
+// as pontas giram na direção de quem assiste, como uma tela de cinema curva.
+.stage {
+  --w: calc(23 * var(--u));
+  --h: calc(16 * var(--u));
+  --r: calc(80 * var(--u));
+  // 18,5° entre os cartões: no raio de 80u isso dá ~25,4u de um centro ao
+  // outro, ou seja, ~2,4u de espaço entre cartões de 23u.
+  --step: -18.5deg;
+  // --k = 1: o centro do giro fica À FRENTE dos cartões (arco côncavo).
+  // --k = -1: o centro fica ATRÁS (arco convexo, como um tambor).
+  --k: 1;
+  --lift: calc(4.6 * var(--u));
+  position: absolute;
+  inset: 0;
+  perspective: calc(66 * var(--u));
+  perspective-origin: 50% var(--y, 58%);
+  pointer-events: none;
+
+  // O arco pequeno (a faixa de lugares embaixo da página de uma seção) é
+  // CONVEXO: as pontas se afastam em vez de chegar perto. Num arco côncavo,
+  // uma lista comprida (Sua estadia tem 7) trazia o último cartão para tão
+  // perto que ele crescia e saía da tela.
+  &[data-size="small"] {
+    --w: calc(9.6 * var(--u));
+    --h: calc(6.4 * var(--u));
+    --r: calc(40 * var(--u));
+    // 16°: ~1,4u de espaço entre os cartões pequenos.
+    --step: 16deg;
+    --k: -1;
+    --lift: calc(1.4 * var(--u));
+    perspective: calc(42 * var(--u));
+  }
+}
+
+.arc {
+  position: absolute;
+  top: var(--y, 58%);
+  left: 50%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  transform-style: preserve-3d;
+  // Só transform, sem opacity, e fill "backwards": uma animação de opacidade
+  // presa no elemento (mesmo em 1) faz o navegador achatar tudo o que está
+  // dentro dele, e o arco perde a profundidade.
+  animation: arrive 0.7s var(--ease) backwards;
+}
+
+.slot {
+  position: absolute;
+  top: calc(var(--h) / -2);
+  left: calc(var(--w) / -2);
+  width: var(--w);
+  height: var(--h);
+  transform: translateZ(calc(var(--r) * var(--k))) rotateY(calc(var(--d) * var(--step)))
+    translateZ(calc(var(--r) * var(--k) * -1));
+  transform-style: preserve-3d;
+  transition:
+    transform 0.85s var(--ease),
+    opacity 0.6s ease;
+  pointer-events: auto;
+
+  &[data-far] {
+    opacity: 0;
+    pointer-events: none;
+  }
+}
+
+.card {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: calc(var(--w) * 0.04);
+  background: center / cover no-repeat;
+  box-shadow: 0 calc(var(--w) * 0.11) calc(var(--w) * 0.2) calc(var(--w) * -0.08) rgba(var(--color-shadow-rgb), 0.75);
+  color: #fbf9f5;
+  cursor: pointer;
+  filter: saturate(0.75) brightness(0.86);
+  transition:
+    transform 0.85s var(--ease),
+    filter 0.6s ease,
+    box-shadow 0.6s ease;
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent 45%, rgba(15, 13, 11, 0.8));
+  }
+
+  // O escolhido acende e avança um pouco: o resto da faixa fica na penumbra.
+  &[data-focus] {
+    filter: none;
+    transform: translateZ(var(--lift));
+    box-shadow:
+      0 calc(var(--w) * 0.14) calc(var(--w) * 0.24) calc(var(--w) * -0.08) rgba(var(--color-shadow-rgb), 0.85),
+      0 0 0 calc(var(--w) * 0.01) var(--color-ink);
+  }
+
+  &:focus-visible {
+    outline: none;
+  }
+}
+
+.cardText {
+  position: absolute;
+  right: calc(var(--w) * 0.05);
+  bottom: calc(var(--w) * 0.04);
+  left: calc(var(--w) * 0.05);
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--w) * 0.018);
+  font: 400 calc(var(--w) * 0.07) / 1.1 var(--font-title);
+  text-align: left;
+  text-shadow: 0 calc(0.1 * var(--u)) calc(0.8 * var(--u)) rgba(0, 0, 0, 0.7);
+
+  small {
+    font: 500 calc(var(--w) * 0.034) / 1 var(--font-mono);
+    letter-spacing: 0.2em;
+    opacity: 0.8;
+  }
+}
+
+// O formato das fotos dos Ajustes vale também para os cartões do arco.
+:global(:root[data-photo-shape="square"]) .card {
+  border-radius: 0;
+}
+
+:global(:root[data-photo-shape="arch"]) .card {
+  border-radius: 50% 50% calc(var(--w) * 0.03) calc(var(--w) * 0.03) / 34% 34% calc(var(--w) * 0.03) calc(var(--w) * 0.03);
+}
+
+:global(:root[data-photo-shape="fragment"]) .card {
+  border-radius: 0;
+  clip-path: polygon(3% 6%, 58% 0%, 97% 7%, 100% 90%, 44% 100%, 0% 88%);
+}
+
+// Ao trocar de lista (entrar ou sair de uma seção), o arco chega girando.
+@keyframes arrive {
+  from {
+    transform: rotateY(12deg) translateZ(calc(-14 * var(--u)));
+  }
+}
+
+:global(:root[data-reduce-motion]) {
+  .arc {
+    animation: none;
+  }
+
+  .slot,
+  .card {
+    transition-duration: 0s;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .arc {
+    animation: none;
+  }
+
+  .slot,
+  .card {
+    transition-duration: 0s;
+  }
+}

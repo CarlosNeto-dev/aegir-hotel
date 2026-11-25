@@ -1,0 +1,186 @@
+// A página de uma seção ocupa quase a tela inteira: texto à esquerda, foto
+// grande à direita e a faixa curva dos lugares embaixo. Cores do tema (papel
+// e tinta), medidas em --u (o quadro 16:9) e textos que crescem com --tv-text.
+$soft: color-mix(in srgb, var(--color-ink) 78%, var(--color-paper));
+
+.root {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+}
+
+.page {
+  position: absolute;
+  top: calc(8.4 * var(--u));
+  right: calc(3 * var(--u));
+  bottom: calc(11.8 * var(--u));
+  left: calc(4 * var(--u));
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  grid-template-rows: minmax(0, 1fr);
+  gap: calc(3.4 * var(--u));
+  align-items: center;
+  animation: enter 0.6s var(--ease) both;
+}
+
+// A coluna de texto tem a altura da página e corta o que sobrar embaixo:
+// com o texto Grande/Maior ela nunca sobe por cima da marca nem desce na faixa.
+.info {
+  align-self: stretch;
+  justify-content: center;
+  max-height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: calc(1.2 * var(--u));
+  min-width: 0;
+}
+
+.kicker {
+  color: var(--color-grey);
+  font: 500 calc(calc(0.95 * var(--u)) * var(--tv-text)) / 1 var(--font-mono);
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+}
+
+.title {
+  font: 400 calc(calc(4.2 * var(--u)) * var(--tv-text)) / 1 var(--font-title);
+  text-wrap: balance;
+}
+
+.text {
+  display: -webkit-box;
+  overflow: hidden;
+  color: $soft;
+  font: 400 calc(calc(1.3 * var(--u)) * var(--tv-text)) / 1.5 var(--font-body);
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+}
+
+.highlights {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: calc(0.6 * var(--u)) calc(2 * var(--u));
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: $soft;
+  font: 400 calc(calc(1.1 * var(--u)) * var(--tv-text)) / 1.35 var(--font-body);
+
+  li {
+    position: relative;
+    padding-left: calc(1.2 * var(--u));
+
+    &::before {
+      content: "";
+      position: absolute;
+      top: calc(0.6 * var(--u));
+      left: 0;
+      width: calc(0.45 * var(--u));
+      height: calc(0.45 * var(--u));
+      border-radius: 50%;
+      background: var(--color-tide);
+    }
+  }
+}
+
+// Os números do lugar, como na seção comum: rótulo pequeno e valor grande.
+.facts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: calc(1.1 * var(--u)) calc(2 * var(--u));
+  margin: calc(0.4 * var(--u)) 0 0;
+  padding-top: calc(1.2 * var(--u));
+  border-top: 1px solid var(--color-line);
+
+  dt {
+    color: var(--color-grey);
+    font: 500 calc(calc(0.78 * var(--u)) * var(--tv-text)) / 1.2 var(--font-mono);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+
+  dd {
+    margin: calc(0.4 * var(--u)) 0 0;
+    font: 400 calc(calc(1.25 * var(--u)) * var(--tv-text)) / 1.3 var(--font-body);
+  }
+}
+
+.note {
+  color: var(--color-grey);
+  font: 500 calc(calc(0.9 * var(--u)) * var(--tv-text)) / 1.4 var(--font-mono);
+  letter-spacing: 0.06em;
+}
+
+// A foto grande segue o formato escolhido nos Ajustes (como o PhotoFragment).
+.photo {
+  align-self: stretch;
+  border-radius: calc(1.4 * var(--u));
+  background: center / cover no-repeat;
+  box-shadow: 0 calc(3 * var(--u)) calc(6 * var(--u)) calc(-3 * var(--u)) rgba(var(--color-shadow-rgb), 0.8);
+}
+
+:global(:root[data-photo-shape="square"]) .photo {
+  border-radius: 0;
+}
+
+:global(:root[data-photo-shape="arch"]) .photo {
+  border-radius: 50% 50% calc(1 * var(--u)) calc(1 * var(--u)) / 34% 34% calc(1 * var(--u)) calc(1 * var(--u));
+}
+
+:global(:root[data-photo-shape="fragment"]) .photo {
+  border-radius: 0;
+  clip-path: polygon(4% 6%, 60% 0%, 97% 8%, 100% 90%, 42% 100%, 0% 88%);
+}
+
+.counter {
+  position: absolute;
+  top: calc(5.6 * var(--u));
+  left: calc(4 * var(--u));
+  color: var(--color-grey);
+  font: 500 calc(calc(0.8 * var(--u)) * var(--tv-text)) / 1 var(--font-mono);
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+}
+
+// A faixa curva dos lugares, encostada embaixo.
+.strip {
+  --y: 50%;
+  position: absolute;
+  right: 0;
+  bottom: calc(0.6 * var(--u));
+  left: 0;
+  height: calc(10.6 * var(--u));
+}
+
+@keyframes enter {
+  from {
+    opacity: 0;
+    transform: translateY(calc(1.2 * var(--u)));
+  }
+}
+
+:global(:root[data-reduce-motion]) .page {
+  animation: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page {
+    animation: none;
+  }
+}
+
+// Com o texto maior, menos linhas e menos destaques, para tudo caber.
+:global(:root[data-text-size="large"]) .text {
+  -webkit-line-clamp: 3;
+}
+
+:global(:root[data-text-size="larger"]) {
+  .text {
+    -webkit-line-clamp: 2;
+  }
+
+  .highlights li:nth-child(n + 3) {
+    display: none;
+  }
+}
