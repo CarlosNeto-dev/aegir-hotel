@@ -1,3 +1,4 @@
+import LandingFooter from "@/app/(landing)/landing-layout/LandingFooter/LandingFooter";
 import LandingMain from "@/app/(landing)/landing-layout/LandingMain/LandingMain";
 import ProgressBar from "@/app/(landing)/landing-layout/overlays/ProgressBar/ProgressBar";
 import ScrollCue from "@/app/(landing)/landing-layout/overlays/ScrollCue/ScrollCue";
@@ -10,6 +11,7 @@ export default function Page() {
       <SiteLoader />
       <ProgressBar />
       <LandingMain />
+      <LandingFooter />
       <ScrollCue />
     </div>
   );

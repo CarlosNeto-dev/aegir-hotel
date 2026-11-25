@@ -1,0 +1,96 @@
+@use "tools/breakpoints" as *;
+@use "tools/mixins" as *;
+
+.root {
+  position: relative;
+
+  .scene {
+    position: relative;
+    height: 100svh;
+    overflow: hidden;
+  }
+
+  .center {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding-inline: var(--gutter);
+    pointer-events: none;
+  }
+
+  .message {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.4rem;
+    text-align: center;
+  }
+
+  .messageKicker {
+    color: var(--color-grey);
+    font-family: var(--font-mono);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    visibility: hidden;
+    @include fluid(font-size, 0.95rem, 1rem, 1.8rem);
+  }
+
+  .messageText {
+    --in: 0;
+    @include display(3.2rem, 6.4rem, 11rem);
+
+    em {
+      color: var(--color-tide);
+    }
+  }
+
+  /* Camada fixa: os fragmentos voam por cima de tudo até pousar nas fotos do rodapé. */
+  .layer {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    pointer-events: none;
+  }
+
+  /* As linhas da hélice: as duas fitas e os degraus no verde-azulado do mar (--color-tide). */
+  .helix {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    z-index: 1;
+  }
+
+  .strand,
+  .rung {
+    fill: none;
+    stroke-linecap: round;
+  }
+
+  .strand {
+    stroke: var(--color-tide);
+    stroke-width: 1.5;
+  }
+
+  .rung {
+    stroke: color-mix(in srgb, var(--color-tide) 28%, transparent);
+    stroke-width: 1;
+  }
+
+  .fragment {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: block;
+    visibility: hidden;
+    will-change: transform;
+  }
+
+  .photo {
+    width: 100%;
+    height: 100%;
+  }
+}
