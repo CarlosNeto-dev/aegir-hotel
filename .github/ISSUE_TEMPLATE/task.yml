@@ -1,63 +1,45 @@
 name: 🧩 Task / Tarefa (GitHub Projects)
-description: A concrete unit of work tracked on the board. / Unidade concreta de trabalho no board.
-title: "[task]: "
+description: A concrete unit of work tracked on the board. / Unidade concreta de trabalho no quadro.
+title: "FRENTE 00 - "
 labels: ["task"]
-# projects: ["CarlosNeto-dev/1"]
+projects: ["CarlosNeto-dev/3"]
 body:
   - type: markdown
     attributes:
       value: |
-        Use this for planned work that already has a clear scope (no triage needed).
-        It maps 1:1 to a card in the GitHub Project.
-        _Use para trabalho planejado com escopo claro. Vira um card no GitHub Projects._
+        **Título:** `FRENTE NÚMERO - TEMA`, por exemplo `FRONT 01 - Finalizar o header`.
+        Issue mãe com dois dígitos (`FRONT 01`), sub-issue com ponto (`FRONT 01.1`).
+        Se esta tarefa depende de outra, marque em **Relationships → Blocked by** depois de criar.
 
-  - type: textarea
-    id: goal
+  - type: dropdown
+    id: frente
     attributes:
-      label: Goal / Objetivo
-      description: One or two sentences. What will exist after this is done?
+      label: Frente
+      options:
+        - INFRA
+        - DOCS
+        - FRONT
+        - 3D
     validations:
       required: true
 
-  - type: dropdown
-    id: area
+  - type: textarea
+    id: descricao
     attributes:
-      label: Area / Área
-      options:
-        - app (React / TS / SCSS)
-        - animation (GSAP)
-        - 3D (react-three-fiber / Blender)
-        - docker / compose
-        - dev-container
-        - CI / release
-        - docs
+      label: Descrição
+      description: O que deve ser feito, em texto corrido.
     validations:
       required: true
 
   - type: input
-    id: milestone
+    id: requisitos
     attributes:
-      label: Target version / Versão alvo
-      placeholder: v0.3.0
+      label: Requisitos
+      description: Os requisitos que esta tarefa atende, se houver.
+      placeholder: RF-005, RF-006
 
-  - type: textarea
-    id: subtasks
+  - type: input
+    id: versao
     attributes:
-      label: Sub-tasks / Subtarefas
-      value: |
-        - [ ] Implementation
-        - [ ] Tests
-        - [ ] Docs / README updated
-    validations:
-      required: true
-
-  - type: textarea
-    id: done
-    attributes:
-      label: Definition of done / Definição de pronto
-      value: |
-        - [ ] `pnpm lint && pnpm typecheck && pnpm test && pnpm build` all pass
-        - [ ] PR merged into `develop`
-        - [ ] This issue auto-closed by the PR (`Closes #<id>`)
-    validations:
-      required: true
+      label: Versão alvo
+      placeholder: v0.2.0
