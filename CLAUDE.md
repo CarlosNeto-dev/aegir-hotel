@@ -28,10 +28,8 @@ Current state (checked 2026-11-24):
 ## Working with the owner (Neto, `@CarlosNeto-dev`)
 
 - Reply in **Portuguese (pt-BR)**. Use short blocks and explain from the root.
-- **Never commit or push.** The owner commits himself. The one exception is the
-  `github-agent` subagent, and only when Neto explicitly asks and approved the exact
-  text. Never add a `Co-Authored-By` or any other Claude trailer to a commit
-  message or PR.
+- **Never commit or push.** The owner commits himself. Never add a
+  `Co-Authored-By` or any other Claude trailer to a commit message or PR.
 - On-screen text is Portuguese. The **site** must never say the hotel is
   fictional. The repo READMEs may say so.
 - Ask before installing a dependency, adding a service or changing Docker, CI,
@@ -46,7 +44,6 @@ Current state (checked 2026-11-24):
 | `docker/` | `Dockerfile.frontend` (multi-stage), `docker-compose.yml`, `.env.example`. Two local, git-ignored files: `.env` (copied from the example) and the optional `docker-compose.override.yml` (NVIDIA GPU). |
 | `.devcontainer/frontend/` | The VS Code dev-container. It reuses `docker/docker-compose.yml` only, so the override is not merged there. |
 | `.github/` | `CODEOWNERS`, issue/PR templates, `workflows/release.yml` (CI runs **only** on `v*.*.*` tags), and `CONTRIBUTING.md` (+ `.pt-BR`), which is the workflow guide. There is no `README.md` here, because it would replace the root README as the repo home page. |
-| `.claude/` | `agents/`: the agent team. `tutor` is the main session (`claude --agent tutor`, or `"agent": "tutor"` in the git-ignored `.claude/settings.local.json` so every new chat, VS Code extension included, opens as it): a study mode that never writes code and calls the others (subagents cannot call each other). `owner` gives the final verdict on unclear decisions. `syntax-reviewer`, `error-test-analyst` and `architecture-analyst` only read and report. `github-agent` reads what is pending and, only when Neto asks and approves the text, writes commits, PRs and issues through `git`/`gh`. Every agent first reads the root `CLAUDE.md` plus the docs of the area it touches. Claude Code and Cursor both read this folder. `settings.json` enables `typescript-lsp` for the project. |
 | `.dockerignore` | Lives at the repo root, because the compose build uses `context: ..`. |
 | `scripts/check-docs.sh` | Validates every Mermaid diagram and every local link. Run it after touching any `.md`. |
 

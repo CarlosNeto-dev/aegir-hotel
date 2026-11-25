@@ -68,7 +68,6 @@ aegir-hotel/
 │   ├── ISSUE_TEMPLATE/                # formulários bug / feature / task (GitHub Projects)
 │   ├── PULL_REQUEST_TEMPLATE.md
 │   └── workflows/release.yml          # CI — roda SOMENTE numa tag v*.*.*
-├── .claude/agents/                   # agentes para Claude Code / Cursor (tutor, owner, sintaxe, erros/testes, arquitetura, GitHub)
 ├── .devcontainer/
 │   ├── frontend/devcontainer.json     # dev-container VS Code / Codespaces (reusa o compose)
 │   └── README.md · README.pt-BR.md · CLAUDE.md
