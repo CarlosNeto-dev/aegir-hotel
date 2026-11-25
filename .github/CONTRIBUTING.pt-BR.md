@@ -92,10 +92,12 @@ e [`../.devcontainer/README.pt-BR.md`](../.devcontainer/README.pt-BR.md).
    ([bug](ISSUE_TEMPLATE/bug_report.yml) ·
    [feature](ISSUE_TEMPLATE/feature_request.yml) ·
    [task](ISSUE_TEMPLATE/task.yml)). Issues em branco estão desativadas.
-2. Um mantenedor faz a triagem, aplica labels e coloca no board do
-   **GitHub Projects** (`Triage → Todo → In progress → In review → Done`).
-   Preencha a chave `projects:` em cada formulário quando o board existir.
-3. Pegue um card em **Todo**, se atribua, mova para **In progress**.
+2. Um mantenedor aplica labels e adiciona a issue ao
+   [board do GitHub Projects](https://github.com/users/CarlosNeto-dev/projects/3)
+   (`To do` → `In Progress` → `In Review` → `Done`; `Canceled` para trabalho
+   descartado). Os formulários ainda não colocam a issue no board sozinhos: a
+   chave `projects:` deles está comentada.
+3. Pegue um card em **To do**, se atribua, mova para **In Progress**.
 4. Seu PR fecha a issue: coloque `Closes #<id>` na descrição. O merge move o card
    para **Done** automaticamente.
 
@@ -111,7 +113,8 @@ git switch -c feature/1234-cena-lobby
 
 # ...trabalhe, commitando aos poucos...
 
-pnpm lint && pnpm typecheck && pnpm test && pnpm build
+# dentro do dev-container; ainda não existe script de lint nem de teste
+pnpm typecheck && pnpm build
 
 git push -u origin feature/1234-cena-lobby
 # abra o PR no GitHub, base = develop, preencha o template
@@ -121,8 +124,11 @@ git push -u origin feature/1234-cena-lobby
 
 - A branch base é **`develop`** (só PRs de release miram `main`).
 - O checklist do [template de PR](PULL_REQUEST_TEMPLATE.md) deve estar completo.
-- Pelo menos uma aprovação de **[CODEOWNERS](CODEOWNERS)**.
-- Todos os checks verdes. Squash-merge; o título do PR vira a linha de changelog.
+- Um dono do **[CODEOWNERS](CODEOWNERS)** (o Neto) revisa todo PR. O ruleset
+  só obriga que a mudança chegue por PR (0 aprovações exigidas), então isso é
+  uma regra do time, não um bloqueio do GitHub.
+- Não há checks no PR: a CI só roda com uma tag `v*.*.*`. Rode os comandos acima
+  antes do push. Squash-merge; o título do PR vira a linha de changelog.
   **Exceção:** PRs de release, e PRs que sincronizam a `main` com a `develop`,
   usam **"Create a merge commit"**. Um squash ali faz as duas branches divergirem.
 - Atualize a documentação — `README.md` **e** `README.pt-BR.md` — no mesmo PR.

@@ -92,10 +92,12 @@ off `develop` and merges back into it.
    ([bug](ISSUE_TEMPLATE/bug_report.yml) ·
    [feature](ISSUE_TEMPLATE/feature_request.yml) ·
    [task](ISSUE_TEMPLATE/task.yml)). Blank issues are disabled.
-2. A maintainer triages it, applies labels and drops it on the **GitHub Project**
-   board (`Triage` → `Todo` → `In progress` → `In review` → `Done`). Set the
-   `projects:` key in each form once your board exists.
-3. Pick a card in **Todo**, assign yourself, move it to **In progress**.
+2. A maintainer applies labels and adds it to the
+   [GitHub Project board](https://github.com/users/CarlosNeto-dev/projects/3)
+   (`To do` → `In Progress` → `In Review` → `Done`; `Canceled` for dropped work).
+   The forms do not add it to the board by themselves yet: their `projects:` key
+   is commented out.
+3. Pick a card in **To do**, assign yourself, move it to **In Progress**.
 4. Your PR closes the issue: put `Closes #<id>` in the description. Merging moves
    the card to **Done** automatically.
 
@@ -111,7 +113,8 @@ git switch -c feature/1234-lobby-scene
 
 # ...work, committing as you go...
 
-pnpm lint && pnpm typecheck && pnpm test && pnpm build
+# inside the dev-container; there is no lint or test script yet
+pnpm typecheck && pnpm build
 
 git push -u origin feature/1234-lobby-scene
 # open the PR on GitHub, base = develop, fill the template
@@ -121,8 +124,11 @@ git push -u origin feature/1234-lobby-scene
 
 - Base branch is **`develop`** (only release PRs target `main`).
 - The [PR template](PULL_REQUEST_TEMPLATE.md) checklist must be complete.
-- At least one **[CODEOWNERS](CODEOWNERS)** approval.
-- All checks green. Squash-merge; the PR title becomes the changelog line.
+- A **[CODEOWNERS](CODEOWNERS)** owner (Neto) reviews every PR. The ruleset
+  only forces changes to arrive through a PR (0 required approvals), so this is
+  a team rule, not a GitHub block.
+- There are no PR checks: CI runs only on a `v*.*.*` tag. Run the commands above
+  before you push. Squash-merge; the PR title becomes the changelog line.
   **Exception:** release PRs, and PRs that sync `main` into `develop`, use
   **"Create a merge commit"**. A squash there makes the two branches drift apart.
 - Update docs — `README.md` **and** `README.pt-BR.md` — in the same PR.
