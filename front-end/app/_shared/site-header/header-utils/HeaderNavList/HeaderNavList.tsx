@@ -7,22 +7,16 @@ import SectionLink from "../SectionLink/SectionLink";
 import styles from "./HeaderNavList.module.scss";
 
 type HeaderNavListProps = {
-  variant: "bar" | "drawer";
   items?: readonly NavItem[];
-  onNavigate?: () => void;
 };
 
-export default function HeaderNavList({
-  variant,
-  items = NAV_ITEMS,
-  onNavigate,
-}: HeaderNavListProps) {
+export default function HeaderNavList({ items = NAV_ITEMS }: HeaderNavListProps) {
   const activeId = useActiveId();
   const rootRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const root = rootRef.current;
-    if (!root || variant !== "bar") return;
+    if (!root) return;
 
     const placeIndicator = () => {
       const link = root.querySelector<HTMLElement>('[aria-current="location"]');
@@ -31,20 +25,24 @@ export default function HeaderNavList({
       root.style.setProperty("--ind-o", link ? "1" : "0");
     };
 
+    /*
+     * ResizeObserver avisa sempre que a lista muda de tamanho: janela, fonte
+     * que terminou de carregar, tamanho do texto nos Ajustes. Só "resize"
+     * da janela deixaria a pílula fora do lugar nesses casos.
+     */
     placeIndicator();
-    window.addEventListener("resize", placeIndicator);
-    return () => window.removeEventListener("resize", placeIndicator);
-  }, [activeId, variant]);
+    const observer = new ResizeObserver(placeIndicator);
+    observer.observe(root);
+    return () => observer.disconnect();
+  }, [activeId]);
 
   return (
     <div
       ref={rootRef}
-      className={`${styles.root} ${styles[variant]}`}
+      className={styles.root}
       style={{ "--ind-o": 0 } as CSSProperties}
     >
-      {variant === "bar" && (
-        <span className={styles.indicator} aria-hidden="true" />
-      )}
+      <span className={styles.indicator} aria-hidden="true" />
       <ul className={styles.list}>
         {items.map((item) => (
           <li key={item.id}>
@@ -52,7 +50,6 @@ export default function HeaderNavList({
               href={item.href}
               className={styles.link}
               aria-current={item.id === activeId ? "location" : undefined}
-              onNavigate={onNavigate}
             >
               {item.label}
             </SectionLink>

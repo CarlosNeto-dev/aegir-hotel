@@ -1,0 +1,164 @@
+@use "tools/breakpoints" as *;
+@use "tools/variables" as *;
+@use "tools/mixins" as *;
+
+.root {
+  display: flex;
+  flex-direction: column;
+  padding-inline: var(--gutter);
+  @include fluid(gap, 3.6rem, 6.4rem, 12rem);
+  @include fluid(padding-block, 7.2rem, 12rem, 22rem);
+
+  @include from-desktop {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+    align-items: center;
+  }
+
+  .intro {
+    display: flex;
+    flex-direction: column;
+    @include fluid(gap, 1.8rem, 2.4rem, 4.4rem);
+  }
+
+  .form {
+    margin-bottom: 6.4rem;
+
+    @include from-tablet {
+      margin-bottom: 0;
+    }
+  }
+
+  .kicker {
+    @include kicker;
+  }
+
+  .headline {
+    max-width: 10ch;
+    @include display(4rem, 6.4rem, 11.2rem);
+  }
+
+  .lead {
+    max-width: 42ch;
+    @include copy;
+  }
+
+  .info {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin-top: 0.8rem;
+    @include fluid(gap, 2rem, 2.8rem, 5rem);
+
+    dt {
+      margin-bottom: 0.8rem;
+      @include field-label;
+    }
+
+    dd {
+      color: var(--color-ink);
+      font-family: var(--font-body);
+      font-weight: 400;
+      line-height: 1.4;
+      @include fluid(font-size, 1.3rem, 1.4rem, 2.4rem);
+    }
+  }
+
+  .form {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    border: 1px solid var(--color-line);
+    background: var(--color-white);
+    @include fluid(gap, 1.6rem, 2rem, 3.6rem);
+    @include fluid(padding, 2rem, 3.2rem, 5.6rem);
+    @include fluid(border-radius, 2rem, 2.8rem, 4.8rem);
+  }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    min-width: 0;
+    grid-column: 1 / -1;
+
+    @media (min-width: 480px) {
+      grid-column: auto;
+    }
+
+    &.full {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      @include field-label;
+    }
+
+    input,
+    select {
+      @include input-box;
+      background: var(--color-paper);
+    }
+
+    @include from-tv {
+      gap: 1.4rem;
+    }
+  }
+
+  .estimate {
+    display: flex;
+    grid-column: 1 / -1;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1.6rem;
+    padding-top: 1.6rem;
+    border-top: 1px solid var(--color-line);
+  }
+
+  .estimateText {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    min-width: 0;
+
+    span {
+      @include field-label;
+    }
+
+    small {
+      color: var(--color-grey);
+      font-family: var(--font-body);
+      line-height: 1.4;
+      @include fluid(font-size, 1.2rem, 1.25rem, 2.2rem);
+    }
+  }
+
+  .total {
+    flex: none;
+    color: var(--color-ink);
+    font-family: var(--font-title);
+    font-weight: 400;
+    line-height: 1;
+    @include fluid(font-size, 2.6rem, 3.4rem, 6rem);
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    grid-column: 1 / -1;
+    gap: 1rem;
+  }
+
+  .submit {
+    @include pill-button;
+    width: auto;
+  }
+
+  .status {
+    grid-column: 1 / -1;
+    min-height: 1.4em;
+    color: var(--color-wood);
+    font-family: var(--font-body);
+    font-weight: 400;
+    line-height: 1.4;
+    @include fluid(font-size, 1.25rem, 1.3rem, 2.3rem);
+  }
+}

@@ -9,7 +9,7 @@ export default function SettingsCapsule() {
   const { layer } = usePanels();
 
   return (
-    <div className={styles.root} data-layer={layer ?? undefined}>
+    <div className={styles.root} data-layer={layer ?? undefined} data-settings-capsule="">
       <ThemeToggle />
       <span className={styles.divider} aria-hidden="true" />
       <SettingsButton />

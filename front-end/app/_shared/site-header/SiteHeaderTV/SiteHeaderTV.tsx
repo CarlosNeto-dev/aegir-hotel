@@ -15,7 +15,7 @@ export default function SiteHeaderTV() {
       <div className={styles.face}>
         <div className={styles.navLeft}>
           <nav aria-label="Seções da página, início">
-            <HeaderNavList variant="bar" items={NAV_LEFT} />
+            <HeaderNavList items={NAV_LEFT} />
           </nav>
         </div>
 
@@ -25,7 +25,7 @@ export default function SiteHeaderTV() {
 
         <div className={styles.navRight}>
           <nav aria-label="Seções da página, fim">
-            <HeaderNavList variant="bar" items={NAV_RIGHT} />
+            <HeaderNavList items={NAV_RIGHT} />
           </nav>
         </div>
       </div>

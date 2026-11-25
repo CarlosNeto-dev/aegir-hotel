@@ -1,0 +1,51 @@
+@use "tools/breakpoints" as *;
+@use "tools/mixins" as *;
+
+.root {
+  padding-inline: var(--gutter);
+  background: var(--color-white);
+  @include fluid(padding-block, 5.6rem, 8rem, 14rem);
+
+  .list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 3.2rem 1.6rem;
+
+    @include from-tablet {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+  }
+
+  .item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    text-align: center;
+
+    &:last-child {
+      grid-column: 1 / -1;
+
+      @include from-tablet {
+        grid-column: auto;
+      }
+    }
+  }
+
+  .value {
+    color: var(--color-ink);
+    font-family: var(--font-title);
+    font-weight: 400;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    @include fluid(font-size, 4.4rem, 5.6rem, 10rem);
+  }
+
+  .label {
+    max-width: 16ch;
+    color: var(--color-grey);
+    font-family: var(--font-body);
+    line-height: 1.4;
+    @include fluid(font-size, 1.2rem, 1.25rem, 2.2rem);
+  }
+}

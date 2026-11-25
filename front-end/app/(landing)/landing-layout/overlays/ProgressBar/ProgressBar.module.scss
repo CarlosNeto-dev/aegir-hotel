@@ -1,0 +1,28 @@
+@use "tools/breakpoints" as *;
+@use "tools/variables" as *;
+
+.root {
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: $z-progress;
+  height: 0.3rem;
+  pointer-events: none;
+
+  @include from-tv {
+    height: 0.6rem;
+  }
+
+  .bar {
+    display: block;
+    height: 100%;
+    background: var(--color-progress-bar);
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+}
+
+:global(:root[data-progress-bar="off"]) .root {
+  display: none;
+}

@@ -1,0 +1,107 @@
+@use "tools/breakpoints" as *;
+@use "tools/variables" as *;
+@use "tools/mixins" as *;
+
+.root {
+  position: fixed;
+  top: 50%;
+  left: 1.4rem;
+  z-index: $z-aside;
+  display: none;
+  translate: 0 -50%;
+
+  @include from-desktop {
+    display: block;
+  }
+
+  @include from-tv {
+    left: 3.2rem;
+  }
+
+  .list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    list-style: none;
+  }
+
+  .link {
+    @include row-center;
+    gap: 1.2rem;
+    padding: 0.7rem 0.6rem 0.7rem 0;
+    border-radius: $pill;
+    color: var(--color-ink);
+
+    &:focus-visible {
+      outline: none;
+
+      .dot {
+        @include focus-ring;
+      }
+    }
+
+    @include from-tv {
+      gap: 2.4rem;
+      padding-block: 1.4rem;
+    }
+  }
+
+  .dot {
+    flex: none;
+    width: 0.6rem;
+    height: 0.6rem;
+    margin-left: 0.4rem;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: 0.22;
+    transition:
+      opacity 0.3s linear,
+      scale 0.3s var(--ease);
+
+    @include from-tv {
+      width: 1.1rem;
+      height: 1.1rem;
+    }
+  }
+
+  .label {
+    padding: 0.7rem 1.2rem;
+    border-radius: $pill;
+    font-family: var(--font-body);
+    font-weight: 400;
+    line-height: 1;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    translate: -0.8rem 0;
+    transition:
+      opacity 0.3s linear,
+      translate 0.45s var(--ease);
+    @include glass;
+    @include fluid(font-size, 1.2rem, 1.25rem, 2.2rem);
+
+    b {
+      margin-right: 0.6rem;
+      color: var(--color-grey);
+      font-family: var(--font-mono);
+      font-size: 0.8em;
+      font-weight: 400;
+      letter-spacing: 0.12em;
+    }
+  }
+
+  .link:hover .dot {
+    opacity: 0.6;
+  }
+
+  .link[aria-current] .dot {
+    opacity: 1;
+    scale: 1.7;
+  }
+
+  &:hover .label,
+  .link:focus-visible .label {
+    opacity: 1;
+    translate: 0;
+  }
+}

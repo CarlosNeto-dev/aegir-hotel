@@ -1,0 +1,42 @@
+$spread: 7;
+
+.root {
+  opacity: calc(var(--in, 1) * (1 - var(--out, 0)));
+
+  .word {
+    display: inline-block;
+    white-space: nowrap;
+  }
+
+  .char {
+    display: inline-block;
+  }
+}
+
+:global(:root[data-letters]) .root {
+  opacity: 1;
+
+  .char {
+    --enter: clamp(
+      0,
+      calc((var(--in, 1) * (var(--n) + #{$spread}) - var(--i)) / #{$spread}),
+      1
+    );
+    --exit: clamp(
+      0,
+      calc((var(--out, 0) * (var(--n) + #{$spread}) - var(--i)) / #{$spread}),
+      1
+    );
+    opacity: calc(var(--enter) * (1 - var(--exit)));
+    filter: blur(calc(var(--exit) * 0.35em));
+    transform: translate3d(
+        calc(var(--exit) * 0.4em * var(--move)),
+        calc(
+          ((1 - var(--enter)) * 0.5em - var(--exit) * 0.9em) * var(--move)
+        ),
+        0
+      )
+      rotate(calc(var(--exit) * 10deg * var(--move)));
+    will-change: opacity, transform;
+  }
+}

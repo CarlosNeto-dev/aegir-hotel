@@ -81,16 +81,52 @@ export const SPEED_OPTIONS = [
   { id: "fast", label: "Rápida" },
 ] as const;
 
+/* As fontes extras só são baixadas quando escolhidas (veja layout.tsx e _settings.scss). */
+export const FONT_OPTIONS = [
+  {
+    id: "classic",
+    label: "Clássica",
+    hint: "Serifa de revista com texto limpo",
+    title: "var(--font-title-web), Georgia, serif",
+    body: "var(--font-body-web), system-ui, sans-serif",
+  },
+  {
+    id: "elegant",
+    label: "Elegante",
+    hint: "Serifa fina e delicada",
+    title: "var(--font-elegant-title), Georgia, serif",
+    body: "var(--font-elegant-body), system-ui, sans-serif",
+  },
+  {
+    id: "modern",
+    label: "Moderna",
+    hint: "Serifa forte e texto redondo",
+    title: "var(--font-modern-title), Georgia, serif",
+    body: "var(--font-modern-body), system-ui, sans-serif",
+  },
+  {
+    id: "easy",
+    label: "Leitura fácil",
+    hint: "Letras bem diferentes entre si",
+    title: "var(--font-easy), system-ui, sans-serif",
+    body: "var(--font-easy), system-ui, sans-serif",
+  },
+] as const;
+
+
+/* O formato das fotos do site inteiro (PhotoFragment), escolhido nos Ajustes. */
+export const PHOTO_SHAPE_OPTIONS = [
+  { id: "rounded", label: "Cantos redondos" },
+  { id: "square", label: "Retas" },
+  { id: "arch", label: "Arco" },
+  { id: "fragment", label: "Fragmentos" },
+] as const;
+
 export const GRAPHICS_SWITCHES = [
   {
     id: "progressBar",
     label: "Barra de progresso",
     summary: "A linha no topo da página. Sem ela, fica só o índice lateral.",
-  },
-  {
-    id: "photoCut",
-    label: "Recorte das fotos",
-    summary: "As fotos em fragmentos. Sem ele, elas ficam retangulares.",
   },
   {
     id: "smoothScroll",
@@ -106,6 +142,8 @@ export type FocusId = (typeof FOCUS_OPTIONS)[number]["id"];
 export type TextSizeId = (typeof TEXT_SIZE_OPTIONS)[number]["id"];
 export type SwitchId = (typeof ACCESSIBILITY_SWITCHES)[number]["id"];
 export type GraphicsId = (typeof GRAPHICS_SWITCHES)[number]["id"];
+export type FontId = (typeof FONT_OPTIONS)[number]["id"];
+export type PhotoShapeId = (typeof PHOTO_SHAPE_OPTIONS)[number]["id"];
 export type SpeedId = (typeof SPEED_OPTIONS)[number]["id"];
 export type PresetId = (typeof PRESET_OPTIONS)[number]["id"];
 
@@ -119,19 +157,21 @@ export type Settings = {
   letters: boolean;
   speed: SpeedId;
   textSize: TextSizeId;
+  font: FontId;
+  photoShape: PhotoShapeId;
 } & Record<GraphicsId, boolean> &
   Record<SwitchId, boolean>;
 
 export type PresetValues = Pick<
   Settings,
-  "cursor" | "letters" | "photoCut" | "progressBar" | "smoothScroll" | "speed"
+  "cursor" | "letters" | "photoShape" | "progressBar" | "smoothScroll" | "speed"
 >;
 
 export const PRESETS: Record<PresetId, PresetValues> = {
   light: {
     cursor: "system",
     letters: false,
-    photoCut: false,
+    photoShape: "rounded",
     progressBar: false,
     smoothScroll: false,
     speed: "fast",
@@ -139,7 +179,7 @@ export const PRESETS: Record<PresetId, PresetValues> = {
   medium: {
     cursor: "system",
     letters: false,
-    photoCut: false,
+    photoShape: "rounded",
     progressBar: true,
     smoothScroll: true,
     speed: "normal",
@@ -147,7 +187,7 @@ export const PRESETS: Record<PresetId, PresetValues> = {
   heavy: {
     cursor: "system",
     letters: true,
-    photoCut: false,
+    photoShape: "rounded",
     progressBar: true,
     smoothScroll: true,
     speed: "normal",
@@ -162,6 +202,7 @@ export const DEFAULT_SETTINGS: Settings = {
   focus: "frame",
   focusColor: "ink",
   textSize: "normal",
+  font: "classic",
   reduceMotion: false,
   highContrast: false,
   strongFocus: false,

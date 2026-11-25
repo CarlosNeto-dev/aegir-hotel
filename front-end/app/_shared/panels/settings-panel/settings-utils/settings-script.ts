@@ -13,7 +13,7 @@ const DEVICE_PRESETS: DevicePresets = {
   strong: PRESETS.heavy,
 };
 
-export function readSettings(
+function readSettings(
   key: string,
   defaults: Settings,
   presets: DevicePresets,
@@ -24,7 +24,12 @@ export function readSettings(
     saved = JSON.parse(localStorage.getItem(key) || "null");
   } catch (error) {}
 
-  if (saved) return Object.assign({}, defaults, saved);
+  if (saved) {
+    // Quem salvou antes, quando o recorte era só liga/desliga, continua igual.
+    if (!saved.photoShape && saved.photoCut) saved.photoShape = "fragment";
+    delete saved.photoCut;
+    return Object.assign({}, defaults, saved);
+  }
 
   const device = navigator as Navigator & { deviceMemory?: number };
   const cores = device.hardwareConcurrency || 8;
@@ -49,7 +54,8 @@ export function applySettings(settings: Settings) {
   root.dataset.textSize = settings.textSize;
   root.dataset.speed = settings.speed;
   root.dataset.progressBar = settings.progressBar ? "on" : "off";
-  root.dataset.photoCut = settings.photoCut ? "on" : "off";
+  root.dataset.photoShape = settings.photoShape;
+  root.dataset.font = settings.font;
 
   flags.forEach(([name, on]) => root.toggleAttribute(`data-${name}`, on));
 

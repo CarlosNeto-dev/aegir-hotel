@@ -21,3 +21,11 @@
     }
   }
 }
+
+.font {
+  padding-top: 2rem;
+
+  @include from-tv {
+    padding-top: 3.2rem;
+  }
+}

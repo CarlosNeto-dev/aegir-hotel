@@ -1,0 +1,111 @@
+@use "tools/breakpoints" as *;
+@use "tools/mixins" as *;
+
+.root {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+
+  .legend {
+    margin-bottom: 1.2rem;
+    padding: 0;
+    color: var(--color-grey);
+    font: 500 1.05rem/1 var(--font-mono);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+
+    @include from-tv {
+      margin-bottom: 2rem;
+      font-size: 1.8rem;
+    }
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.8rem;
+
+    @include from-tv {
+      gap: 1.4rem;
+    }
+  }
+
+  .option {
+    display: flex;
+    min-width: 0;
+    cursor: pointer;
+  }
+
+  .input {
+    @include visually-hidden;
+  }
+
+  .card {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 0.4rem;
+    min-width: 0;
+    padding: 1.2rem 1.4rem 1.3rem;
+    border: 1px solid var(--color-line);
+    border-radius: 1.2rem;
+    color: var(--color-ink);
+    transition:
+      border-color 0.25s linear,
+      background 0.25s linear;
+
+    @include from-tv {
+      gap: 0.8rem;
+      padding: 2rem 2.4rem;
+      border-radius: 2rem;
+    }
+  }
+
+  .sample {
+    font-family: var(--sample-title);
+    font-size: 3rem;
+    line-height: 1;
+
+    @include from-tv {
+      font-size: 5rem;
+    }
+  }
+
+  .name {
+    font-family: var(--sample-body);
+    font-size: 1.4rem;
+    font-weight: 500;
+
+    @include from-tv {
+      font-size: 2.4rem;
+    }
+  }
+
+  .hint {
+    color: var(--color-grey);
+    font-family: var(--sample-body);
+    font-size: 1.15rem;
+    line-height: 1.35;
+
+    @include from-tv {
+      font-size: 2rem;
+    }
+  }
+
+  @media (hover: hover) {
+    .option:hover .card {
+      border-color: var(--color-grey);
+    }
+  }
+
+  .input:checked + .card {
+    border-color: var(--color-ink);
+    background: var(--color-glass-hover);
+    box-shadow: inset 0 0 0 1px var(--color-ink);
+  }
+
+  .input:focus-visible + .card {
+    @include focus-ring;
+  }
+}

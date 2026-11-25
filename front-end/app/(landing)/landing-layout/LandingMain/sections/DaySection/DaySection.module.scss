@@ -1,0 +1,320 @@
+@use "tools/breakpoints" as *;
+@use "tools/variables" as *;
+@use "tools/mixins" as *;
+
+.root {
+  --sun: 0;
+  --dusk: 0;
+  --night: 0;
+  // O céu da seção: papel de dia, um azul de fim de tarde que vai escurecendo.
+  --sky: color-mix(in srgb, var(--color-dusk) calc(var(--dusk) * 70%), var(--color-paper));
+  display: flex;
+  flex-direction: column;
+  padding-inline: var(--gutter);
+  // Em cima e embaixo a cor volta a ser o papel: a seção se emenda com a de
+  // cima (Comparar) e a de baixo (Galeria) sem uma linha de corte.
+  background: linear-gradient(
+    to bottom,
+    var(--color-paper) 0,
+    var(--sky) min(28vh, 24rem),
+    var(--sky) calc(100% - min(40vh, 36rem)),
+    var(--color-paper) 100%
+  );
+  @include fluid(gap, 3.2rem, 6.4rem, 11rem);
+  @include fluid(padding-block, 7.2rem, 12rem, 22rem);
+
+  .heading {
+    display: flex;
+    flex-direction: column;
+    gap: 1.8rem;
+
+    @include from-desktop {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) minmax(0, 32rem);
+      align-items: end;
+      gap: 4.8rem;
+    }
+  }
+
+  .kicker {
+    @include kicker;
+
+    @include from-desktop {
+      align-self: center;
+    }
+  }
+
+  .headline {
+    max-width: 16ch;
+    @include display(3.4rem, 5.2rem, 9.2rem);
+  }
+
+  .note {
+    @include copy;
+
+    @include from-tv {
+      max-width: 60rem;
+    }
+  }
+
+  .grid {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+
+    @include from-tablet {
+      display: grid;
+      grid-template-columns: minmax(18rem, 0.32fr) minmax(0, 1fr);
+      align-items: start;
+      gap: clamp(3.2rem, 5vw, 12rem);
+    }
+  }
+
+  .clock {
+    position: sticky;
+    top: 7.4rem;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    gap: 1.6rem;
+    padding: 1rem 1.8rem;
+    border-radius: 2.4rem;
+    @include glass;
+
+    @include from-tablet {
+      top: 14rem;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 3.2rem;
+      padding: 0;
+      border: 0;
+      border-radius: 0;
+      background: none;
+      box-shadow: none;
+      backdrop-filter: none;
+    }
+
+    @include from-tv {
+      top: 28rem;
+      gap: 6rem;
+    }
+  }
+
+  .reading {
+    display: flex;
+    flex: none;
+    flex-direction: column;
+    gap: 0.4rem;
+
+    @include from-tablet {
+      gap: 1rem;
+    }
+  }
+
+  .readings {
+    display: grid;
+  }
+
+  .now {
+    display: flex;
+    flex-direction: column;
+    grid-area: 1 / 1;
+    gap: 0.4rem;
+    visibility: hidden;
+
+    &[data-current] {
+      visibility: visible;
+    }
+
+    @include from-tablet {
+      gap: 1rem;
+    }
+  }
+
+  .label {
+    display: none;
+    @include field-label;
+
+    @include from-tablet {
+      display: block;
+    }
+  }
+
+  .hour {
+    color: var(--color-ink);
+    font-family: var(--font-title);
+    font-weight: 400;
+    line-height: 0.9;
+    @include fluid(font-size, 3.2rem, 8.8rem, 15rem);
+  }
+
+  .where {
+    color: var(--color-grey);
+    font-family: var(--font-body);
+    line-height: 1.2;
+    @include fluid(font-size, 1.15rem, 1.4rem, 2.4rem);
+  }
+
+  .sky {
+    --sky-height: 3.6rem;
+    position: relative;
+    flex: 1;
+    min-width: 0;
+    padding-top: var(--sky-height);
+
+    @include from-tablet {
+      --sky-height: clamp(5.6rem, 6vw, 14rem);
+    }
+  }
+
+  .arc {
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    height: var(--sky-height);
+    border: 1px dashed var(--color-grey-light);
+    border-bottom: 1px solid var(--color-ink);
+    border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+    opacity: 0.55;
+  }
+
+  // O astro: anda pelo arco com --sun (cos dá o x, sin dá a altura).
+  .body {
+    position: absolute;
+    top: var(--sky-height);
+    left: calc(50% - cos(var(--sun) * 180deg) * 50%);
+    display: grid;
+    width: 2.2rem;
+    height: 2.2rem;
+    translate: -50% calc(-50% - sin(var(--sun) * 180deg) * var(--sky-height));
+
+    svg {
+      grid-area: 1 / 1;
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+    }
+
+    @include from-tablet {
+      width: 2.8rem;
+      height: 2.8rem;
+    }
+
+    @include from-tv {
+      width: 4.4rem;
+      height: 4.4rem;
+    }
+  }
+
+  // O sol: amarelo de dia, laranja no fim da tarde (--dusk). Com a noite
+  // (--night de 0 a 1) ele gira para trás, encolhe e some.
+  .sun {
+    --glow: color-mix(in srgb, var(--color-sun-late) calc(var(--dusk) * 100%), var(--color-sun-day));
+    color: var(--glow);
+    filter: drop-shadow(0 0 0.6rem color-mix(in srgb, var(--glow) 55%, transparent));
+    opacity: calc(1 - var(--night));
+    transform: rotate(calc(var(--night) * -120deg)) scale(calc(1 - var(--night) * 0.6));
+  }
+
+  // A lua faz o caminho ao contrário: chega girando e crescendo até o tamanho cheio.
+  .moon {
+    color: var(--color-moon);
+    opacity: var(--night);
+    transform: rotate(calc((1 - var(--night)) * 120deg)) scale(calc(0.4 + var(--night) * 0.6));
+  }
+
+  .scale {
+    display: none;
+    justify-content: space-between;
+    padding-top: 2.8rem;
+    @include field-label;
+
+    @include from-tablet {
+      display: flex;
+    }
+  }
+
+  .list {
+    display: flex;
+    flex-direction: column;
+    list-style: none;
+    @include fluid(gap, 1.4rem, 2rem, 3.6rem);
+  }
+
+  .card {
+    display: grid;
+    grid-template-columns: minmax(0, 0.42fr) minmax(0, 1fr);
+    align-items: center;
+    border: 1px solid var(--color-line);
+    background: color-mix(in srgb, var(--color-white) 78%, transparent);
+    opacity: 0.5;
+    transition:
+      opacity calc(0.45s * var(--pace)) linear,
+      border-color calc(0.45s * var(--pace)) linear,
+      transform calc(0.6s * var(--pace)) var(--ease);
+    @include fluid(gap, 1.4rem, 3.2rem, 5.6rem);
+    @include fluid(padding, 1.2rem, 2rem, 3.6rem);
+    @include fluid(border-radius, 1.8rem, 2.4rem, 4rem);
+
+    &[aria-current] {
+      border-color: var(--color-grey-light);
+      opacity: 1;
+      transform: translateX(calc(0.8rem * var(--move)));
+    }
+  }
+
+  .media {
+    aspect-ratio: 10 / 7.4;
+  }
+
+  .photo {
+    width: 100%;
+    height: 100%;
+  }
+
+  .text {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    min-width: 0;
+    @include fluid(gap, 0.8rem, 1.2rem, 2.2rem);
+  }
+
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.6rem 1rem;
+    @include field-label;
+  }
+
+  .sunset {
+    padding: 0.4rem 0.8rem;
+    border-radius: 999px;
+    background: var(--color-wood);
+    color: var(--color-paper);
+    font-size: 0.9em;
+    letter-spacing: 0.12em;
+  }
+
+  .title {
+    color: var(--color-ink);
+    font-family: var(--font-title);
+    font-weight: 400;
+    line-height: 1.15;
+    @include fluid(font-size, 1.8rem, 2.6rem, 4.6rem);
+  }
+
+  .copy {
+    @include copy;
+  }
+
+  .hours {
+    margin: 0;
+    color: var(--color-sand);
+    font-family: var(--font-mono);
+    letter-spacing: 0.08em;
+    @include fluid(font-size, 1.05rem, 1.15rem, 2rem);
+  }
+}

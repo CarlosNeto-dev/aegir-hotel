@@ -8,7 +8,7 @@ import SiteHeaderMobile from "../SiteHeaderMobile/SiteHeaderMobile";
 import SiteHeaderTV from "../SiteHeaderTV/SiteHeaderTV";
 import styles from "./SiteHeaderLayout.module.scss";
 
-export function SiteHeaderLayout() {
+export default function SiteHeaderLayout() {
   const rootRef = useRef<HTMLDivElement>(null);
   const { layer } = usePanels();
   const hidden = useHeaderHidden(rootRef, layer !== null);

@@ -48,3 +48,8 @@
     pointer-events: none;
   }
 }
+
+// Na landing da TV o coverflow tem a marca e os passos dele: o header sai.
+:global(:root[data-tv-landing]) .root {
+  display: none;
+}

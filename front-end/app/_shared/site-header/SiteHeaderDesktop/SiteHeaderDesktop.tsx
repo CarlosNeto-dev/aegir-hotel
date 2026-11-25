@@ -13,7 +13,7 @@ export default function SiteHeaderDesktop() {
 
       <div className={styles.nav}>
         <nav aria-label="Seções da página">
-          <HeaderNavList variant="bar" />
+          <HeaderNavList />
         </nav>
       </div>
 
