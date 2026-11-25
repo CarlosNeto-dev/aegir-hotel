@@ -14,6 +14,13 @@ backend/Python service unless asked.
 The repo is a **scaffold**: `front-end/` holds the Next.js skeleton (most files are
 still empty placeholders) — `front-end/CLAUDE.md` is the source of truth for it.
 
+**Docs search (RAG) is external and optional.** The private `agent-rag` project
+indexes this repo's English `.md` files and serves them as the MCP tool
+`mcp__agent-rag__search_repo_docs`, registered per machine in local scope (never
+versioned here). Only `architecture-analyst` lists it in `tools:` (agents without a
+`tools:` allowlist inherit it; `github-agent` does not get it). Every agent works
+without it and falls back to Grep/Read when the tool is missing.
+
 ## Layout
 
 | Path | What |
