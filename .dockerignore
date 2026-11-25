@@ -43,8 +43,8 @@ front-end/package-lock.json
 **/*.tsbuildinfo
 
 # ---- Live Sass Compiler output (regenerated from .scss) --------------
-**/src/**/*.css
-**/src/**/*.css.map
+front-end/app/**/*.css
+front-end/app/**/*.css.map
 
 # ---- 3D / Blender sources (heavy; only exported .glb/.gltf ship) -----
 **/*.blend
