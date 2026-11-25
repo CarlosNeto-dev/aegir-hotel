@@ -1,0 +1,409 @@
+@use "tools/breakpoints" as *;
+@use "tools/variables" as *;
+@use "tools/mixins" as *;
+
+.root {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding-inline: var(--gutter);
+  @include fluid(padding-top, 6.4rem, 9.6rem, 16rem);
+  /* espaço para a cápsula fixa (Tema / Ajustes) não cobrir a última linha */
+  @include fluid(padding-bottom, 10.4rem, 12rem, 18rem);
+  @include fluid(gap, 4.8rem, 7.2rem, 12rem);
+
+  .kicker {
+    @include kicker;
+  }
+
+  /* Fotos: no modo Fragmentos ficam escondidas até o fragmento pousar. */
+  &[data-awaiting] [data-slot]:not([data-landed]) .slotPhoto {
+    visibility: hidden;
+  }
+
+  .slotPhoto {
+    width: 100%;
+    height: 100%;
+  }
+
+  /* --- os 14 lugares: é onde os fragmentos pousam --- */
+  .places {
+    display: flex;
+    flex-direction: column;
+    gap: 1.6rem;
+  }
+
+  .strip {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 1rem 0.8rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    @include from-tablet {
+      grid-template-columns: repeat(14, minmax(0, 1fr));
+      gap: 1.2rem;
+    }
+  }
+
+  .thumb {
+    aspect-ratio: 1 / 0.78;
+  }
+
+  /* --- fechamento: a chamada para reservar --- */
+  .closing {
+    max-width: 76rem;
+
+    @include from-tv {
+      max-width: 130rem;
+    }
+  }
+
+  .intro {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    @include fluid(gap, 1.8rem, 2.4rem, 4rem);
+  }
+
+  .title {
+    @include display(3.6rem, 6.4rem, 11rem);
+
+    em {
+      color: var(--color-sand);
+    }
+  }
+
+  .lead {
+    max-width: 52ch;
+    margin: 0;
+    @include copy;
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1.2rem 2.4rem;
+  }
+
+  .book {
+    @include pill-button;
+    width: auto;
+  }
+
+  .mail {
+    color: var(--color-ink);
+    font-family: var(--font-mono);
+    letter-spacing: 0.04em;
+    overflow-wrap: anywhere;
+    text-decoration: underline;
+    text-decoration-color: var(--color-sand);
+    text-underline-offset: 0.35em;
+    @include fluid(font-size, 1.2rem, 1.3rem, 2.2rem);
+
+    &:focus-visible {
+      @include focus-ring;
+    }
+  }
+
+  .contact {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+    gap: 1.6rem 2.4rem;
+    margin: 0;
+    padding-top: 2rem;
+    border-top: 1px solid var(--color-line);
+
+    @include from-tv {
+      grid-template-columns: repeat(auto-fit, minmax(30rem, 1fr));
+    }
+
+    dt {
+      margin-bottom: 0.4rem;
+      color: var(--color-grey);
+      font-family: var(--font-mono);
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      @include fluid(font-size, 0.95rem, 1rem, 1.7rem);
+    }
+
+    dd {
+      margin: 0;
+      color: var(--color-ink);
+      font-family: var(--font-body);
+      line-height: 1.45;
+      @include fluid(font-size, 1.3rem, 1.4rem, 2.4rem);
+    }
+  }
+
+  /* --- informações práticas --- */
+  .info {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 3.2rem;
+    padding-top: 3.2rem;
+    border-top: 1px solid var(--color-line);
+
+    @include from-tablet {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      column-gap: 4rem;
+    }
+
+    @include from-desktop {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  .block {
+    display: flex;
+    flex-direction: column;
+    gap: 1.6rem;
+    min-width: 0;
+  }
+
+  .blockTitle {
+    margin: 0;
+    color: var(--color-ink);
+    font-family: var(--font-title);
+    font-weight: 400;
+    line-height: 1.1;
+    @include fluid(font-size, 2.2rem, 2.6rem, 4.4rem);
+  }
+
+  .rows {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+
+    div {
+      padding-block: 1rem;
+      border-bottom: 1px solid var(--color-line);
+    }
+
+    dt {
+      color: var(--color-grey);
+      font-family: var(--font-mono);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      @include fluid(font-size, 0.95rem, 1rem, 1.7rem);
+    }
+
+    dd {
+      margin: 0.3rem 0 0;
+      color: var(--color-ink);
+      font-family: var(--font-body);
+      line-height: 1.45;
+      @include fluid(font-size, 1.3rem, 1.4rem, 2.4rem);
+    }
+  }
+
+  /* --- equipe --- */
+  .team {
+    display: flex;
+    flex-direction: column;
+    gap: 1.6rem;
+  }
+
+  .members {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--color-line);
+
+    @include from-tablet {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      column-gap: 4rem;
+    }
+
+    @include from-desktop {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      column-gap: 2.4rem;
+      border-top: 0;
+    }
+
+    li {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      padding-block: 1.2rem;
+      border-bottom: 1px solid var(--color-line);
+
+      @include from-desktop {
+        padding-top: 1.6rem;
+        border-top: 1px solid var(--color-line);
+        border-bottom: 0;
+      }
+    }
+  }
+
+  .name {
+    color: var(--color-ink);
+    font-family: var(--font-body);
+    @include fluid(font-size, 1.4rem, 1.5rem, 2.5rem);
+  }
+
+  .role,
+  .missing {
+    color: var(--color-grey);
+    font-family: var(--font-mono);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    @include fluid(font-size, 0.95rem, 1rem, 1.7rem);
+  }
+
+  .link {
+    align-self: flex-start;
+    color: var(--color-sand);
+    font-family: var(--font-mono);
+    text-underline-offset: 0.3em;
+    @include fluid(font-size, 1.05rem, 1.15rem, 1.9rem);
+
+    &:focus-visible {
+      @include focus-ring;
+    }
+
+    @media (hover: hover) {
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+
+  /* --- navegação: as seções em cartões (o mesmo jeito do menu do celular) --- */
+  .nav {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  .cards {
+    display: grid;
+    grid-auto-columns: min(62vw, 24rem);
+    grid-auto-flow: column;
+    gap: 1.2rem;
+    // No celular os cartões correm para o lado, com o dedo, e param encaixados.
+    margin: 0 calc(var(--gutter) * -1);
+    padding: 0.4rem var(--gutter) 1.6rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: var(--gutter);
+    scrollbar-width: none;
+    list-style: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+
+    li {
+      scroll-snap-align: start;
+    }
+
+    @include from-tablet {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-auto-columns: auto;
+      grid-auto-flow: row;
+      margin: 0;
+      padding: 0;
+      overflow: visible;
+    }
+
+    @include from-desktop {
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 1.6rem;
+    }
+
+    @include from-tv {
+      gap: 2.8rem;
+    }
+  }
+
+  .card {
+    position: relative;
+    display: block;
+    aspect-ratio: 3 / 4;
+    overflow: hidden;
+    border: 0.4rem solid var(--color-white);
+    border-radius: 2rem;
+    background: var(--color-white);
+    box-shadow: 0 2.4rem 4rem -2.8rem rgba(var(--color-shadow-rgb), 0.7);
+    color: #fbf9f5;
+    transition: translate 0.4s var(--ease), scale 0.15s ease;
+
+    // A mesma escurecida do menu do celular: o texto branco lê em qualquer foto.
+    &::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, transparent 38%, rgba(23, 22, 20, 0.78));
+    }
+
+    &:focus-visible {
+      @include focus-ring;
+    }
+
+    &:active {
+      scale: 0.97;
+    }
+
+    @media (hover: hover) {
+      &:hover {
+        translate: 0 -0.6rem;
+      }
+
+      &:hover .cardPhoto {
+        scale: 1.06;
+      }
+    }
+
+    @include from-tv {
+      border-width: 0.6rem;
+      border-radius: 3rem;
+    }
+  }
+
+  .cardPhoto {
+    position: absolute;
+    inset: 0;
+    background: center / cover no-repeat;
+    transition: scale 0.6s var(--ease);
+  }
+
+  .cardText {
+    position: absolute;
+    right: 1.2rem;
+    bottom: 1.2rem;
+    left: 1.2rem;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+
+    small {
+      font: 500 0.95rem/1 var(--font-mono);
+      letter-spacing: 0.14em;
+      opacity: 0.8;
+      @include from-tv {
+        font-size: 1.5rem;
+      }
+    }
+
+    b {
+      font-family: var(--font-title);
+      font-weight: 400;
+      line-height: 1.05;
+      @include fluid(font-size, 2rem, 2.2rem, 3.8rem);
+    }
+
+    span {
+      font-family: var(--font-body);
+      line-height: 1.3;
+      opacity: 0.85;
+      @include fluid(font-size, 1.2rem, 1.25rem, 2rem);
+    }
+  }
+}

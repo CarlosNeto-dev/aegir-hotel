@@ -113,6 +113,10 @@ export const FONT_OPTIONS = [
   },
 ] as const;
 
+export const FOOTER_OPTIONS = [
+  { id: "simple", label: "Simples" },
+  { id: "fragments", label: "Fragmentos" },
+] as const;
 
 /* O formato das fotos do site inteiro (PhotoFragment), escolhido nos Ajustes. */
 export const PHOTO_SHAPE_OPTIONS = [
@@ -143,6 +147,7 @@ export type TextSizeId = (typeof TEXT_SIZE_OPTIONS)[number]["id"];
 export type SwitchId = (typeof ACCESSIBILITY_SWITCHES)[number]["id"];
 export type GraphicsId = (typeof GRAPHICS_SWITCHES)[number]["id"];
 export type FontId = (typeof FONT_OPTIONS)[number]["id"];
+export type FooterId = (typeof FOOTER_OPTIONS)[number]["id"];
 export type PhotoShapeId = (typeof PHOTO_SHAPE_OPTIONS)[number]["id"];
 export type SpeedId = (typeof SPEED_OPTIONS)[number]["id"];
 export type PresetId = (typeof PRESET_OPTIONS)[number]["id"];
@@ -157,6 +162,7 @@ export type Settings = {
   letters: boolean;
   speed: SpeedId;
   textSize: TextSizeId;
+  footer: FooterId;
   font: FontId;
   photoShape: PhotoShapeId;
 } & Record<GraphicsId, boolean> &
@@ -202,6 +208,7 @@ export const DEFAULT_SETTINGS: Settings = {
   focus: "frame",
   focusColor: "ink",
   textSize: "normal",
+  footer: "simple",
   font: "classic",
   reduceMotion: false,
   highContrast: false,
@@ -221,7 +228,7 @@ export function matchPreset(settings: Settings): PresetId | null {
 }
 
 export function demoVideo(
-  group: "cursor" | "touch" | "focus" | "letters",
+  group: "cursor" | "touch" | "focus" | "letters" | "footer",
   id: string,
 ) {
   return `/videos/settings/${group}-${id}`;

@@ -10,7 +10,7 @@ type ShapeOption<Id extends string> = { id: Id; label: string };
 type ShapePickerProps<Id extends string> = {
   name: string;
   legend: string;
-  group?: "cursor" | "touch" | "focus";
+  group?: "cursor" | "touch" | "focus" | "footer";
   options: readonly ShapeOption<Id>[];
   value: Id;
   onChange: (id: Id) => void;

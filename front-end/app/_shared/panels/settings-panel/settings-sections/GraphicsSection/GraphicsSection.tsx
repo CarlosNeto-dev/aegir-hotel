@@ -5,6 +5,7 @@ import SettingSwitch from "../../settings-controls/SettingSwitch/SettingSwitch";
 import ShapePicker from "../../settings-controls/ShapePicker/ShapePicker";
 import { useSettings } from "../../SettingsProvider/SettingsProvider";
 import {
+  FOOTER_OPTIONS,
   GRAPHICS_SWITCHES,
   PHOTO_SHAPE_OPTIONS,
 } from "../../settings-utils/settings-options";
@@ -51,6 +52,20 @@ export default function GraphicsSection({
           preview={(id) => <PhotoShapePreview shape={id} />}
         />
       </div>
+
+      {!tv && (
+        <div className={styles.group}>
+          <ShapePicker
+            name="footer"
+            legend="Rodapé"
+            group="footer"
+            options={FOOTER_OPTIONS}
+            value={settings.footer}
+            onChange={(id) => update("footer", id)}
+            showVideos={showVideos}
+          />
+        </div>
+      )}
     </div>
   );
 }

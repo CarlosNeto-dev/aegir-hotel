@@ -55,6 +55,7 @@ export function applySettings(settings: Settings) {
   root.dataset.speed = settings.speed;
   root.dataset.progressBar = settings.progressBar ? "on" : "off";
   root.dataset.photoShape = settings.photoShape;
+  root.dataset.footer = settings.footer;
   root.dataset.font = settings.font;
 
   flags.forEach(([name, on]) => root.toggleAttribute(`data-${name}`, on));
