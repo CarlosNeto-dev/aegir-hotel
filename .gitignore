@@ -27,10 +27,9 @@ front-end/coverage/
 # ---- Live Sass Compiler output (generated from .scss) -----------------
 #  Legacy: unused since the move to Next (it compiles .scss itself); these files were a standalone build for
 #  inspection only. They land in one dedicated folder (Live Sass `savePath`)
-#  whose contents are ignored but the folder itself is kept (.gitkeep). The
-#  broad globs are a safety net — .css under app/ is always generated here.
-front-end/app/_styles/css/*
-!front-end/app/_styles/css/.gitkeep
+#  that is ignored entirely. The broad globs are a safety net — .css under app/
+#  is always generated here.
+front-end/app/_styles/css/
 front-end/app/**/*.css
 front-end/app/**/*.css.map
 
@@ -48,6 +47,9 @@ desktop.ini
 *.log
 npm-debug.log*
 pnpm-debug.log*
+
+# ---- Claude Code: personal settings (each machine keeps its own) -----
+.claude/settings.local.json
 
 # ---- 3D source files (ship exported .glb/.gltf only) -----------------
 *.blend
