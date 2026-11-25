@@ -1,7 +1,7 @@
 name: ✨ Feature request / Proposta de funcionalidade
 description: Suggest a new capability or improvement. / Sugira uma nova capacidade ou melhoria.
 title: "[feat]: "
-labels: ["enhancement", "triage"]
+labels: ["enhancement"]
 # projects: ["CarlosNeto-dev/1"]
 body:
   - type: textarea

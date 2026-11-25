@@ -30,12 +30,10 @@ Closes #
 
 ## ✅ Checklist
 
-- [ ] `pnpm lint` passes
 - [ ] `pnpm typecheck` passes
-- [ ] `pnpm test` passes
-- [ ] `pnpm build` produces a clean `dist/`
+- [ ] `pnpm build` passes
 - [ ] Docs updated (`README.md` / folder `README.md` / `CLAUDE.md`) — both EN and PT
-- [ ] No secrets, `.env`, `node_modules/` or `dist/` committed
+- [ ] No secrets, `.env`, `node_modules/` or `.next/` committed
 - [ ] Self-reviewed the diff
 
 ## 🖼️ Screenshots / recording (UI changes)

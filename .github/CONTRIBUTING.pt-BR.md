@@ -66,7 +66,8 @@ e [`../.devcontainer/README.pt-BR.md`](../.devcontainer/README.pt-BR.md).
 | `feature/<slug>` | funcionalidade de uma issue | `develop` | `develop` | — |
 | `fix/<slug>` | correção de bug não urgente | `develop` | `develop` | — |
 | `chore/<slug>` | ferramentas / deps / docs | `develop` | `develop` | — |
-| `hotfix/<slug>` | correção urgente em produção | `main` | `main` **e** `develop` | — |
+| `release/v<x.y.z>` | teste final de uma versão: só correções e docs, nada novo | `develop` | `main` (tag), depois de volta para `develop` | — |
+| `hotfix/<slug>` | correção urgente numa versão lançada | `main` | `main` **e** `develop` | — |
 
 <!-- diagram (gitGraph) removed on request — to be re-added later -->
 
@@ -74,6 +75,12 @@ e [`../.devcontainer/README.pt-BR.md`](../.devcontainer/README.pt-BR.md).
   `hotfix/*` seguem o mesmo formato da tabela acima.
 - Branches de vida curta. Faça rebase em `develop` antes de abrir o PR.
 - Uma issue leva a uma branch, que leva a um PR.
+- Apague a branch depois que o PR entrar. Os commits e o PR ficam no histórico;
+  só a etiqueta some.
+- **Produção** é a última tag `v*.*.*` na `main`. Antes da primeira tag não há o
+  que corrigir com hotfix: bugs vão em `fix/*`.
+- `main` e `develop` são protegidas por um ruleset: não podem ser apagadas, não
+  aceitam force push e só mudam por PR.
 
 ---
 
@@ -85,10 +92,12 @@ e [`../.devcontainer/README.pt-BR.md`](../.devcontainer/README.pt-BR.md).
    ([bug](ISSUE_TEMPLATE/bug_report.yml) ·
    [feature](ISSUE_TEMPLATE/feature_request.yml) ·
    [task](ISSUE_TEMPLATE/task.yml)). Issues em branco estão desativadas.
-2. Um mantenedor faz a triagem, aplica labels e coloca no board do
-   **GitHub Projects** (`Triage → Todo → In progress → In review → Done`).
-   Preencha a chave `projects:` em cada formulário quando o board existir.
-3. Pegue um card em **Todo**, se atribua, mova para **In progress**.
+2. Um mantenedor aplica labels e adiciona a issue ao
+   [board do GitHub Projects](https://github.com/users/CarlosNeto-dev/projects/3)
+   (`To do` → `In Progress` → `In Review` → `Done`; `Canceled` para trabalho
+   descartado). Os formulários ainda não colocam a issue no board sozinhos: a
+   chave `projects:` deles está comentada.
+3. Pegue um card em **To do**, se atribua, mova para **In Progress**.
 4. Seu PR fecha a issue: coloque `Closes #<id>` na descrição. O merge move o card
    para **Done** automaticamente.
 
@@ -104,7 +113,8 @@ git switch -c feature/1234-cena-lobby
 
 # ...trabalhe, commitando aos poucos...
 
-pnpm lint && pnpm typecheck && pnpm test && pnpm build
+# dentro do dev-container; ainda não existe script de lint nem de teste
+pnpm typecheck && pnpm build
 
 git push -u origin feature/1234-cena-lobby
 # abra o PR no GitHub, base = develop, preencha o template
@@ -114,8 +124,13 @@ git push -u origin feature/1234-cena-lobby
 
 - A branch base é **`develop`** (só PRs de release miram `main`).
 - O checklist do [template de PR](PULL_REQUEST_TEMPLATE.md) deve estar completo.
-- Pelo menos uma aprovação de **[CODEOWNERS](CODEOWNERS)**.
-- Todos os checks verdes. Squash-merge; o título do PR vira a linha de changelog.
+- Um dono do **[CODEOWNERS](CODEOWNERS)** (o Neto) revisa todo PR. O ruleset
+  só obriga que a mudança chegue por PR (0 aprovações exigidas), então isso é
+  uma regra do time, não um bloqueio do GitHub.
+- Não há checks no PR: a CI só roda com uma tag `v*.*.*`. Rode os comandos acima
+  antes do push. Squash-merge; o título do PR vira a linha de changelog.
+  **Exceção:** PRs de release, e PRs que sincronizam a `main` com a `develop`,
+  usam **"Create a merge commit"**. Um squash ali faz as duas branches divergirem.
 - Atualize a documentação — `README.md` **e** `README.pt-BR.md` — no mesmo PR.
 - Rode [`scripts/check-docs.sh`](../scripts/check-docs.sh) se mexeu em algum
   diagrama Mermaid.
@@ -134,7 +149,17 @@ mudança que quebra compatibilidade.
 <!-- diagram (sequenceDiagram) removed on request — to be re-added later -->
 
 ```bash
-# em main, depois que o PR de release entrou:
+# 1. corte a branch de release a partir da develop
+git switch develop && git pull upstream develop
+git switch -c release/v1.2.0
+# teste em todos os dispositivos; aqui só entram correções e docs
+git push -u origin release/v1.2.0
+# abra um PR: base = main, mescle com "Create a merge commit"
+
+# 2. traga a release de volta para a develop
+#    (abra um PR main -> develop, também com merge commit)
+
+# 3. em main, depois que o PR de release entrou:
 git switch main && git pull upstream main
 git tag v1.2.0
 git push upstream v1.2.0        # ← único gatilho do GitHub Actions
