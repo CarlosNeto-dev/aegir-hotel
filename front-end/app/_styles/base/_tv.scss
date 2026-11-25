@@ -1,0 +1,29 @@
+// A landing da TV (LandingScreen escreve data-tv-landing no <html>): a tela
+// inteira é o coverflow, então a página não rola. Sem rolagem, também não
+// precisa guardar o espaço da barra de rolagem (o _reset.scss guarda), que
+// cortava os cartões na beirada da direita.
+:root[data-tv-landing] {
+  overflow: hidden;
+  scrollbar-gutter: auto;
+}
+
+// --u é a régua da landing da TV: 1% da largura de um quadro 16:9 que cabe
+// inteiro na tela. Numa TV (16:9) é igual a 1vw; numa janela larga e baixa,
+// a altura manda e nada sai para fora.
+:root {
+  --u: min(1vw, 1.7778vh);
+}
+
+// O "Tamanho do texto" dos Ajustes também vale na TV: as medidas de texto da
+// landing da TV são multiplicadas por --tv-text.
+:root {
+  --tv-text: 1;
+}
+
+:root[data-text-size="large"] {
+  --tv-text: 1.12;
+}
+
+:root[data-text-size="larger"] {
+  --tv-text: 1.24;
+}

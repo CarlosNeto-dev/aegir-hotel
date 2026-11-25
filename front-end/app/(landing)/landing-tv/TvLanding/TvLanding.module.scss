@@ -1,0 +1,92 @@
+// A landing da TV usa as cores do tema (papel e tinta): o botão de tema claro
+// e escuro vale aqui também. Os textos crescem com --tv-text (Tamanho do texto).
+.root {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background: var(--color-paper);
+  color: var(--color-ink);
+}
+
+// Tudo fica dentro de um quadro 16:9 no meio da tela (medido em --u). O fundo
+// (.root) continua ocupando a tela inteira.
+.frame {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: calc(100 * var(--u));
+  height: calc(56.25 * var(--u));
+  translate: -50% -50%;
+}
+
+.brand {
+  position: absolute;
+  top: calc(3 * var(--u));
+  left: calc(4 * var(--u));
+  z-index: 3;
+  font: 400 calc(1.8 * var(--u))/1 var(--font-title);
+  letter-spacing: 0.45em;
+  text-transform: uppercase;
+}
+
+.home {
+  position: absolute;
+  inset: 0;
+}
+
+// O texto da seção escolhida, centralizado em cima do arco.
+.copy {
+  position: absolute;
+  top: calc(5.6 * var(--u));
+  right: 0;
+  left: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(1 * var(--u));
+  padding-inline: calc(12 * var(--u));
+  text-align: center;
+}
+
+.kicker {
+  color: var(--color-grey);
+  font: 500 calc(calc(0.95 * var(--u)) * var(--tv-text)) / 1 var(--font-mono);
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+}
+
+.title {
+  font: 400 calc(calc(4.2 * var(--u)) * var(--tv-text)) / 1.05 var(--font-title);
+  text-wrap: balance;
+}
+
+.text {
+  max-width: calc(50 * var(--u));
+  color: color-mix(in srgb, var(--color-ink) 78%, var(--color-paper));
+  font: 400 calc(calc(1.35 * var(--u)) * var(--tv-text)) / 1.45 var(--font-body);
+}
+
+.hint {
+  position: absolute;
+  right: 0;
+  bottom: calc(2.2 * var(--u));
+  left: 0;
+  z-index: 3;
+  display: flex;
+  justify-content: center;
+  gap: calc(2.4 * var(--u));
+  color: var(--color-grey);
+  font: 600 calc(calc(0.8 * var(--u)) * var(--tv-text)) / 1 var(--font-mono);
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+
+// Na página da seção a faixa curva fica embaixo: a dica sobe para o canto.
+.root[data-inside] .hint {
+  top: calc(3.3 * var(--u));
+  right: calc(4 * var(--u));
+  bottom: auto;
+  left: auto;
+}
