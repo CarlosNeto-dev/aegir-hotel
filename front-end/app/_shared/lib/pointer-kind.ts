@@ -22,38 +22,40 @@ const TV_QUERY = "(min-width: 2560px)";
  * do modelo (AFTMM, AFTKA...), e não palavras como "after".
  */
 const TV_USER_AGENT_MARKERS: readonly string[] = [
-  // Modelos Genéricos
+  // Genéricos: o padrão HbbTV, o termo "smart tv" e o navegador Opera TV
   "hbbtv", "smarttv", "smart tv", "opera tv",
 
-  // Modelos Samsung
+  // Samsung: o navegador da TV se apresenta como "SMART-TV"
   "smart-tv",
 
-  // Modelos LG
+  // LG: os sistemas webOS e NetCast
   "web0s", "netcast",
 
-  // Modelos Google / Android TV
+  // Google: os sistemas Android TV e Google TV
   "android tv", "googletv",
 
-  // Modelos Sony
+  // Sony: a linha de TVs Bravia
   "bravia",
 
-  // Modelos Xiaomi
+  // Xiaomi: as linhas de aparelhos Mi TV e Mi Box
   "mitv", "mibox",
 
-  // Modelos Amazon Fire TV
+  // Amazon Fire TV: o começo do código de modelo (AFTMM, AFTKA...)
   "; aft",
 
-  // Modelos Chromecast
+  // Chromecast: o aparelho se apresenta como "CrKey"
   "crkey",
 
-  // Modelos Firefox rodando em TV
+  // Firefox OS: o sistema das TVs que rodavam Firefox
   "tv; rv:",
 ];
 
 /*
  * O aparelho é uma TV? Sim quando o user agent traz um dos marcadores acima, ou
- * quando não há ponteiro nem toque (só o controle de setas). A largura da tela
- * não entra: a TV costuma ter menos pixels CSS que um monitor grande.
+ * quando não há ponteiro nem toque (só o controle de setas). O
+ * "(pointer: none)" olha só o ponteiro principal, o que o navegador escolhe
+ * como entrada primária; o "any-pointer" olharia todos. A largura da tela não
+ * entra: a TV costuma ter menos pixels CSS que um monitor grande.
  * Só chame no navegador (dentro de um useEffect ou de um evento): no servidor
  * não há aparelho para ler, e a resposta não bateria com a do navegador na
  * hidratação. Limitação conhecida: um PC sem mouse também cai na segunda regra.
