@@ -28,8 +28,9 @@ Current state (checked 2026-11-24):
 ## Working with the owner (Neto, `@CarlosNeto-dev`)
 
 - Reply in **Portuguese (pt-BR)**. Use short blocks and explain from the root.
-- **Never commit or push.** The owner commits himself. Never add a
-  `Co-Authored-By` or any other Claude trailer to a commit message or PR.
+- **Commit or push only after Neto approves** the exact files, message and
+  branch. Never add a `Co-Authored-By` or any other Claude trailer to a commit
+  message or PR.
 - On-screen text is Portuguese. The **site** must never say the hotel is
   fictional. The repo READMEs may say so.
 - Ask before installing a dependency, adding a service or changing Docker, CI,
